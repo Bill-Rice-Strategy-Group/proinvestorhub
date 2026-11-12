@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { HoneypotInput } from '@/components/honeypot-input'
+import { track } from '@/lib/track'
 
 type Offer = {
   id: string
@@ -49,13 +50,10 @@ export function CalculatorCTA({
       if (res.ok) {
         setEmailSent(true)
         setEmail('')
-        if (typeof window !== 'undefined' && 'dataLayer' in window) {
-          ;(window as unknown as { dataLayer: Record<string, unknown>[] }).dataLayer.push({
-            event: 'newsletter_signup',
-            signup_location: context || 'calculator',
-            email_domain: email.split('@')[1],
-          })
-        }
+        track('newsletter_signup', {
+          signup_location: context || 'calculator',
+          email_domain: email.split('@')[1],
+        })
       }
     } catch {
       // Silently fail — don't interrupt calculator UX
@@ -127,16 +125,13 @@ export function CalculatorCTA({
               href={offer.href || '#'}
               className="block rounded-lg border border-accent/30 bg-accent/5 p-4 hover:bg-accent/10 transition-colors group"
               onClick={() => {
-                if (typeof window !== 'undefined' && 'dataLayer' in window) {
-                  ;(window as unknown as { dataLayer: Record<string, unknown>[] }).dataLayer.push({
-                    event: 'cta_click',
-                    cta_type: offer.type,
-                    cta_id: offer.id,
-                    cta_text: offer.cta,
-                    cta_url: offer.href || '',
-                    cta_location: context || 'calculator',
-                  })
-                }
+                track('cta_click', {
+                  cta_type: offer.type,
+                  cta_id: offer.id,
+                  cta_text: offer.cta,
+                  cta_url: offer.href || '',
+                  cta_location: context || 'calculator',
+                })
               }}
             >
               <p className="text-sm font-semibold text-text group-hover:text-primary transition-colors">

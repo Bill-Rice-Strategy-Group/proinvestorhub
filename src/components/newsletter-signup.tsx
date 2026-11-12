@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import type { ExperienceLevel } from '@/app/api/newsletter/route'
 import { HoneypotInput } from '@/components/honeypot-input'
+import { track } from '@/lib/track'
 
 type Variant = 'inline' | 'card' | 'banner'
 
@@ -40,14 +41,11 @@ export function NewsletterSignup({
       if (res.ok) {
         setStatus('success')
         setStep('done')
-        if (typeof window !== 'undefined' && 'dataLayer' in window) {
-          ;(window as unknown as { dataLayer: Record<string, unknown>[] }).dataLayer.push({
-            event: 'newsletter_signup',
-            email_domain: email.split('@')[1],
-            experience_level: experience || 'skipped',
-            signup_source: source,
-          })
-        }
+        track('newsletter_signup', {
+          email_domain: email.split('@')[1],
+          experience_level: experience || 'skipped',
+          signup_source: source,
+        })
       } else {
         setStatus('error')
         setStep('email')

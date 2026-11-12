@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { copyShareLink } from '@/lib/calculator-utils'
+import { track } from '@/lib/track'
 
 interface CalculatorActionsProps {
   calculatorPath: string
@@ -23,23 +24,17 @@ export function CalculatorActions({
       setTimeout(() => setCopied(false), 2000)
     }
 
-    if (typeof window !== 'undefined' && 'dataLayer' in window) {
-      ;(window as unknown as { dataLayer: Record<string, unknown>[] }).dataLayer.push({
-        event: 'calculator_interaction',
-        action: 'share_link',
-        calculator: calculatorName,
-      })
-    }
+    track('calculator_interaction', {
+      action: 'share_link',
+      calculator: calculatorName,
+    })
   }
 
   const handlePrint = () => {
-    if (typeof window !== 'undefined' && 'dataLayer' in window) {
-      ;(window as unknown as { dataLayer: Record<string, unknown>[] }).dataLayer.push({
-        event: 'calculator_interaction',
-        action: 'download_pdf',
-        calculator: calculatorName,
-      })
-    }
+    track('calculator_interaction', {
+      action: 'download_pdf',
+      calculator: calculatorName,
+    })
     window.print()
   }
 

@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { HoneypotInput } from '@/components/honeypot-input'
+import { track } from '@/lib/track'
 
 type Variant = 'inline' | 'card' | 'banner'
 
@@ -25,15 +26,12 @@ export function LeadMagnetCTA({
 
     setStatus('loading')
 
-    // Push dataLayer event
-    if (typeof window !== 'undefined' && 'dataLayer' in window) {
-      ;(window as unknown as { dataLayer: Record<string, unknown>[] }).dataLayer.push({
-        event: 'cta_click',
-        type: 'lead_magnet',
-        lead_magnet: 'deal-analysis-checklist',
-        email_domain: email.split('@')[1],
-      })
-    }
+    // Click on the lead-magnet submit (fires before the API call)
+    track('cta_click', {
+      type: 'lead_magnet',
+      lead_magnet: 'deal-analysis-checklist',
+      email_domain: email.split('@')[1],
+    })
 
     try {
       const res = await fetch('/api/newsletter', {
@@ -44,6 +42,12 @@ export function LeadMagnetCTA({
       if (res.ok) {
         setStatus('success')
         setEmail('')
+        track('generate_lead', {
+          lead_type: 'deal_analysis_checklist',
+          form_location: `lead_magnet_cta_${variant}`,
+        })
+        // the checklist is delivered through /api/newsletter, so it is also a subscription
+        track('newsletter_signup', { signup_source: 'lead_magnet_cta' })
       } else {
         setStatus('error')
       }

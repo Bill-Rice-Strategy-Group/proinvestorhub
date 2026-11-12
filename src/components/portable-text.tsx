@@ -10,6 +10,7 @@ import { NewsletterSignup } from '@/components/newsletter-signup'
 import { CalculatorCTA } from '@/components/calculator-cta'
 import type { BPVertical } from '@/lib/partner-links'
 import { useGlossaryLinker } from '@/lib/glossary-linker'
+import { track } from '@/lib/track'
 
 /** Extract plain text from a Portable Text block's span children */
 function blockToText(value: { children?: { text?: string }[] }): string {
@@ -18,15 +19,12 @@ function blockToText(value: { children?: { text?: string }[] }): string {
 }
 
 function trackCtaClick(href: string, text: string) {
-  if (typeof window !== 'undefined' && 'dataLayer' in window) {
-    ;(window as unknown as { dataLayer: Record<string, unknown>[] }).dataLayer.push({
-      event: 'cta_click',
-      cta_type: href.startsWith('http') ? 'outbound' : 'internal',
-      cta_url: href,
-      cta_text: text,
-      cta_location: 'content',
-    })
-  }
+  track('cta_click', {
+    cta_type: href.startsWith('http') ? 'outbound' : 'internal',
+    cta_url: href,
+    cta_text: text,
+    cta_location: 'content',
+  })
 }
 
 const components: PortableTextComponents = {

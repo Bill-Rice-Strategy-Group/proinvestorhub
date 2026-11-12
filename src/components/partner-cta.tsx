@@ -2,6 +2,7 @@
 
 import { usePathname } from 'next/navigation'
 import { buildBPLink, BP_VERTICALS, type BPVertical } from '@/lib/partner-links'
+import { track } from '@/lib/track'
 
 function trackBPClick({
   vertical,
@@ -14,16 +15,13 @@ function trackBPClick({
   slug: string
   url: string
 }) {
-  if (typeof window !== 'undefined' && 'dataLayer' in window) {
-    ;(window as unknown as { dataLayer: Record<string, unknown>[] }).dataLayer.push({
-      event: 'bp_referral_click',
-      bp_vertical: vertical,
-      cta_placement: placement,
-      article_slug: slug,
-      destination_url: url,
-      cta_type: 'outbound',
-    })
-  }
+  track('bp_referral_click', {
+    bp_vertical: vertical,
+    cta_placement: placement,
+    article_slug: slug,
+    destination_url: url,
+    cta_type: 'outbound',
+  })
 }
 
 function slugFromPath(pathname: string): string {

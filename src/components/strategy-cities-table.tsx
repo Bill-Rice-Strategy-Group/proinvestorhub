@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import type { CityWithScore } from '@/data/market-strategies'
+import { track } from '@/lib/track'
 
 type SortKey = 'score' | 'city' | 'avgCapRate' | 'medianHomePrice' | 'medianRent' | 'rentToPrice' | 'populationGrowth'
 type SortDir = 'asc' | 'desc'
@@ -53,13 +54,10 @@ export function StrategyCitiesTable({
   }, [cities, sortKey, sortDir])
 
   function trackEvent(action: string, detail: Record<string, unknown>) {
-    if (typeof window !== 'undefined' && 'dataLayer' in window) {
-      ;(window as unknown as { dataLayer: Record<string, unknown>[] }).dataLayer.push({
-        event: 'markets_interaction',
-        action,
-        ...detail,
-      })
-    }
+    track('markets_interaction', {
+      action,
+      ...detail,
+    })
   }
 
   function handleSort(key: SortKey) {

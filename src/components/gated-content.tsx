@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { trackLeadCapture } from '@/lib/tracking'
 import { HoneypotInput } from '@/components/honeypot-input'
+import { track } from '@/lib/track'
 
 const STORAGE_KEY = 'pih_content_unlocked'
 
@@ -41,6 +42,9 @@ export function GatedContent({
 
       if (res.ok) {
         trackLeadCapture('lead-magnet', email.split('@')[1] || '')
+        track('generate_lead', { lead_type: 'gated_content', form_location: 'gated_content' })
+        // the unlock goes through /api/newsletter, so it is also a subscription
+        track('newsletter_signup', { signup_source: 'gated_content' })
         localStorage.setItem(STORAGE_KEY, 'true')
         setUnlocked(true)
       } else {

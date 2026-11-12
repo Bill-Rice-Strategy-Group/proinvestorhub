@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { trackLeadCapture, trackCtaDismiss, trackCtaImpression } from '@/lib/tracking'
 import { HoneypotInput } from '@/components/honeypot-input'
+import { track } from '@/lib/track'
 
 const STORAGE_KEY = 'pih_exit_intent'
 const COOLDOWN_MS = 7 * 24 * 60 * 60 * 1000 // 7 days
@@ -99,6 +100,12 @@ export function ExitIntentModal() {
 
       if (res.ok) {
         trackLeadCapture('exit-intent', email.split('@')[1] || '')
+        track('generate_lead', {
+          lead_type: 'deal_analysis_checklist',
+          form_location: 'exit_intent_modal',
+        })
+        // the checklist is delivered through /api/newsletter, so it is also a subscription
+        track('newsletter_signup', { signup_source: 'exit-intent' })
         setStatus('success')
         setCooldown()
       } else {
