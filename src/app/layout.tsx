@@ -1,11 +1,7 @@
 import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import { SanityLive } from '@/sanity/lib/live'
-import {
-  GoogleTagManager,
-  GoogleTagManagerNoscript,
-  GoogleAnalytics,
-} from '@/components/analytics'
+import { GoogleAnalytics } from '@/components/analytics'
 import './globals.css'
 
 const geistSans = Geist({
@@ -68,13 +64,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <GoogleTagManager />
         <GoogleAnalytics />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <GoogleTagManagerNoscript />
         {children}
         <SanityLive />
       </body>

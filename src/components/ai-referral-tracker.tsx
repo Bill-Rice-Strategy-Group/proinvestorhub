@@ -1,17 +1,18 @@
 'use client'
 
 import { useEffect } from 'react'
+import { track } from '@/lib/track'
 
 /**
  * AI-referral tracker.
  *
  * Answer engines (ChatGPT, Perplexity, Claude, Gemini, Copilot) send referral
  * traffic that GA4 otherwise buckets as "Direct" — so every AEO win looks like
- * nothing. This fires a `ai_referral` dataLayer event once per session when the
- * landing referrer is a known AI host, giving GTM/GA4 a signal to build a
+ * nothing. This fires an `ai_referral` GA4 event once per session when the
+ * landing referrer is a known AI host, giving GA4 a signal to build a
  * first-class "AI Assistant" channel and attribute report traffic correctly.
  *
- * Pure measurement: reads document.referrer, writes one dataLayer event. No
+ * Pure measurement: reads document.referrer, sends one GA4 event. No
  * network, no PII, no cookies beyond a sessionStorage de-dupe flag.
  */
 
@@ -42,10 +43,7 @@ export function AiReferralTracker() {
       if (!match) return
 
       sessionStorage.setItem(SESSION_KEY, '1')
-      const w = window as unknown as { dataLayer?: Record<string, unknown>[] }
-      w.dataLayer = w.dataLayer || []
-      w.dataLayer.push({
-        event: 'ai_referral',
+      track('ai_referral', {
         ai_source: match[1],
         ai_referrer_host: host,
         landing_page: window.location.pathname,

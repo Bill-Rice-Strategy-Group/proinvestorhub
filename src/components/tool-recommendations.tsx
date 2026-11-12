@@ -7,18 +7,16 @@ import {
   getToolsForContext,
   type ToolSlug,
 } from '@/lib/tool-links'
+import { track } from '@/lib/track'
 
 function trackToolClick(tool: string, placement: string, pageSlug: string, url: string) {
-  if (typeof window !== 'undefined' && 'dataLayer' in window) {
-    ;(window as unknown as { dataLayer: Record<string, unknown>[] }).dataLayer.push({
-      event: 'tool_referral_click',
-      tool_name: tool,
-      cta_placement: placement,
-      page_slug: pageSlug,
-      destination_url: url,
-      cta_type: 'outbound',
-    })
-  }
+  track('tool_referral_click', {
+    tool_name: tool,
+    cta_placement: placement,
+    page_slug: pageSlug,
+    destination_url: url,
+    cta_type: 'outbound',
+  })
 }
 
 function slugFromPath(pathname: string): string {

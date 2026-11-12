@@ -8,9 +8,11 @@
  *   utm_content={placement} (e.g. "profile-cta", "comparison-table", "finder-result")
  *   utm_term={lender-slug}
  *
- * GA4 events pushed via dataLayer:
+ * GA4 events sent via track() (src/lib/track.ts):
  *   lender_cta_click — any outbound click to a lender website
  */
+
+import { track } from '@/lib/track'
 
 export type LenderCTAPlacement =
   | 'profile-cta'        // Main CTA on /lenders/reviews/[slug]
@@ -64,17 +66,14 @@ export function trackLenderClick({
   state?: string
   editorRating?: number
 }) {
-  if (typeof window !== 'undefined' && 'dataLayer' in window) {
-    ;(window as unknown as { dataLayer: Record<string, unknown>[] }).dataLayer.push({
-      event: 'lender_cta_click',
-      lender_name: lenderName,
-      lender_slug: lenderSlug,
-      cta_placement: placement,
-      destination_url: destinationUrl,
-      loan_type: loanType || '',
-      state: state || '',
-      editor_rating: editorRating || 0,
-      cta_type: 'outbound',
-    })
-  }
+  track('lender_cta_click', {
+    lender_name: lenderName,
+    lender_slug: lenderSlug,
+    cta_placement: placement,
+    destination_url: destinationUrl,
+    loan_type: loanType || '',
+    state: state || '',
+    editor_rating: editorRating || 0,
+    cta_type: 'outbound',
+  })
 }

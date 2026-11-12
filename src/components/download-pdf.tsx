@@ -4,17 +4,16 @@
  * Print-to-PDF button. Uses window.print() with a print-optimized stylesheet.
  * No extra dependencies needed — the browser handles PDF generation.
  */
+import { track } from '@/lib/track'
+
 export function DownloadPDF({ label }: { label?: string }) {
   return (
     <button
       onClick={() => {
-        if (typeof window !== 'undefined' && 'dataLayer' in window) {
-          ;(window as unknown as { dataLayer: Record<string, unknown>[] }).dataLayer.push({
-            event: 'markets_interaction',
-            action: 'download_pdf',
-            page: window.location.pathname,
-          })
-        }
+        track('markets_interaction', {
+          action: 'download_pdf',
+          page: window.location.pathname,
+        })
         window.print()
       }}
       className="inline-flex items-center gap-2 rounded-lg border border-primary px-4 py-2 text-sm font-semibold text-primary hover:bg-primary/5 transition-colors print:hidden"
