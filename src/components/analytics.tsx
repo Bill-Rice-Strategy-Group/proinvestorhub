@@ -43,7 +43,12 @@ export function GoogleAnalytics() {
           run during HTML parse, before hydration. Events that components fire
           on mount (e.g. ai_referral) therefore queue behind the config command
           instead of ahead of it. gtag.js loads afterInteractive and drains the
-          queue. */}
+          queue.
+          navigator.webdriver is true in automated browsers (headless Chrome,
+          Puppeteer, Playwright, Selenium). They run JavaScript, carry no
+          referrer, and GA4's known-bot list does not catch them, so they land
+          as "Direct" sessions. Without a config command gtag.js sends nothing
+          for them; real visitors' browsers never set the flag. */}
       <script
         id="ga4-init"
         dangerouslySetInnerHTML={{
@@ -51,7 +56,7 @@ export function GoogleAnalytics() {
 function gtag(){dataLayer.push(arguments);}
 window.gtag=gtag;
 gtag('js',new Date());
-if(location.hostname==='${PROD_HOST}'){gtag('config','${GA4_MEASUREMENT_ID}');}`,
+if(location.hostname==='${PROD_HOST}'&&!navigator.webdriver){gtag('config','${GA4_MEASUREMENT_ID}');}`,
         }}
       />
       <Script
