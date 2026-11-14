@@ -228,6 +228,12 @@ export default function MortgageCalculatorPage() {
             Cash-on-Cash Return
           </Link>
           <Link
+            href="/calculators/cap-rate"
+            className="rounded-lg border border-primary/20 px-4 py-2 text-sm font-medium text-primary hover:bg-primary/5 transition-colors"
+          >
+            Cap Rate Calculator
+          </Link>
+          <Link
             href="/calculators/rental-cashflow"
             className="rounded-lg border border-primary/20 px-4 py-2 text-sm font-medium text-primary hover:bg-primary/5 transition-colors"
           >
