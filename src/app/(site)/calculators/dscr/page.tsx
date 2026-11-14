@@ -186,6 +186,7 @@ export default function DscrPage() {
         tools={[
           { label: 'Mortgage / DSCR Payment', href: '/calculators/mortgage' },
           { label: 'Cash-on-Cash Return', href: '/calculators/cash-on-cash' },
+          { label: 'Cap Rate Calculator', href: '/calculators/cap-rate' },
           { label: 'Financing Matcher', href: '/financing/matcher' },
           { label: 'Compare DSCR Lenders', href: '/lenders/dscr-loans', muted: true },
         ]}

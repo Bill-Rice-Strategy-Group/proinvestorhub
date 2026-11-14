@@ -332,6 +332,50 @@ export const lenderComparisons: LenderComparison[] = [
     angle: 'These two share an unusual model — both originate fix-and-flip loans and let outside investors fund them as notes. Groundfloor is the more accessible entry point: a 600 credit floor and a retail-investor notes product make it friendlier to newer flippers and small-dollar backers. Upright sets a 640 floor but pushes higher leverage (up to ~85% of purchase) and is built around experienced flippers and accredited note investors. Choose Groundfloor if credit or accessibility is the constraint; choose Upright to maximize leverage once you have flips under your belt.',
     sharedLoanTypes: ['fix-and-flip-loans'],
   },
+
+  // ── Brand-name head-to-heads, batch 3 (added 2026-11-14) ──
+  //    Every figure below is read from src/data/lenders.ts; sharedLoanTypes are
+  //    the true intersection of the two lenders' loanTypeSlugs.
+  {
+    slug: 'civic-financial-vs-roc-capital',
+    lenderA: 'civic-financial',
+    lenderB: 'roc-capital',
+    title: 'Civic Financial vs Roc Capital: Two Roc360 Brands Compared',
+    metaTitle: 'Civic Financial vs Roc Capital 2026: Same Parent? | ProInvestorHub',
+    metaDescription: 'Civic Financial vs Roc Capital — both are now Roc360 brands. Compare credit floors (640 vs 620), starting rates, property types, and loan sizes side by side.',
+    angle: 'These are sibling brands, not rivals: Roc360, the holding company behind Roc Capital, acquired Civic\'s origination business in 2023. The two offer the same product set — hard money, fix-and-flip, bridge, and DSCR — with the same $75K-$5M loan range and 10-21 day closings. Roc Capital has the lower credit floor (620 vs 640) and a lower starting rate (7% vs 7.5%), and often reaches borrowers through brokers given its wholesale focus. Civic adds mixed-use eligibility. Get a quote from whichever channel reaches you first, but don\'t treat a second quote from the other brand as a truly independent comparison.',
+    sharedLoanTypes: ['hard-money-loans', 'fix-and-flip-loans', 'bridge-loans', 'dscr-loans'],
+  },
+  {
+    slug: 'kiavi-vs-roc-capital',
+    lenderA: 'kiavi',
+    lenderB: 'roc-capital',
+    title: 'Kiavi vs Roc Capital: Digital Platform vs Credit Flexibility',
+    metaTitle: 'Kiavi vs Roc Capital 2026: Rates, Credit & Loan Size | ProInvestorHub',
+    metaDescription: 'Kiavi vs Roc Capital compared. Fix-and-flip, bridge, and DSCR loans — credit floors (640 vs 620), starting rates, max loan size, and property types side by side.',
+    angle: 'Both fund fix-and-flip, bridge, and DSCR loans and close in 10-21 days. Kiavi starts lower (6.5% vs 7%), runs a fully digital platform, and needs no experience, but sticks to 1-4 unit residential with a $3M cap and a $100K minimum. Roc Capital accepts lower credit (620 vs 640), adds hard money and multifamily, lends from $75K up to $5M, and is often reached through a broker given its wholesale focus, though its platform is less polished. Choose Kiavi for streamlined 1-4 unit deals; Roc Capital for tighter credit, smaller or larger loans, or multifamily.',
+    sharedLoanTypes: ['dscr-loans', 'fix-and-flip-loans', 'bridge-loans'],
+  },
+  {
+    slug: 'lima-one-vs-visio-lending',
+    lenderA: 'lima-one-capital',
+    lenderB: 'visio-lending',
+    title: 'Lima One Capital vs Visio Lending: DSCR Loans Compared',
+    metaTitle: 'Lima One vs Visio Lending 2026: DSCR Rental Loans | ProInvestorHub',
+    metaDescription: 'Lima One Capital vs Visio Lending for DSCR rental loans. Full-service lender vs DSCR-only specialist — credit floors (660 vs 680), prepayment terms, and speed.',
+    angle: 'For a DSCR rental loan, this is full-service lender vs specialist. Lima One accepts a lower credit floor (660 vs 680), closes faster (14-21 vs 21-30 days), uses a shorter 3-2-1 prepayment step-down, offers foreign national programs, and can also fund your flip, bridge, or construction loan. Visio does only DSCR, carries a 5-year step-down prepayment penalty and a 680 floor, but it was one of the first lenders built around DSCR loans, is one of the most established DSCR options on this site, and starts lower (6.5% vs 7%). Choose Lima One if you want one lender across strategies or need a shorter prepay; Visio if you are a pure buy-and-hold investor planning to keep the property.',
+    sharedLoanTypes: ['dscr-loans'],
+  },
+  {
+    slug: 'rcn-capital-vs-civic-financial',
+    lenderA: 'rcn-capital',
+    lenderB: 'civic-financial',
+    title: 'RCN Capital vs Civic Financial: Credit Flexibility vs Loan Size',
+    metaTitle: 'RCN Capital vs Civic Financial 2026: Rates & Terms | ProInvestorHub',
+    metaDescription: 'RCN Capital vs Civic Financial for flip, bridge, and DSCR loans. Credit floors (620 vs 640), starting rates, foreign national options, and max loan size compared.',
+    angle: 'Both offer fix-and-flip, bridge, and DSCR loans from $75K. RCN Capital is the more accessible pick: a 620 credit floor, a lower starting rate (6.5% vs 7.5%), and foreign national programs. Civic Financial, now part of the Roc360 group, goes bigger — loans up to $5M (vs RCN\'s $2.5M), hard money, and mixed-use eligibility — and can close a little faster (10-21 vs 14-21 days). Choose RCN for credit flexibility or a foreign-national loan; Civic for larger or mixed-use deals.',
+    sharedLoanTypes: ['fix-and-flip-loans', 'bridge-loans', 'dscr-loans'],
+  },
 ]
 
 export function getComparisonBySlug(slug: string): LenderComparison | undefined {

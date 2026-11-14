@@ -144,6 +144,7 @@ export default function SellVsRentPage() {
 
       <CalculatorRelatedTools
         tools={[
+          { label: 'Cap Rate Calculator', href: '/calculators/cap-rate' },
           { label: 'Refinance Calculator', href: '/calculators/refinance' },
           { label: 'Investment Property HELOC', href: '/calculators/heloc' },
           { label: '1031 Exchange Tax Savings', href: '/calculators/1031-exchange' },

@@ -148,6 +148,7 @@ export default function ClosingCostsPage() {
           { label: 'Cash-on-Cash Return', href: '/calculators/cash-on-cash' },
           { label: 'Mortgage Points', href: '/calculators/mortgage-points' },
           { label: 'Rental Cash Flow', href: '/calculators/rental-cashflow' },
+          { label: 'Cap Rate Calculator', href: '/calculators/cap-rate' },
         ]}
       />
     </div>

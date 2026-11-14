@@ -148,6 +148,7 @@ export default function DepreciationPage() {
         tools={[
           { label: '1031 Exchange Tax Savings', href: '/calculators/1031-exchange' },
           { label: 'Rental Cash Flow', href: '/calculators/rental-cashflow' },
+          { label: 'Cap Rate Calculator', href: '/calculators/cap-rate' },
           { label: 'Cash-on-Cash Return', href: '/calculators/cash-on-cash' },
           { label: 'Sell vs. Rent', href: '/calculators/sell-vs-rent' },
         ]}

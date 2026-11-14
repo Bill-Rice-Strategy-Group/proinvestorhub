@@ -9,14 +9,49 @@ import { cities } from '@/data/cap-rate-cities'
 export const metadata: Metadata = {
   title: 'Cap Rate Calculator + Formula: How to Calculate Cap Rate',
   description:
-    'Free cap rate calculator plus the cap rate formula and a step-by-step example. Calculate the capitalization rate of any rental property instantly and learn how to do it by hand. No sign-up required.',
+    'Free cap rate calculator: Cap Rate = NOI ÷ Purchase Price × 100. Get any rental property\'s capitalization rate instantly, plus a worked example and FAQ.',
   alternates: { canonical: '/calculators/cap-rate' },
   openGraph: {
-    title: 'Cap Rate Calculator | ProInvestorHub',
+    title: 'Cap Rate Calculator + Formula | ProInvestorHub',
     description:
-      'Free cap rate calculator for real estate investors. Analyze deals in seconds.',
+      'Free cap rate calculator: Cap Rate = NOI ÷ Purchase Price × 100. Instant results, a worked example, and what counts as a good cap rate.',
   },
 }
+
+// One source for both the visible FAQ and the FAQPage JSON-LD, so the
+// structured data can never describe answers the page does not show.
+const capRateFaqs = [
+  {
+    question: 'What is the cap rate formula?',
+    answer:
+      'Cap Rate = Net Operating Income (NOI) / Purchase Price × 100. NOI is your annual rental income minus all operating expenses (property taxes, insurance, maintenance, management) but excluding mortgage payments.',
+  },
+  {
+    question: 'How do you calculate cap rate?',
+    answer:
+      'Calculate net operating income (NOI) by subtracting annual operating expenses and a vacancy allowance from gross rental income, then divide NOI by the purchase price and multiply by 100. For example, $21,000 NOI on a $300,000 property is a 7.0% cap rate.',
+  },
+  {
+    question: 'What is a good cap rate for rental property?',
+    answer:
+      'A "good" cap rate depends on your market and strategy. In gateway cities like San Francisco or New York, 3-5% is typical. In secondary markets, 5-7% is common. Cash-flow-focused investors in the Midwest or South often target 7-10%.',
+  },
+  {
+    question: 'Is a higher cap rate better?',
+    answer:
+      'Not automatically. A higher cap rate means more net operating income per dollar of purchase price, which is why cash-flow investors favor 7-10% markets. But cap rates of 10% and above are most common in high-risk or distressed areas, so a high number can be the market pricing in risk. Compare cap rates within the same market and property type.',
+  },
+  {
+    question: 'Does cap rate include mortgage payments?',
+    answer:
+      'No. Cap rate measures the unlevered return on a property — it ignores how you finance the purchase. This makes it useful for comparing properties regardless of financing. Use cash-on-cash return to factor in your mortgage.',
+  },
+  {
+    question: 'What is the difference between cap rate and cash-on-cash return?',
+    answer:
+      'Cap rate ignores financing and tells you how the property performs regardless of how you pay for it. Cash-on-cash return factors in your mortgage and tells you how your invested cash is performing. Use cap rate to compare properties and cash-on-cash to evaluate a specific deal with your financing.',
+  },
+]
 
 export default function CapRateCalculatorPage() {
   const baseUrl =
@@ -40,28 +75,7 @@ export default function CapRateCalculatorPage() {
         ])}
       />
       <JsonLd
-        data={faqJsonLd([
-          {
-            question: 'What is a good cap rate for rental property?',
-            answer:
-              'A "good" cap rate depends on your market and strategy. In gateway cities like San Francisco or New York, 3-5% is typical. In secondary markets, 5-7% is common. Cash-flow-focused investors in the Midwest or South often target 7-10%.',
-          },
-          {
-            question: 'What is the cap rate formula?',
-            answer:
-              'Cap Rate = Net Operating Income (NOI) / Purchase Price × 100. NOI is your annual rental income minus all operating expenses (property taxes, insurance, maintenance, management) but excluding mortgage payments.',
-          },
-          {
-            question: 'Does cap rate include mortgage payments?',
-            answer:
-              'No. Cap rate measures the unlevered return on a property — it ignores how you finance the purchase. This makes it useful for comparing properties regardless of financing. Use cash-on-cash return to factor in your mortgage.',
-          },
-          {
-            question: 'How do you calculate cap rate?',
-            answer:
-              'Calculate net operating income (NOI) by subtracting annual operating expenses and a vacancy allowance from gross rental income, then divide NOI by the purchase price and multiply by 100. For example, $21,000 NOI on a $300,000 property is a 7.0% cap rate.',
-          },
-        ])}
+        data={faqJsonLd(capRateFaqs)}
       />
       <JsonLd
         data={howToJsonLd({
@@ -100,8 +114,17 @@ export default function CapRateCalculatorPage() {
           Cap Rate Calculator
         </h1>
         <p className="mt-3 text-lg text-text-muted leading-7">
-          Capitalization rate measures the unlevered return on a property
-          relative to its purchase price. It&apos;s the fastest way to compare
+          Cap rate (capitalization rate) is a property&apos;s annual net
+          operating income divided by its purchase price:{' '}
+          <strong className="text-text">
+            Cap Rate = NOI &divide; Purchase Price &times; 100
+          </strong>
+          . A $300,000 rental with $21,000 of NOI has a{' '}
+          <strong className="text-text">7.0% cap rate</strong>. Enter your
+          numbers below to get the cap rate for any rental property instantly.
+        </p>
+        <p className="mt-3 text-text-muted leading-7">
+          Because it ignores financing, cap rate is the fastest way to compare
           deals across markets, property types, and price points.
         </p>
       </div>
@@ -345,6 +368,21 @@ export default function CapRateCalculatorPage() {
             cash-on-cash return — or erase it entirely if the monthly payment
             outruns your net operating income.
           </p>
+        </div>
+      </section>
+
+      {/* FAQ — mirrors the FAQPage JSON-LD above */}
+      <section className="mt-16 max-w-3xl">
+        <h2 className="text-2xl font-bold text-text">
+          Cap Rate Calculator FAQ
+        </h2>
+        <div className="mt-6 space-y-6">
+          {capRateFaqs.map((faq) => (
+            <div key={faq.question}>
+              <h3 className="text-lg font-semibold text-text">{faq.question}</h3>
+              <p className="mt-2 text-text-muted leading-7">{faq.answer}</p>
+            </div>
+          ))}
         </div>
       </section>
 
