@@ -6,6 +6,7 @@ import { loanTypes, getLoanTypeBySlug } from '@/data/loan-types'
 import { getLendersByLoanType } from '@/data/lenders'
 import { usStates } from '@/data/us-states'
 import { LenderCard } from '@/components/lender-card'
+import { NewsletterSignup } from '@/components/newsletter-signup'
 import { normalizeTitle } from '@/lib/page-title'
 
 type Props = { params: Promise<{ loanType: string }> }
@@ -43,6 +44,8 @@ export default async function LoanTypePage({ params }: Props) {
   if (!lt) notFound()
 
   const matchingLenders = getLendersByLoanType(slug)
+  // Mid-sentence form of the short name: "portfolio", "fix & flip", but "DSCR"/"SBA".
+  const loanNoun = lt.shortName.replace(/\b(?!(?:DSCR|SBA)\b)\w+/g, (w) => w.toLowerCase())
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://proinvestorhub.com'
 
   return (
@@ -224,6 +227,16 @@ export default async function LoanTypePage({ params }: Props) {
             soon — we&apos;re constantly adding new lenders.
           </p>
         )}
+      </section>
+
+      {/* Newsletter — one in-page box after the lender list (no popup). */}
+      <section className="max-w-3xl mb-12">
+        <NewsletterSignup
+          variant="card"
+          source={`lenders-${slug}`}
+          heading={`Comparing ${loanNoun} lenders? Get the weekly investor brief`}
+          description="Market trends, deal analysis and a featured lending partner, written for real estate investors. One email a week, free, unsubscribe anytime."
+        />
       </section>
 
       {/* FAQs */}

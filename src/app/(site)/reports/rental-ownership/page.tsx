@@ -273,8 +273,8 @@ export default function RentalOwnershipReport() {
         <NewsletterSignup
           variant="banner"
           source="report-rental-ownership"
-          heading="Get the next data report"
-          description="New investor-market data reports built on primary sources — like this one — the week they publish. Free, no spam."
+          heading="Rental-market data in your inbox, weekly"
+          description="Rental-market trends, deal analysis and new primary-source reports like this one. One email a week, free, unsubscribe anytime."
         />
       </section>
 
