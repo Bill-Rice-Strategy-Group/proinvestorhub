@@ -6,6 +6,17 @@
 
 ---
 
+## 2026-11-15 — Newsletter signup on the top-traffic pages
+<!-- added 2026-11-15 session — list growth ahead of the weekly issues -->
+
+- [x] **RESOLVED 2026-11-15 — in-page newsletter box on the two top-session pages.** `/lenders/[loanType]`
+  (covers `/lenders/portfolio-loans`, 20 sessions last week, and every other loan-type page) now carries the
+  existing `NewsletterSignup` card after the lender list ("Comparing {loan} lenders? Get the weekly investor
+  brief", `source=lenders-<slug>`). `/reports/rental-ownership` (16 sessions) already had one; its copy now
+  promises the weekly email instead of "the next data report". Same `/api/newsletter` route (Resend contact +
+  welcome) and the same `newsletter_signup` GA4 event on success. Also added `min-w-0` to the form input: the
+  card/inline row overflowed at 390px (the footer form was already 3px over).
+
 ## 2026-07-14 — Portfolio Performance Report priority anchor
 <!-- added 2026-07-14 — cross-portfolio prioritization from the BRSG Portfolio Performance Report (daily) -->
 
