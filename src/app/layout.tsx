@@ -1,6 +1,5 @@
 import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
-import { SanityLive } from '@/sanity/lib/live'
 import { GoogleAnalytics } from '@/components/analytics'
 import './globals.css'
 
@@ -70,7 +69,9 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {children}
-        <SanityLive />
+        {/* SanityLive is mounted only by the routes that call sanityFetch (home,
+            blog, glossary, guides, newsletter, authors), not site-wide: it is
+            the largest client bundle and most pages never read Sanity live. */}
       </body>
     </html>
   )

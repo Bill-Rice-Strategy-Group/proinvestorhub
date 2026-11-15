@@ -1,7 +1,6 @@
 import { Header } from '@/components/header'
 import { Footer } from '@/components/footer'
-import { StickyCTA } from '@/components/sticky-cta'
-import { ExitIntentModal } from '@/components/exit-intent-modal'
+import { DeferredEngagement } from '@/components/deferred-engagement'
 import { AiReferralTracker } from '@/components/ai-referral-tracker'
 
 export default function SiteLayout({
@@ -14,8 +13,7 @@ export default function SiteLayout({
       <Header />
       <main className="flex-1">{children}</main>
       <Footer />
-      <StickyCTA />
-      <ExitIntentModal />
+      <DeferredEngagement />
       <AiReferralTracker />
     </div>
   )

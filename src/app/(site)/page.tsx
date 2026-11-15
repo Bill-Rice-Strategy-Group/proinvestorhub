@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Suspense } from 'react'
-import { sanityFetch } from '@/sanity/lib/live'
+import { sanityFetch, SanityLive } from '@/sanity/lib/live'
 import { POSTS_QUERY } from '@/sanity/lib/queries'
 import { urlFor } from '@/sanity/lib/image'
 import type { PostSummary } from '@/sanity/lib/types'
@@ -269,6 +269,7 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+      <SanityLive />
     </>
   )
 }
