@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { JsonLd, breadcrumbJsonLd, faqJsonLd } from '@/components/json-ld'
 import { encodeCalculatorState } from '@/lib/calculator-utils'
+import { getMetroCosts, metroCostsMeta } from '@/data/metro-costs'
 import { CalculatorCTA } from '@/components/calculator-cta'
 import { StrategyScoreBreakdown } from '@/components/strategy-score-breakdown'
 import { CityStrategyComparison } from '@/components/city-strategy-comparison'
@@ -104,6 +105,7 @@ export default async function CityStrategyPage({
 
   // Quick math — identical formula and inputs to /calculators/cap-rate/[city]
   const math = computeRentYield(data.medianRent, data.medianHomeValue)
+  const costs = getMetroCosts(data.cbsa)
   const opexPct = Math.round(ILLUSTRATIVE_OPEX_RATIO * 100)
 
   return (
@@ -309,15 +311,12 @@ export default async function CityStrategyPage({
             <div className="mt-6 flex flex-wrap justify-center gap-3">
               <Link
                 href={`/calculators/cap-rate?s=${encodeCalculatorState({
+                  // Metro medians from Census ACS only. Inputs with no
+                  // per-metro public source are left blank for the user.
                   purchasePrice: data.medianHomeValue,
                   grossRent: data.medianRent * 12,
-                  vacancy: 0,
-                  propertyTax: 0,
-                  insurance: 0,
-                  maintenance: 0,
-                  management: 0,
-                  // Illustrative 50%-rule expenses as one line — replace with real figures.
-                  otherExpenses: Math.round(math.illustrativeOpex),
+                  ...(costs?.rentalVacancyRate != null ? { vacancy: costs.rentalVacancyRate } : {}),
+                  ...(costs?.medianRealEstateTaxes != null ? { propertyTax: costs.medianRealEstateTaxes } : {}),
                 })}`}
                 className="rounded-lg bg-accent px-5 py-2.5 text-sm font-bold text-primary-dark hover:bg-accent-light transition-colors"
               >
@@ -333,6 +332,19 @@ export default async function CityStrategyPage({
                 </Link>
               ))}
             </div>
+            <p className="mx-auto mt-4 max-w-xl text-xs text-text-muted leading-5">
+              The cap rate calculator opens with {data.metroName} metro medians from the{' '}
+              {metroCostsMeta.source}: home value, gross rent
+              {costs?.rentalVacancyRate != null && <>, rental vacancy rate ({costs.rentalVacancyRate}%)</>}
+              {costs?.medianRealEstateTaxes != null && (
+                <>
+                  , and the median real estate tax homeowners pay (${costs.medianRealEstateTaxes.toLocaleString('en-US')}/yr;
+                  investor-owned rentals often pay more where homestead exemptions apply)
+                </>
+              )}
+              . Insurance, maintenance and management are left blank: there is no per-metro public
+              source for them, so enter your own quotes.
+            </p>
           </section>
         </div>
 

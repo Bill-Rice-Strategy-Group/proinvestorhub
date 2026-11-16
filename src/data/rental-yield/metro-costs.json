@@ -1,0 +1,1987 @@
+{
+  "meta": {
+    "year": 2024,
+    "dataset": "ACS 2024 1-year",
+    "source": "U.S. Census Bureau, American Community Survey 2024 1-year estimates",
+    "tables": {
+      "medianRealEstateTaxes": "B25103_001 — median real estate taxes paid, owner-occupied housing units",
+      "rentalVacancyRate": "B25004_002 / (B25003_003 + B25004_003 + B25004_002) — rental vacancy rate, %"
+    },
+    "files": [
+      "https://www2.census.gov/programs-surveys/acs/summary_file/2024/table-based-SF/data/1YRData/acsdt1y2024-b25103.dat",
+      "https://www2.census.gov/programs-surveys/acs/summary_file/2024/table-based-SF/data/1YRData/acsdt1y2024-b25004.dat",
+      "https://www2.census.gov/programs-surveys/acs/summary_file/2024/table-based-SF/data/1YRData/acsdt1y2024-b25003.dat"
+    ],
+    "geography": "Metropolitan statistical area (CBSA), matched to rental-yield/metros.json",
+    "generatedAt": "2026-11-16",
+    "metroCount": 393,
+    "metrosWithGaps": 108
+  },
+  "metros": {
+    "10180": {
+      "name": "Abilene, TX",
+      "medianRealEstateTaxes": 2077,
+      "rentalVacancyRate": 5.2
+    },
+    "10380": {
+      "name": "Aguadilla, PR",
+      "medianRealEstateTaxes": 573,
+      "rentalVacancyRate": 21.9
+    },
+    "10420": {
+      "name": "Akron, OH",
+      "medianRealEstateTaxes": 3278,
+      "rentalVacancyRate": 4
+    },
+    "10500": {
+      "name": "Albany, GA",
+      "medianRealEstateTaxes": 1544,
+      "rentalVacancyRate": 12
+    },
+    "10540": {
+      "name": "Albany, OR",
+      "medianRealEstateTaxes": 3409,
+      "rentalVacancyRate": null
+    },
+    "10580": {
+      "name": "Albany-Schenectady-Troy, NY",
+      "medianRealEstateTaxes": 5041,
+      "rentalVacancyRate": 2.1
+    },
+    "10740": {
+      "name": "Albuquerque, NM",
+      "medianRealEstateTaxes": 2520,
+      "rentalVacancyRate": 8.2
+    },
+    "10780": {
+      "name": "Alexandria, LA",
+      "medianRealEstateTaxes": 832,
+      "rentalVacancyRate": 5.5
+    },
+    "10900": {
+      "name": "Allentown-Bethlehem-Easton, PA-NJ",
+      "medianRealEstateTaxes": 4702,
+      "rentalVacancyRate": 6
+    },
+    "11020": {
+      "name": "Altoona, PA",
+      "medianRealEstateTaxes": 1721,
+      "rentalVacancyRate": 7.9
+    },
+    "11100": {
+      "name": "Amarillo, TX",
+      "medianRealEstateTaxes": 2923,
+      "rentalVacancyRate": 8.1
+    },
+    "11180": {
+      "name": "Ames, IA",
+      "medianRealEstateTaxes": 3388,
+      "rentalVacancyRate": null
+    },
+    "11200": {
+      "name": "Amherst Town-Northampton, MA",
+      "medianRealEstateTaxes": 5702,
+      "rentalVacancyRate": null
+    },
+    "11260": {
+      "name": "Anchorage, AK",
+      "medianRealEstateTaxes": 4752,
+      "rentalVacancyRate": 7.4
+    },
+    "11460": {
+      "name": "Ann Arbor, MI",
+      "medianRealEstateTaxes": 5827,
+      "rentalVacancyRate": 4
+    },
+    "11500": {
+      "name": "Anniston-Oxford, AL",
+      "medianRealEstateTaxes": 661,
+      "rentalVacancyRate": null
+    },
+    "11540": {
+      "name": "Appleton, WI",
+      "medianRealEstateTaxes": 3638,
+      "rentalVacancyRate": null
+    },
+    "11640": {
+      "name": "Arecibo, PR",
+      "medianRealEstateTaxes": 339,
+      "rentalVacancyRate": 4.9
+    },
+    "11700": {
+      "name": "Asheville, NC",
+      "medianRealEstateTaxes": 2134,
+      "rentalVacancyRate": 28.2
+    },
+    "12020": {
+      "name": "Athens-Clarke County, GA",
+      "medianRealEstateTaxes": 2733,
+      "rentalVacancyRate": 5.5
+    },
+    "12060": {
+      "name": "Atlanta-Sandy Springs-Roswell, GA",
+      "medianRealEstateTaxes": 3254,
+      "rentalVacancyRate": 8.3
+    },
+    "12100": {
+      "name": "Atlantic City-Hammonton, NJ",
+      "medianRealEstateTaxes": 6069,
+      "rentalVacancyRate": 8.4
+    },
+    "12220": {
+      "name": "Auburn-Opelika, AL",
+      "medianRealEstateTaxes": 1286,
+      "rentalVacancyRate": 12.1
+    },
+    "12260": {
+      "name": "Augusta-Richmond County, GA-SC",
+      "medianRealEstateTaxes": 1512,
+      "rentalVacancyRate": 7.6
+    },
+    "12420": {
+      "name": "Austin-Round Rock-San Marcos, TX",
+      "medianRealEstateTaxes": 6896,
+      "rentalVacancyRate": 6.2
+    },
+    "12540": {
+      "name": "Bakersfield-Delano, CA",
+      "medianRealEstateTaxes": 3168,
+      "rentalVacancyRate": 4.2
+    },
+    "12580": {
+      "name": "Baltimore-Columbia-Towson, MD",
+      "medianRealEstateTaxes": 3927,
+      "rentalVacancyRate": 4.4
+    },
+    "12620": {
+      "name": "Bangor, ME",
+      "medianRealEstateTaxes": 2554,
+      "rentalVacancyRate": null
+    },
+    "12700": {
+      "name": "Barnstable Town, MA",
+      "medianRealEstateTaxes": 4338,
+      "rentalVacancyRate": 3.5
+    },
+    "12940": {
+      "name": "Baton Rouge, LA",
+      "medianRealEstateTaxes": 1406,
+      "rentalVacancyRate": 10.7
+    },
+    "12980": {
+      "name": "Battle Creek, MI",
+      "medianRealEstateTaxes": 2404,
+      "rentalVacancyRate": 11.9
+    },
+    "13020": {
+      "name": "Bay City, MI",
+      "medianRealEstateTaxes": 2314,
+      "rentalVacancyRate": null
+    },
+    "13140": {
+      "name": "Beaumont-Port Arthur, TX",
+      "medianRealEstateTaxes": 2245,
+      "rentalVacancyRate": 9
+    },
+    "13220": {
+      "name": "Beckley, WV",
+      "medianRealEstateTaxes": 634,
+      "rentalVacancyRate": null
+    },
+    "13380": {
+      "name": "Bellingham, WA",
+      "medianRealEstateTaxes": 4413,
+      "rentalVacancyRate": null
+    },
+    "13460": {
+      "name": "Bend, OR",
+      "medianRealEstateTaxes": 3715,
+      "rentalVacancyRate": 1.6
+    },
+    "13740": {
+      "name": "Billings, MT",
+      "medianRealEstateTaxes": 2988,
+      "rentalVacancyRate": 4
+    },
+    "13780": {
+      "name": "Binghamton, NY",
+      "medianRealEstateTaxes": 3654,
+      "rentalVacancyRate": 9.4
+    },
+    "13820": {
+      "name": "Birmingham, AL",
+      "medianRealEstateTaxes": 1334,
+      "rentalVacancyRate": 6.5
+    },
+    "13900": {
+      "name": "Bismarck, ND",
+      "medianRealEstateTaxes": 2840,
+      "rentalVacancyRate": null
+    },
+    "13980": {
+      "name": "Blacksburg-Christiansburg-Radford, VA",
+      "medianRealEstateTaxes": 1645,
+      "rentalVacancyRate": 7.3
+    },
+    "14010": {
+      "name": "Bloomington, IL",
+      "medianRealEstateTaxes": 4693,
+      "rentalVacancyRate": null
+    },
+    "14020": {
+      "name": "Bloomington, IN",
+      "medianRealEstateTaxes": 2179,
+      "rentalVacancyRate": null
+    },
+    "14260": {
+      "name": "Boise City, ID",
+      "medianRealEstateTaxes": 2162,
+      "rentalVacancyRate": 4.9
+    },
+    "14460": {
+      "name": "Boston-Cambridge-Newton, MA-NH",
+      "medianRealEstateTaxes": 6913,
+      "rentalVacancyRate": 3.6
+    },
+    "14500": {
+      "name": "Boulder, CO",
+      "medianRealEstateTaxes": 4283,
+      "rentalVacancyRate": 4.6
+    },
+    "14540": {
+      "name": "Bowling Green, KY",
+      "medianRealEstateTaxes": 1477,
+      "rentalVacancyRate": 4
+    },
+    "14580": {
+      "name": "Bozeman, MT",
+      "medianRealEstateTaxes": 4724,
+      "rentalVacancyRate": null
+    },
+    "14740": {
+      "name": "Bremerton-Silverdale-Port Orchard, WA",
+      "medianRealEstateTaxes": 4430,
+      "rentalVacancyRate": 4.7
+    },
+    "14860": {
+      "name": "Bridgeport-Stamford-Danbury, CT",
+      "medianRealEstateTaxes": 9035,
+      "rentalVacancyRate": 4
+    },
+    "15180": {
+      "name": "Brownsville-Harlingen, TX",
+      "medianRealEstateTaxes": 2167,
+      "rentalVacancyRate": 4.4
+    },
+    "15260": {
+      "name": "Brunswick-St. Simons, GA",
+      "medianRealEstateTaxes": 1479,
+      "rentalVacancyRate": null
+    },
+    "15380": {
+      "name": "Buffalo-Cheektowaga, NY",
+      "medianRealEstateTaxes": 4508,
+      "rentalVacancyRate": 3.3
+    },
+    "15500": {
+      "name": "Burlington, NC",
+      "medianRealEstateTaxes": 1744,
+      "rentalVacancyRate": 5
+    },
+    "15540": {
+      "name": "Burlington-South Burlington, VT",
+      "medianRealEstateTaxes": 5880,
+      "rentalVacancyRate": 0.6
+    },
+    "15940": {
+      "name": "Canton-Massillon, OH",
+      "medianRealEstateTaxes": 2331,
+      "rentalVacancyRate": null
+    },
+    "15980": {
+      "name": "Cape Coral-Fort Myers, FL",
+      "medianRealEstateTaxes": 3087,
+      "rentalVacancyRate": 12.3
+    },
+    "16020": {
+      "name": "Cape Girardeau, MO-IL",
+      "medianRealEstateTaxes": 1344,
+      "rentalVacancyRate": 10
+    },
+    "16180": {
+      "name": "Carson City, NV",
+      "medianRealEstateTaxes": 2029,
+      "rentalVacancyRate": null
+    },
+    "16220": {
+      "name": "Casper, WY",
+      "medianRealEstateTaxes": 1748,
+      "rentalVacancyRate": null
+    },
+    "16300": {
+      "name": "Cedar Rapids, IA",
+      "medianRealEstateTaxes": 3409,
+      "rentalVacancyRate": 9.7
+    },
+    "16540": {
+      "name": "Chambersburg, PA",
+      "medianRealEstateTaxes": 2622,
+      "rentalVacancyRate": null
+    },
+    "16580": {
+      "name": "Champaign-Urbana, IL",
+      "medianRealEstateTaxes": 4236,
+      "rentalVacancyRate": 7.5
+    },
+    "16620": {
+      "name": "Charleston, WV",
+      "medianRealEstateTaxes": 947,
+      "rentalVacancyRate": 11.3
+    },
+    "16700": {
+      "name": "Charleston-North Charleston, SC",
+      "medianRealEstateTaxes": 1787,
+      "rentalVacancyRate": 8.5
+    },
+    "16740": {
+      "name": "Charlotte-Concord-Gastonia, NC-SC",
+      "medianRealEstateTaxes": 2552,
+      "rentalVacancyRate": 7.8
+    },
+    "16820": {
+      "name": "Charlottesville, VA",
+      "medianRealEstateTaxes": 3413,
+      "rentalVacancyRate": 2.8
+    },
+    "16860": {
+      "name": "Chattanooga, TN-GA",
+      "medianRealEstateTaxes": 1785,
+      "rentalVacancyRate": 5.7
+    },
+    "16940": {
+      "name": "Cheyenne, WY",
+      "medianRealEstateTaxes": 2174,
+      "rentalVacancyRate": null
+    },
+    "16980": {
+      "name": "Chicago-Naperville-Elgin, IL-IN",
+      "medianRealEstateTaxes": 6461,
+      "rentalVacancyRate": 3.7
+    },
+    "17020": {
+      "name": "Chico, CA",
+      "medianRealEstateTaxes": 3187,
+      "rentalVacancyRate": 7.1
+    },
+    "17140": {
+      "name": "Cincinnati, OH-KY-IN",
+      "medianRealEstateTaxes": 3255,
+      "rentalVacancyRate": 4.6
+    },
+    "17300": {
+      "name": "Clarksville, TN-KY",
+      "medianRealEstateTaxes": 1546,
+      "rentalVacancyRate": 3.2
+    },
+    "17410": {
+      "name": "Cleveland, OH",
+      "medianRealEstateTaxes": 3556,
+      "rentalVacancyRate": 6.3
+    },
+    "17420": {
+      "name": "Cleveland, TN",
+      "medianRealEstateTaxes": 1238,
+      "rentalVacancyRate": null
+    },
+    "17660": {
+      "name": "Coeur d'Alene, ID",
+      "medianRealEstateTaxes": 2051,
+      "rentalVacancyRate": 4.6
+    },
+    "17780": {
+      "name": "College Station-Bryan, TX",
+      "medianRealEstateTaxes": 3761,
+      "rentalVacancyRate": 6.9
+    },
+    "17820": {
+      "name": "Colorado Springs, CO",
+      "medianRealEstateTaxes": 2063,
+      "rentalVacancyRate": 3.3
+    },
+    "17860": {
+      "name": "Columbia, MO",
+      "medianRealEstateTaxes": 2275,
+      "rentalVacancyRate": 3.7
+    },
+    "17900": {
+      "name": "Columbia, SC",
+      "medianRealEstateTaxes": 1325,
+      "rentalVacancyRate": 5.4
+    },
+    "17980": {
+      "name": "Columbus, GA-AL",
+      "medianRealEstateTaxes": 1555,
+      "rentalVacancyRate": 4.8
+    },
+    "18020": {
+      "name": "Columbus, IN",
+      "medianRealEstateTaxes": 1866,
+      "rentalVacancyRate": null
+    },
+    "18140": {
+      "name": "Columbus, OH",
+      "medianRealEstateTaxes": 4178,
+      "rentalVacancyRate": 4.4
+    },
+    "18580": {
+      "name": "Corpus Christi, TX",
+      "medianRealEstateTaxes": 3158,
+      "rentalVacancyRate": 11.1
+    },
+    "18700": {
+      "name": "Corvallis, OR",
+      "medianRealEstateTaxes": 5014,
+      "rentalVacancyRate": null
+    },
+    "18880": {
+      "name": "Crestview-Fort Walton Beach-Destin, FL",
+      "medianRealEstateTaxes": 2233,
+      "rentalVacancyRate": 29.7
+    },
+    "19100": {
+      "name": "Dallas-Fort Worth-Arlington, TX",
+      "medianRealEstateTaxes": 5616,
+      "rentalVacancyRate": 8.3
+    },
+    "19140": {
+      "name": "Dalton, GA",
+      "medianRealEstateTaxes": 1449,
+      "rentalVacancyRate": 4.6
+    },
+    "19300": {
+      "name": "Daphne-Fairhope-Foley, AL",
+      "medianRealEstateTaxes": 1093,
+      "rentalVacancyRate": 8.3
+    },
+    "19340": {
+      "name": "Davenport-Moline-Rock Island, IA-IL",
+      "medianRealEstateTaxes": 3265,
+      "rentalVacancyRate": 5
+    },
+    "19430": {
+      "name": "Dayton-Kettering-Beavercreek, OH",
+      "medianRealEstateTaxes": 3208,
+      "rentalVacancyRate": 6.7
+    },
+    "19460": {
+      "name": "Decatur, AL",
+      "medianRealEstateTaxes": 690,
+      "rentalVacancyRate": 7.8
+    },
+    "19500": {
+      "name": "Decatur, IL",
+      "medianRealEstateTaxes": 2893,
+      "rentalVacancyRate": 11.5
+    },
+    "19660": {
+      "name": "Deltona-Daytona Beach-Ormond Beach, FL",
+      "medianRealEstateTaxes": 2760,
+      "rentalVacancyRate": 10.9
+    },
+    "19740": {
+      "name": "Denver-Aurora-Centennial, CO",
+      "medianRealEstateTaxes": 3387,
+      "rentalVacancyRate": 4.9
+    },
+    "19780": {
+      "name": "Des Moines-West Des Moines, IA",
+      "medianRealEstateTaxes": 4130,
+      "rentalVacancyRate": 6.7
+    },
+    "19820": {
+      "name": "Detroit-Warren-Dearborn, MI",
+      "medianRealEstateTaxes": 3489,
+      "rentalVacancyRate": 6.4
+    },
+    "20020": {
+      "name": "Dothan, AL",
+      "medianRealEstateTaxes": 642,
+      "rentalVacancyRate": 6.7
+    },
+    "20100": {
+      "name": "Dover, DE",
+      "medianRealEstateTaxes": 1422,
+      "rentalVacancyRate": 5.8
+    },
+    "20220": {
+      "name": "Dubuque, IA",
+      "medianRealEstateTaxes": 2899,
+      "rentalVacancyRate": null
+    },
+    "20260": {
+      "name": "Duluth, MN-WI",
+      "medianRealEstateTaxes": 2545,
+      "rentalVacancyRate": 3.8
+    },
+    "20500": {
+      "name": "Durham-Chapel Hill, NC",
+      "medianRealEstateTaxes": 3177,
+      "rentalVacancyRate": 6.1
+    },
+    "20580": {
+      "name": "Eagle Pass, TX",
+      "medianRealEstateTaxes": 1675,
+      "rentalVacancyRate": 15.3
+    },
+    "20740": {
+      "name": "Eau Claire, WI",
+      "medianRealEstateTaxes": 3326,
+      "rentalVacancyRate": 0.5
+    },
+    "20940": {
+      "name": "El Centro, CA",
+      "medianRealEstateTaxes": 2398,
+      "rentalVacancyRate": null
+    },
+    "21060": {
+      "name": "Elizabethtown, KY",
+      "medianRealEstateTaxes": 1468,
+      "rentalVacancyRate": null
+    },
+    "21140": {
+      "name": "Elkhart-Goshen, IN",
+      "medianRealEstateTaxes": 1966,
+      "rentalVacancyRate": 17.5
+    },
+    "21300": {
+      "name": "Elmira, NY",
+      "medianRealEstateTaxes": 3547,
+      "rentalVacancyRate": null
+    },
+    "21340": {
+      "name": "El Paso, TX",
+      "medianRealEstateTaxes": 3617,
+      "rentalVacancyRate": 7
+    },
+    "21420": {
+      "name": "Enid, OK",
+      "medianRealEstateTaxes": 1404,
+      "rentalVacancyRate": null
+    },
+    "21500": {
+      "name": "Erie, PA",
+      "medianRealEstateTaxes": 2818,
+      "rentalVacancyRate": null
+    },
+    "21660": {
+      "name": "Eugene-Springfield, OR",
+      "medianRealEstateTaxes": 3438,
+      "rentalVacancyRate": 3.4
+    },
+    "21780": {
+      "name": "Evansville, IN",
+      "medianRealEstateTaxes": 1616,
+      "rentalVacancyRate": 3.2
+    },
+    "21820": {
+      "name": "Fairbanks-College, AK",
+      "medianRealEstateTaxes": 3415,
+      "rentalVacancyRate": null
+    },
+    "22020": {
+      "name": "Fargo, ND-MN",
+      "medianRealEstateTaxes": 3503,
+      "rentalVacancyRate": 1
+    },
+    "22140": {
+      "name": "Farmington, NM",
+      "medianRealEstateTaxes": 1318,
+      "rentalVacancyRate": null
+    },
+    "22180": {
+      "name": "Fayetteville, NC",
+      "medianRealEstateTaxes": 1847,
+      "rentalVacancyRate": 5.5
+    },
+    "22220": {
+      "name": "Fayetteville-Springdale-Rogers, AR",
+      "medianRealEstateTaxes": 1821,
+      "rentalVacancyRate": 4.5
+    },
+    "22380": {
+      "name": "Flagstaff, AZ",
+      "medianRealEstateTaxes": 1956,
+      "rentalVacancyRate": null
+    },
+    "22420": {
+      "name": "Flint, MI",
+      "medianRealEstateTaxes": 2557,
+      "rentalVacancyRate": 3.7
+    },
+    "22500": {
+      "name": "Florence, SC",
+      "medianRealEstateTaxes": 704,
+      "rentalVacancyRate": 4.9
+    },
+    "22520": {
+      "name": "Florence-Muscle Shoals, AL",
+      "medianRealEstateTaxes": 910,
+      "rentalVacancyRate": 6.3
+    },
+    "22540": {
+      "name": "Fond du Lac, WI",
+      "medianRealEstateTaxes": 3221,
+      "rentalVacancyRate": null
+    },
+    "22660": {
+      "name": "Fort Collins-Loveland, CO",
+      "medianRealEstateTaxes": 3146,
+      "rentalVacancyRate": 3.3
+    },
+    "22900": {
+      "name": "Fort Smith, AR-OK",
+      "medianRealEstateTaxes": 1062,
+      "rentalVacancyRate": 5
+    },
+    "23060": {
+      "name": "Fort Wayne, IN",
+      "medianRealEstateTaxes": 1920,
+      "rentalVacancyRate": 4.4
+    },
+    "23420": {
+      "name": "Fresno, CA",
+      "medianRealEstateTaxes": 3075,
+      "rentalVacancyRate": 3.7
+    },
+    "23460": {
+      "name": "Gadsden, AL",
+      "medianRealEstateTaxes": 700,
+      "rentalVacancyRate": 11.5
+    },
+    "23540": {
+      "name": "Gainesville, FL",
+      "medianRealEstateTaxes": 2588,
+      "rentalVacancyRate": 3.2
+    },
+    "23580": {
+      "name": "Gainesville, GA",
+      "medianRealEstateTaxes": 3108,
+      "rentalVacancyRate": null
+    },
+    "23900": {
+      "name": "Gettysburg, PA",
+      "medianRealEstateTaxes": 3379,
+      "rentalVacancyRate": null
+    },
+    "24020": {
+      "name": "Glens Falls, NY",
+      "medianRealEstateTaxes": 3963,
+      "rentalVacancyRate": null
+    },
+    "24140": {
+      "name": "Goldsboro, NC",
+      "medianRealEstateTaxes": 1292,
+      "rentalVacancyRate": null
+    },
+    "24220": {
+      "name": "Grand Forks, ND-MN",
+      "medianRealEstateTaxes": 3091,
+      "rentalVacancyRate": null
+    },
+    "24260": {
+      "name": "Grand Island, NE",
+      "medianRealEstateTaxes": 3321,
+      "rentalVacancyRate": null
+    },
+    "24300": {
+      "name": "Grand Junction, CO",
+      "medianRealEstateTaxes": 1580,
+      "rentalVacancyRate": null
+    },
+    "24340": {
+      "name": "Grand Rapids-Wyoming-Kentwood, MI",
+      "medianRealEstateTaxes": 3180,
+      "rentalVacancyRate": 4.1
+    },
+    "24420": {
+      "name": "Grants Pass, OR",
+      "medianRealEstateTaxes": 2117,
+      "rentalVacancyRate": 7.9
+    },
+    "24500": {
+      "name": "Great Falls, MT",
+      "medianRealEstateTaxes": 2572,
+      "rentalVacancyRate": null
+    },
+    "24540": {
+      "name": "Greeley, CO",
+      "medianRealEstateTaxes": 2688,
+      "rentalVacancyRate": 5.8
+    },
+    "24580": {
+      "name": "Green Bay, WI",
+      "medianRealEstateTaxes": 3471,
+      "rentalVacancyRate": 7.2
+    },
+    "24660": {
+      "name": "Greensboro-High Point, NC",
+      "medianRealEstateTaxes": 1966,
+      "rentalVacancyRate": 6.4
+    },
+    "24780": {
+      "name": "Greenville, NC",
+      "medianRealEstateTaxes": 1843,
+      "rentalVacancyRate": null
+    },
+    "24860": {
+      "name": "Greenville-Anderson-Greer, SC",
+      "medianRealEstateTaxes": 1369,
+      "rentalVacancyRate": 7.9
+    },
+    "25020": {
+      "name": "Guayama, PR",
+      "medianRealEstateTaxes": 661,
+      "rentalVacancyRate": null
+    },
+    "25060": {
+      "name": "Gulfport-Biloxi, MS",
+      "medianRealEstateTaxes": 1409,
+      "rentalVacancyRate": 7.5
+    },
+    "25180": {
+      "name": "Hagerstown-Martinsburg, MD-WV",
+      "medianRealEstateTaxes": 1852,
+      "rentalVacancyRate": null
+    },
+    "25220": {
+      "name": "Hammond, LA",
+      "medianRealEstateTaxes": 790,
+      "rentalVacancyRate": null
+    },
+    "25260": {
+      "name": "Hanford-Corcoran, CA",
+      "medianRealEstateTaxes": 2537,
+      "rentalVacancyRate": null
+    },
+    "25420": {
+      "name": "Harrisburg-Carlisle, PA",
+      "medianRealEstateTaxes": 3160,
+      "rentalVacancyRate": 2.1
+    },
+    "25500": {
+      "name": "Harrisonburg, VA",
+      "medianRealEstateTaxes": 1842,
+      "rentalVacancyRate": 2.9
+    },
+    "25540": {
+      "name": "Hartford-West Hartford-East Hartford, CT",
+      "medianRealEstateTaxes": 6387,
+      "rentalVacancyRate": 4.2
+    },
+    "25620": {
+      "name": "Hattiesburg, MS",
+      "medianRealEstateTaxes": 1453,
+      "rentalVacancyRate": null
+    },
+    "25740": {
+      "name": "Helena, MT",
+      "medianRealEstateTaxes": 3434,
+      "rentalVacancyRate": null
+    },
+    "25860": {
+      "name": "Hickory-Lenoir-Morganton, NC",
+      "medianRealEstateTaxes": 1467,
+      "rentalVacancyRate": 6.6
+    },
+    "25940": {
+      "name": "Hilton Head Island-Bluffton-Port Royal, SC",
+      "medianRealEstateTaxes": 2448,
+      "rentalVacancyRate": 15.5
+    },
+    "25980": {
+      "name": "Hinesville, GA",
+      "medianRealEstateTaxes": 2293,
+      "rentalVacancyRate": null
+    },
+    "26140": {
+      "name": "Homosassa Springs, FL",
+      "medianRealEstateTaxes": 1711,
+      "rentalVacancyRate": 5.5
+    },
+    "26300": {
+      "name": "Hot Springs, AR",
+      "medianRealEstateTaxes": 985,
+      "rentalVacancyRate": null
+    },
+    "26380": {
+      "name": "Houma-Bayou Cane-Thibodaux, LA",
+      "medianRealEstateTaxes": 822,
+      "rentalVacancyRate": 5.1
+    },
+    "26420": {
+      "name": "Houston-Pasadena-The Woodlands, TX",
+      "medianRealEstateTaxes": 4750,
+      "rentalVacancyRate": 10.5
+    },
+    "26580": {
+      "name": "Huntington-Ashland, WV-KY-OH",
+      "medianRealEstateTaxes": 1052,
+      "rentalVacancyRate": 6.3
+    },
+    "26620": {
+      "name": "Huntsville, AL",
+      "medianRealEstateTaxes": 1310,
+      "rentalVacancyRate": 6.5
+    },
+    "26820": {
+      "name": "Idaho Falls, ID",
+      "medianRealEstateTaxes": 1813,
+      "rentalVacancyRate": 1.2
+    },
+    "26900": {
+      "name": "Indianapolis-Carmel-Greenwood, IN",
+      "medianRealEstateTaxes": 2409,
+      "rentalVacancyRate": 4.2
+    },
+    "26980": {
+      "name": "Iowa City, IA",
+      "medianRealEstateTaxes": 4585,
+      "rentalVacancyRate": null
+    },
+    "27060": {
+      "name": "Ithaca, NY",
+      "medianRealEstateTaxes": 6540,
+      "rentalVacancyRate": null
+    },
+    "27100": {
+      "name": "Jackson, MI",
+      "medianRealEstateTaxes": 2498,
+      "rentalVacancyRate": 6.4
+    },
+    "27140": {
+      "name": "Jackson, MS",
+      "medianRealEstateTaxes": 1428,
+      "rentalVacancyRate": 6.9
+    },
+    "27180": {
+      "name": "Jackson, TN",
+      "medianRealEstateTaxes": 1031,
+      "rentalVacancyRate": null
+    },
+    "27260": {
+      "name": "Jacksonville, FL",
+      "medianRealEstateTaxes": 2808,
+      "rentalVacancyRate": 9.6
+    },
+    "27340": {
+      "name": "Jacksonville, NC",
+      "medianRealEstateTaxes": 1682,
+      "rentalVacancyRate": null
+    },
+    "27500": {
+      "name": "Janesville-Beloit, WI",
+      "medianRealEstateTaxes": 3524,
+      "rentalVacancyRate": 5.3
+    },
+    "27620": {
+      "name": "Jefferson City, MO",
+      "medianRealEstateTaxes": 1540,
+      "rentalVacancyRate": 2.1
+    },
+    "27740": {
+      "name": "Johnson City, TN",
+      "medianRealEstateTaxes": 1135,
+      "rentalVacancyRate": null
+    },
+    "27780": {
+      "name": "Johnstown, PA",
+      "medianRealEstateTaxes": 1418,
+      "rentalVacancyRate": 2.6
+    },
+    "27860": {
+      "name": "Jonesboro, AR",
+      "medianRealEstateTaxes": 1159,
+      "rentalVacancyRate": 4.5
+    },
+    "27900": {
+      "name": "Joplin, MO-KS",
+      "medianRealEstateTaxes": 1190,
+      "rentalVacancyRate": 2.9
+    },
+    "27980": {
+      "name": "Kahului-Wailuku, HI",
+      "medianRealEstateTaxes": 1552,
+      "rentalVacancyRate": 5.1
+    },
+    "28020": {
+      "name": "Kalamazoo-Portage, MI",
+      "medianRealEstateTaxes": 3540,
+      "rentalVacancyRate": 6.8
+    },
+    "28100": {
+      "name": "Kankakee, IL",
+      "medianRealEstateTaxes": 4597,
+      "rentalVacancyRate": 6.4
+    },
+    "28140": {
+      "name": "Kansas City, MO-KS",
+      "medianRealEstateTaxes": 3379,
+      "rentalVacancyRate": 4.2
+    },
+    "28420": {
+      "name": "Kennewick-Richland, WA",
+      "medianRealEstateTaxes": 3340,
+      "rentalVacancyRate": 3.7
+    },
+    "28450": {
+      "name": "Kenosha, WI",
+      "medianRealEstateTaxes": 3744,
+      "rentalVacancyRate": null
+    },
+    "28660": {
+      "name": "Killeen-Temple, TX",
+      "medianRealEstateTaxes": 3297,
+      "rentalVacancyRate": 7.9
+    },
+    "28700": {
+      "name": "Kingsport-Bristol, TN-VA",
+      "medianRealEstateTaxes": 1147,
+      "rentalVacancyRate": 5.9
+    },
+    "28740": {
+      "name": "Kingston, NY",
+      "medianRealEstateTaxes": 6114,
+      "rentalVacancyRate": 3.5
+    },
+    "28880": {
+      "name": "Kiryas Joel-Poughkeepsie-Newburgh, NY",
+      "medianRealEstateTaxes": 8114,
+      "rentalVacancyRate": 2.8
+    },
+    "28940": {
+      "name": "Knoxville, TN",
+      "medianRealEstateTaxes": 1300,
+      "rentalVacancyRate": 5.5
+    },
+    "29020": {
+      "name": "Kokomo, IN",
+      "medianRealEstateTaxes": 1240,
+      "rentalVacancyRate": null
+    },
+    "29100": {
+      "name": "La Crosse-Onalaska, WI-MN",
+      "medianRealEstateTaxes": 3568,
+      "rentalVacancyRate": null
+    },
+    "29180": {
+      "name": "Lafayette, LA",
+      "medianRealEstateTaxes": 1054,
+      "rentalVacancyRate": 4
+    },
+    "29200": {
+      "name": "Lafayette-West Lafayette, IN",
+      "medianRealEstateTaxes": 1712,
+      "rentalVacancyRate": 4.1
+    },
+    "29340": {
+      "name": "Lake Charles, LA",
+      "medianRealEstateTaxes": 1029,
+      "rentalVacancyRate": null
+    },
+    "29420": {
+      "name": "Lake Havasu City-Kingman, AZ",
+      "medianRealEstateTaxes": 1200,
+      "rentalVacancyRate": 2.2
+    },
+    "29460": {
+      "name": "Lakeland-Winter Haven, FL",
+      "medianRealEstateTaxes": 2245,
+      "rentalVacancyRate": 8.2
+    },
+    "29540": {
+      "name": "Lancaster, PA",
+      "medianRealEstateTaxes": 3890,
+      "rentalVacancyRate": 0.6
+    },
+    "29620": {
+      "name": "Lansing-East Lansing, MI",
+      "medianRealEstateTaxes": 3590,
+      "rentalVacancyRate": 4.2
+    },
+    "29700": {
+      "name": "Laredo, TX",
+      "medianRealEstateTaxes": 3586,
+      "rentalVacancyRate": 9.8
+    },
+    "29740": {
+      "name": "Las Cruces, NM",
+      "medianRealEstateTaxes": 1523,
+      "rentalVacancyRate": null
+    },
+    "29820": {
+      "name": "Las Vegas-Henderson-North Las Vegas, NV",
+      "medianRealEstateTaxes": 2155,
+      "rentalVacancyRate": 7.6
+    },
+    "29940": {
+      "name": "Lawrence, KS",
+      "medianRealEstateTaxes": 4141,
+      "rentalVacancyRate": null
+    },
+    "30020": {
+      "name": "Lawton, OK",
+      "medianRealEstateTaxes": 1393,
+      "rentalVacancyRate": 8.4
+    },
+    "30140": {
+      "name": "Lebanon, PA",
+      "medianRealEstateTaxes": 3374,
+      "rentalVacancyRate": null
+    },
+    "30300": {
+      "name": "Lewiston, ID-WA",
+      "medianRealEstateTaxes": 2494,
+      "rentalVacancyRate": null
+    },
+    "30340": {
+      "name": "Lewiston-Auburn, ME",
+      "medianRealEstateTaxes": 2852,
+      "rentalVacancyRate": null
+    },
+    "30460": {
+      "name": "Lexington-Fayette, KY",
+      "medianRealEstateTaxes": 2361,
+      "rentalVacancyRate": 3.4
+    },
+    "30500": {
+      "name": "Lexington Park, MD",
+      "medianRealEstateTaxes": 3566,
+      "rentalVacancyRate": 1.6
+    },
+    "30620": {
+      "name": "Lima, OH",
+      "medianRealEstateTaxes": 1924,
+      "rentalVacancyRate": null
+    },
+    "30700": {
+      "name": "Lincoln, NE",
+      "medianRealEstateTaxes": 4104,
+      "rentalVacancyRate": null
+    },
+    "30780": {
+      "name": "Little Rock-North Little Rock-Conway, AR",
+      "medianRealEstateTaxes": 1452,
+      "rentalVacancyRate": 6.5
+    },
+    "30860": {
+      "name": "Logan, UT-ID",
+      "medianRealEstateTaxes": 1991,
+      "rentalVacancyRate": null
+    },
+    "30980": {
+      "name": "Longview, TX",
+      "medianRealEstateTaxes": 1818,
+      "rentalVacancyRate": 5.1
+    },
+    "31020": {
+      "name": "Longview-Kelso, WA",
+      "medianRealEstateTaxes": 3355,
+      "rentalVacancyRate": null
+    },
+    "31080": {
+      "name": "Los Angeles-Long Beach-Anaheim, CA",
+      "medianRealEstateTaxes": 6011,
+      "rentalVacancyRate": 3.8
+    },
+    "31140": {
+      "name": "Louisville/Jefferson County, KY-IN",
+      "medianRealEstateTaxes": 2130,
+      "rentalVacancyRate": 6.9
+    },
+    "31180": {
+      "name": "Lubbock, TX",
+      "medianRealEstateTaxes": 2807,
+      "rentalVacancyRate": 9.3
+    },
+    "31340": {
+      "name": "Lynchburg, VA",
+      "medianRealEstateTaxes": 1198,
+      "rentalVacancyRate": 3.8
+    },
+    "31420": {
+      "name": "Macon-Bibb County, GA",
+      "medianRealEstateTaxes": 1800,
+      "rentalVacancyRate": 10.4
+    },
+    "31540": {
+      "name": "Madison, WI",
+      "medianRealEstateTaxes": 5977,
+      "rentalVacancyRate": 3.7
+    },
+    "31700": {
+      "name": "Manchester-Nashua, NH",
+      "medianRealEstateTaxes": 7162,
+      "rentalVacancyRate": null
+    },
+    "31740": {
+      "name": "Manhattan, KS",
+      "medianRealEstateTaxes": 3448,
+      "rentalVacancyRate": null
+    },
+    "31860": {
+      "name": "Mankato, MN",
+      "medianRealEstateTaxes": 2896,
+      "rentalVacancyRate": null
+    },
+    "31900": {
+      "name": "Mansfield, OH",
+      "medianRealEstateTaxes": 1978,
+      "rentalVacancyRate": null
+    },
+    "32420": {
+      "name": "Mayagüez, PR",
+      "medianRealEstateTaxes": 590,
+      "rentalVacancyRate": 7.5
+    },
+    "32580": {
+      "name": "McAllen-Edinburg-Mission, TX",
+      "medianRealEstateTaxes": 2402,
+      "rentalVacancyRate": 8.2
+    },
+    "32780": {
+      "name": "Medford, OR",
+      "medianRealEstateTaxes": 3326,
+      "rentalVacancyRate": null
+    },
+    "32820": {
+      "name": "Memphis, TN-MS-AR",
+      "medianRealEstateTaxes": 1898,
+      "rentalVacancyRate": 9.4
+    },
+    "32900": {
+      "name": "Merced, CA",
+      "medianRealEstateTaxes": 2674,
+      "rentalVacancyRate": null
+    },
+    "33100": {
+      "name": "Miami-Fort Lauderdale-West Palm Beach, FL",
+      "medianRealEstateTaxes": 4260,
+      "rentalVacancyRate": 7.3
+    },
+    "33140": {
+      "name": "Michigan City-La Porte, IN",
+      "medianRealEstateTaxes": 1672,
+      "rentalVacancyRate": 5.4
+    },
+    "33220": {
+      "name": "Midland, MI",
+      "medianRealEstateTaxes": 3076,
+      "rentalVacancyRate": null
+    },
+    "33260": {
+      "name": "Midland, TX",
+      "medianRealEstateTaxes": 3486,
+      "rentalVacancyRate": null
+    },
+    "33340": {
+      "name": "Milwaukee-Waukesha, WI",
+      "medianRealEstateTaxes": 4240,
+      "rentalVacancyRate": 5.6
+    },
+    "33460": {
+      "name": "Minneapolis-St. Paul-Bloomington, MN-WI",
+      "medianRealEstateTaxes": 4113,
+      "rentalVacancyRate": 5.5
+    },
+    "33500": {
+      "name": "Minot, ND",
+      "medianRealEstateTaxes": 2838,
+      "rentalVacancyRate": 3
+    },
+    "33540": {
+      "name": "Missoula, MT",
+      "medianRealEstateTaxes": 4677,
+      "rentalVacancyRate": null
+    },
+    "33660": {
+      "name": "Mobile, AL",
+      "medianRealEstateTaxes": 963,
+      "rentalVacancyRate": 9.6
+    },
+    "33700": {
+      "name": "Modesto, CA",
+      "medianRealEstateTaxes": 3320,
+      "rentalVacancyRate": 2.7
+    },
+    "33740": {
+      "name": "Monroe, LA",
+      "medianRealEstateTaxes": 746,
+      "rentalVacancyRate": 9.7
+    },
+    "33780": {
+      "name": "Monroe, MI",
+      "medianRealEstateTaxes": 2814,
+      "rentalVacancyRate": null
+    },
+    "33860": {
+      "name": "Montgomery, AL",
+      "medianRealEstateTaxes": 791,
+      "rentalVacancyRate": 11.2
+    },
+    "34060": {
+      "name": "Morgantown, WV",
+      "medianRealEstateTaxes": 1127,
+      "rentalVacancyRate": 3.3
+    },
+    "34100": {
+      "name": "Morristown, TN",
+      "medianRealEstateTaxes": 858,
+      "rentalVacancyRate": null
+    },
+    "34580": {
+      "name": "Mount Vernon-Anacortes, WA",
+      "medianRealEstateTaxes": 4697,
+      "rentalVacancyRate": 2.4
+    },
+    "34620": {
+      "name": "Muncie, IN",
+      "medianRealEstateTaxes": 1110,
+      "rentalVacancyRate": 6.1
+    },
+    "34740": {
+      "name": "Muskegon-Norton Shores, MI",
+      "medianRealEstateTaxes": 2479,
+      "rentalVacancyRate": 6.6
+    },
+    "34820": {
+      "name": "Myrtle Beach-Conway-North Myrtle Beach, SC",
+      "medianRealEstateTaxes": 1087,
+      "rentalVacancyRate": 14.7
+    },
+    "34900": {
+      "name": "Napa, CA",
+      "medianRealEstateTaxes": 6049,
+      "rentalVacancyRate": 7
+    },
+    "34940": {
+      "name": "Naples-Marco Island, FL",
+      "medianRealEstateTaxes": 3597,
+      "rentalVacancyRate": 10.6
+    },
+    "34980": {
+      "name": "Nashville-Davidson--Murfreesboro--Franklin, TN",
+      "medianRealEstateTaxes": 2140,
+      "rentalVacancyRate": 8.3
+    },
+    "35300": {
+      "name": "New Haven, CT",
+      "medianRealEstateTaxes": 6687,
+      "rentalVacancyRate": 5.1
+    },
+    "35380": {
+      "name": "New Orleans-Metairie, LA",
+      "medianRealEstateTaxes": 1636,
+      "rentalVacancyRate": 9.4
+    },
+    "35620": {
+      "name": "New York-Newark-Jersey City, NY-NJ",
+      "medianRealEstateTaxes": 9973,
+      "rentalVacancyRate": 3.7
+    },
+    "35660": {
+      "name": "Niles, MI",
+      "medianRealEstateTaxes": 2531,
+      "rentalVacancyRate": 9.4
+    },
+    "35840": {
+      "name": "North Port-Bradenton-Sarasota, FL",
+      "medianRealEstateTaxes": 3431,
+      "rentalVacancyRate": 9
+    },
+    "35980": {
+      "name": "Norwich-New London-Willimantic, CT",
+      "medianRealEstateTaxes": 5290,
+      "rentalVacancyRate": 4.4
+    },
+    "36100": {
+      "name": "Ocala, FL",
+      "medianRealEstateTaxes": 2012,
+      "rentalVacancyRate": 12.3
+    },
+    "36220": {
+      "name": "Odessa, TX",
+      "medianRealEstateTaxes": 2518,
+      "rentalVacancyRate": null
+    },
+    "36260": {
+      "name": "Ogden, UT",
+      "medianRealEstateTaxes": 2737,
+      "rentalVacancyRate": 8.5
+    },
+    "36420": {
+      "name": "Oklahoma City, OK",
+      "medianRealEstateTaxes": 2278,
+      "rentalVacancyRate": 6
+    },
+    "36500": {
+      "name": "Olympia-Lacey-Tumwater, WA",
+      "medianRealEstateTaxes": 4238,
+      "rentalVacancyRate": 4.4
+    },
+    "36540": {
+      "name": "Omaha, NE-IA",
+      "medianRealEstateTaxes": 4633,
+      "rentalVacancyRate": 3.6
+    },
+    "36740": {
+      "name": "Orlando-Kissimmee-Sanford, FL",
+      "medianRealEstateTaxes": 3012,
+      "rentalVacancyRate": 7.1
+    },
+    "36780": {
+      "name": "Oshkosh-Neenah, WI",
+      "medianRealEstateTaxes": 3645,
+      "rentalVacancyRate": null
+    },
+    "36980": {
+      "name": "Owensboro, KY",
+      "medianRealEstateTaxes": 1567,
+      "rentalVacancyRate": null
+    },
+    "37100": {
+      "name": "Oxnard-Thousand Oaks-Ventura, CA",
+      "medianRealEstateTaxes": 5862,
+      "rentalVacancyRate": 4.5
+    },
+    "37140": {
+      "name": "Paducah, KY-IL",
+      "medianRealEstateTaxes": 1357,
+      "rentalVacancyRate": null
+    },
+    "37340": {
+      "name": "Palm Bay-Melbourne-Titusville, FL",
+      "medianRealEstateTaxes": 2597,
+      "rentalVacancyRate": 10.6
+    },
+    "37460": {
+      "name": "Panama City-Panama City Beach, FL",
+      "medianRealEstateTaxes": 1903,
+      "rentalVacancyRate": 12.7
+    },
+    "37620": {
+      "name": "Parkersburg-Vienna, WV",
+      "medianRealEstateTaxes": 937,
+      "rentalVacancyRate": 9.9
+    },
+    "37860": {
+      "name": "Pensacola-Ferry Pass-Brent, FL",
+      "medianRealEstateTaxes": 1800,
+      "rentalVacancyRate": 7.2
+    },
+    "37900": {
+      "name": "Peoria, IL",
+      "medianRealEstateTaxes": 3654,
+      "rentalVacancyRate": 7.2
+    },
+    "37980": {
+      "name": "Philadelphia-Camden-Wilmington, PA-NJ-DE-MD",
+      "medianRealEstateTaxes": 5016,
+      "rentalVacancyRate": 4.9
+    },
+    "38060": {
+      "name": "Phoenix-Mesa-Chandler, AZ",
+      "medianRealEstateTaxes": 1883,
+      "rentalVacancyRate": 7.5
+    },
+    "38240": {
+      "name": "Pinehurst-Southern Pines, NC",
+      "medianRealEstateTaxes": 1825,
+      "rentalVacancyRate": 8.4
+    },
+    "38300": {
+      "name": "Pittsburgh, PA",
+      "medianRealEstateTaxes": 2778,
+      "rentalVacancyRate": 6.1
+    },
+    "38340": {
+      "name": "Pittsfield, MA",
+      "medianRealEstateTaxes": 4040,
+      "rentalVacancyRate": null
+    },
+    "38540": {
+      "name": "Pocatello, ID",
+      "medianRealEstateTaxes": 1712,
+      "rentalVacancyRate": 6.5
+    },
+    "38660": {
+      "name": "Ponce, PR",
+      "medianRealEstateTaxes": 315,
+      "rentalVacancyRate": 2.9
+    },
+    "38860": {
+      "name": "Portland-South Portland, ME",
+      "medianRealEstateTaxes": 4330,
+      "rentalVacancyRate": 3
+    },
+    "38900": {
+      "name": "Portland-Vancouver-Hillsboro, OR-WA",
+      "medianRealEstateTaxes": 4889,
+      "rentalVacancyRate": 5.9
+    },
+    "38940": {
+      "name": "Port St. Lucie, FL",
+      "medianRealEstateTaxes": 3877,
+      "rentalVacancyRate": 4
+    },
+    "39150": {
+      "name": "Prescott Valley-Prescott, AZ",
+      "medianRealEstateTaxes": 1664,
+      "rentalVacancyRate": 2.1
+    },
+    "39300": {
+      "name": "Providence-Warwick, RI-MA",
+      "medianRealEstateTaxes": 4946,
+      "rentalVacancyRate": 3.5
+    },
+    "39340": {
+      "name": "Provo-Orem-Lehi, UT",
+      "medianRealEstateTaxes": 2532,
+      "rentalVacancyRate": 3
+    },
+    "39380": {
+      "name": "Pueblo, CO",
+      "medianRealEstateTaxes": 1543,
+      "rentalVacancyRate": 5.9
+    },
+    "39460": {
+      "name": "Punta Gorda, FL",
+      "medianRealEstateTaxes": 2991,
+      "rentalVacancyRate": 11.4
+    },
+    "39540": {
+      "name": "Racine-Mount Pleasant, WI",
+      "medianRealEstateTaxes": 3908,
+      "rentalVacancyRate": null
+    },
+    "39580": {
+      "name": "Raleigh-Cary, NC",
+      "medianRealEstateTaxes": 3082,
+      "rentalVacancyRate": 4.9
+    },
+    "39660": {
+      "name": "Rapid City, SD",
+      "medianRealEstateTaxes": 3577,
+      "rentalVacancyRate": 7.9
+    },
+    "39740": {
+      "name": "Reading, PA",
+      "medianRealEstateTaxes": 4030,
+      "rentalVacancyRate": 2.1
+    },
+    "39820": {
+      "name": "Redding, CA",
+      "medianRealEstateTaxes": 2678,
+      "rentalVacancyRate": 4.2
+    },
+    "39900": {
+      "name": "Reno, NV",
+      "medianRealEstateTaxes": 2383,
+      "rentalVacancyRate": 5.6
+    },
+    "40060": {
+      "name": "Richmond, VA",
+      "medianRealEstateTaxes": 2681,
+      "rentalVacancyRate": 6.1
+    },
+    "40140": {
+      "name": "Riverside-San Bernardino-Ontario, CA",
+      "medianRealEstateTaxes": 4092,
+      "rentalVacancyRate": 4.7
+    },
+    "40220": {
+      "name": "Roanoke, VA",
+      "medianRealEstateTaxes": 2014,
+      "rentalVacancyRate": 7.3
+    },
+    "40340": {
+      "name": "Rochester, MN",
+      "medianRealEstateTaxes": 3437,
+      "rentalVacancyRate": 10.7
+    },
+    "40380": {
+      "name": "Rochester, NY",
+      "medianRealEstateTaxes": 5313,
+      "rentalVacancyRate": 3.7
+    },
+    "40420": {
+      "name": "Rockford, IL",
+      "medianRealEstateTaxes": 4068,
+      "rentalVacancyRate": 3.9
+    },
+    "40580": {
+      "name": "Rocky Mount, NC",
+      "medianRealEstateTaxes": 1382,
+      "rentalVacancyRate": 2.1
+    },
+    "40660": {
+      "name": "Rome, GA",
+      "medianRealEstateTaxes": 2367,
+      "rentalVacancyRate": 10.3
+    },
+    "40900": {
+      "name": "Sacramento-Roseville-Folsom, CA",
+      "medianRealEstateTaxes": 4594,
+      "rentalVacancyRate": 5
+    },
+    "40980": {
+      "name": "Saginaw, MI",
+      "medianRealEstateTaxes": 2412,
+      "rentalVacancyRate": null
+    },
+    "41060": {
+      "name": "St. Cloud, MN",
+      "medianRealEstateTaxes": 2845,
+      "rentalVacancyRate": 4.5
+    },
+    "41100": {
+      "name": "St. George, UT",
+      "medianRealEstateTaxes": 2216,
+      "rentalVacancyRate": 12.6
+    },
+    "41140": {
+      "name": "St. Joseph, MO-KS",
+      "medianRealEstateTaxes": 1390,
+      "rentalVacancyRate": null
+    },
+    "41180": {
+      "name": "St. Louis, MO-IL",
+      "medianRealEstateTaxes": 3014,
+      "rentalVacancyRate": 6.6
+    },
+    "41420": {
+      "name": "Salem, OR",
+      "medianRealEstateTaxes": 3516,
+      "rentalVacancyRate": null
+    },
+    "41500": {
+      "name": "Salinas, CA",
+      "medianRealEstateTaxes": 5016,
+      "rentalVacancyRate": 2.7
+    },
+    "41540": {
+      "name": "Salisbury, MD",
+      "medianRealEstateTaxes": 1924,
+      "rentalVacancyRate": 7.1
+    },
+    "41620": {
+      "name": "Salt Lake City-Murray, UT",
+      "medianRealEstateTaxes": 2929,
+      "rentalVacancyRate": 5.1
+    },
+    "41660": {
+      "name": "San Angelo, TX",
+      "medianRealEstateTaxes": 2662,
+      "rentalVacancyRate": 4.5
+    },
+    "41700": {
+      "name": "San Antonio-New Braunfels, TX",
+      "medianRealEstateTaxes": 4303,
+      "rentalVacancyRate": 9.5
+    },
+    "41740": {
+      "name": "San Diego-Chula Vista-Carlsbad, CA",
+      "medianRealEstateTaxes": 5948,
+      "rentalVacancyRate": 4.3
+    },
+    "41780": {
+      "name": "Sandusky, OH",
+      "medianRealEstateTaxes": 2630,
+      "rentalVacancyRate": 4.8
+    },
+    "41860": {
+      "name": "San Francisco-Oakland-Fremont, CA",
+      "medianRealEstateTaxes": 8777,
+      "rentalVacancyRate": 5.9
+    },
+    "41940": {
+      "name": "San Jose-Sunnyvale-Santa Clara, CA",
+      "medianRealEstateTaxes": 10001,
+      "rentalVacancyRate": 3.9
+    },
+    "41980": {
+      "name": "San Juan-Bayamón-Caguas, PR",
+      "medianRealEstateTaxes": 678,
+      "rentalVacancyRate": 5.6
+    },
+    "42020": {
+      "name": "San Luis Obispo-Paso Robles, CA",
+      "medianRealEstateTaxes": 5852,
+      "rentalVacancyRate": 5
+    },
+    "42100": {
+      "name": "Santa Cruz-Watsonville, CA",
+      "medianRealEstateTaxes": 6496,
+      "rentalVacancyRate": 3.3
+    },
+    "42140": {
+      "name": "Santa Fe, NM",
+      "medianRealEstateTaxes": 2167,
+      "rentalVacancyRate": 5.9
+    },
+    "42200": {
+      "name": "Santa Maria-Santa Barbara, CA",
+      "medianRealEstateTaxes": 5491,
+      "rentalVacancyRate": 4.7
+    },
+    "42220": {
+      "name": "Santa Rosa-Petaluma, CA",
+      "medianRealEstateTaxes": 5787,
+      "rentalVacancyRate": 3.1
+    },
+    "42340": {
+      "name": "Savannah, GA",
+      "medianRealEstateTaxes": 2770,
+      "rentalVacancyRate": 6.5
+    },
+    "42540": {
+      "name": "Scranton--Wilkes-Barre, PA",
+      "medianRealEstateTaxes": 2660,
+      "rentalVacancyRate": 3.9
+    },
+    "42660": {
+      "name": "Seattle-Tacoma-Bellevue, WA",
+      "medianRealEstateTaxes": 6294,
+      "rentalVacancyRate": 5.1
+    },
+    "42680": {
+      "name": "Sebastian-Vero Beach-West Vero Corridor, FL",
+      "medianRealEstateTaxes": 2647,
+      "rentalVacancyRate": 4
+    },
+    "42700": {
+      "name": "Sebring, FL",
+      "medianRealEstateTaxes": 1603,
+      "rentalVacancyRate": 4.9
+    },
+    "43100": {
+      "name": "Sheboygan, WI",
+      "medianRealEstateTaxes": 3075,
+      "rentalVacancyRate": null
+    },
+    "43300": {
+      "name": "Sherman-Denison, TX",
+      "medianRealEstateTaxes": 3280,
+      "rentalVacancyRate": 3.5
+    },
+    "43340": {
+      "name": "Shreveport-Bossier City, LA",
+      "medianRealEstateTaxes": 1161,
+      "rentalVacancyRate": 7.5
+    },
+    "43420": {
+      "name": "Sierra Vista-Douglas, AZ",
+      "medianRealEstateTaxes": 1228,
+      "rentalVacancyRate": 8.6
+    },
+    "43580": {
+      "name": "Sioux City, IA-NE-SD",
+      "medianRealEstateTaxes": 2878,
+      "rentalVacancyRate": null
+    },
+    "43620": {
+      "name": "Sioux Falls, SD-MN",
+      "medianRealEstateTaxes": 3735,
+      "rentalVacancyRate": 6
+    },
+    "43640": {
+      "name": "Slidell-Mandeville-Covington, LA",
+      "medianRealEstateTaxes": 1994,
+      "rentalVacancyRate": 5.4
+    },
+    "43780": {
+      "name": "South Bend-Mishawaka, IN-MI",
+      "medianRealEstateTaxes": 1965,
+      "rentalVacancyRate": 4.3
+    },
+    "43900": {
+      "name": "Spartanburg, SC",
+      "medianRealEstateTaxes": 1325,
+      "rentalVacancyRate": 9.2
+    },
+    "44060": {
+      "name": "Spokane-Spokane Valley, WA",
+      "medianRealEstateTaxes": 3486,
+      "rentalVacancyRate": 4.4
+    },
+    "44100": {
+      "name": "Springfield, IL",
+      "medianRealEstateTaxes": 3762,
+      "rentalVacancyRate": null
+    },
+    "44140": {
+      "name": "Springfield, MA",
+      "medianRealEstateTaxes": 4606,
+      "rentalVacancyRate": 4.2
+    },
+    "44180": {
+      "name": "Springfield, MO",
+      "medianRealEstateTaxes": 1623,
+      "rentalVacancyRate": 4.6
+    },
+    "44220": {
+      "name": "Springfield, OH",
+      "medianRealEstateTaxes": 2177,
+      "rentalVacancyRate": null
+    },
+    "44300": {
+      "name": "State College, PA",
+      "medianRealEstateTaxes": 3363,
+      "rentalVacancyRate": 13.5
+    },
+    "44420": {
+      "name": "Staunton-Stuarts Draft, VA",
+      "medianRealEstateTaxes": 1705,
+      "rentalVacancyRate": null
+    },
+    "44700": {
+      "name": "Stockton-Lodi, CA",
+      "medianRealEstateTaxes": 4267,
+      "rentalVacancyRate": 3.3
+    },
+    "44940": {
+      "name": "Sumter, SC",
+      "medianRealEstateTaxes": 925,
+      "rentalVacancyRate": 4.7
+    },
+    "45060": {
+      "name": "Syracuse, NY",
+      "medianRealEstateTaxes": 4643,
+      "rentalVacancyRate": 2.9
+    },
+    "45220": {
+      "name": "Tallahassee, FL",
+      "medianRealEstateTaxes": 2107,
+      "rentalVacancyRate": 7.6
+    },
+    "45300": {
+      "name": "Tampa-St. Petersburg-Clearwater, FL",
+      "medianRealEstateTaxes": 2876,
+      "rentalVacancyRate": 7.3
+    },
+    "45460": {
+      "name": "Terre Haute, IN",
+      "medianRealEstateTaxes": 1057,
+      "rentalVacancyRate": 6.9
+    },
+    "45500": {
+      "name": "Texarkana, TX-AR",
+      "medianRealEstateTaxes": 1265,
+      "rentalVacancyRate": 7.6
+    },
+    "45780": {
+      "name": "Toledo, OH",
+      "medianRealEstateTaxes": 2798,
+      "rentalVacancyRate": 5.8
+    },
+    "45820": {
+      "name": "Topeka, KS",
+      "medianRealEstateTaxes": 2879,
+      "rentalVacancyRate": 3.2
+    },
+    "45900": {
+      "name": "Traverse City, MI",
+      "medianRealEstateTaxes": 2844,
+      "rentalVacancyRate": null
+    },
+    "45940": {
+      "name": "Trenton-Princeton, NJ",
+      "medianRealEstateTaxes": 8709,
+      "rentalVacancyRate": null
+    },
+    "46060": {
+      "name": "Tucson, AZ",
+      "medianRealEstateTaxes": 2276,
+      "rentalVacancyRate": 5.8
+    },
+    "46140": {
+      "name": "Tulsa, OK",
+      "medianRealEstateTaxes": 1999,
+      "rentalVacancyRate": 4.9
+    },
+    "46220": {
+      "name": "Tuscaloosa, AL",
+      "medianRealEstateTaxes": 737,
+      "rentalVacancyRate": 5.4
+    },
+    "46300": {
+      "name": "Twin Falls, ID",
+      "medianRealEstateTaxes": 2099,
+      "rentalVacancyRate": null
+    },
+    "46340": {
+      "name": "Tyler, TX",
+      "medianRealEstateTaxes": 2551,
+      "rentalVacancyRate": 7.9
+    },
+    "46520": {
+      "name": "Urban Honolulu, HI",
+      "medianRealEstateTaxes": 2701,
+      "rentalVacancyRate": 6
+    },
+    "46540": {
+      "name": "Utica-Rome, NY",
+      "medianRealEstateTaxes": 3564,
+      "rentalVacancyRate": 3.9
+    },
+    "46660": {
+      "name": "Valdosta, GA",
+      "medianRealEstateTaxes": 1799,
+      "rentalVacancyRate": 11.4
+    },
+    "46700": {
+      "name": "Vallejo, CA",
+      "medianRealEstateTaxes": 4837,
+      "rentalVacancyRate": 2.3
+    },
+    "47020": {
+      "name": "Victoria, TX",
+      "medianRealEstateTaxes": 2845,
+      "rentalVacancyRate": null
+    },
+    "47220": {
+      "name": "Vineland, NJ",
+      "medianRealEstateTaxes": 4922,
+      "rentalVacancyRate": null
+    },
+    "47260": {
+      "name": "Virginia Beach-Chesapeake-Norfolk, VA-NC",
+      "medianRealEstateTaxes": 2949,
+      "rentalVacancyRate": 5.3
+    },
+    "47300": {
+      "name": "Visalia, CA",
+      "medianRealEstateTaxes": 2487,
+      "rentalVacancyRate": 2.2
+    },
+    "47380": {
+      "name": "Waco, TX",
+      "medianRealEstateTaxes": 3071,
+      "rentalVacancyRate": 3.4
+    },
+    "47460": {
+      "name": "Walla Walla, WA",
+      "medianRealEstateTaxes": 3704,
+      "rentalVacancyRate": null
+    },
+    "47580": {
+      "name": "Warner Robins, GA",
+      "medianRealEstateTaxes": 1976,
+      "rentalVacancyRate": null
+    },
+    "47900": {
+      "name": "Washington-Arlington-Alexandria, DC-VA-MD-WV",
+      "medianRealEstateTaxes": 5430,
+      "rentalVacancyRate": 4.6
+    },
+    "47930": {
+      "name": "Waterbury-Shelton, CT",
+      "medianRealEstateTaxes": 5921,
+      "rentalVacancyRate": 4.5
+    },
+    "47940": {
+      "name": "Waterloo-Cedar Falls, IA",
+      "medianRealEstateTaxes": 2774,
+      "rentalVacancyRate": null
+    },
+    "48060": {
+      "name": "Watertown-Fort Drum, NY",
+      "medianRealEstateTaxes": 2712,
+      "rentalVacancyRate": null
+    },
+    "48140": {
+      "name": "Wausau, WI",
+      "medianRealEstateTaxes": 3028,
+      "rentalVacancyRate": null
+    },
+    "48260": {
+      "name": "Weirton-Steubenville, WV-OH",
+      "medianRealEstateTaxes": 1112,
+      "rentalVacancyRate": null
+    },
+    "48300": {
+      "name": "Wenatchee-East Wenatchee, WA",
+      "medianRealEstateTaxes": 3622,
+      "rentalVacancyRate": 4
+    },
+    "48540": {
+      "name": "Wheeling, WV-OH",
+      "medianRealEstateTaxes": 1178,
+      "rentalVacancyRate": 4.7
+    },
+    "48620": {
+      "name": "Wichita, KS",
+      "medianRealEstateTaxes": 2652,
+      "rentalVacancyRate": 8.2
+    },
+    "48660": {
+      "name": "Wichita Falls, TX",
+      "medianRealEstateTaxes": 2464,
+      "rentalVacancyRate": 6
+    },
+    "48680": {
+      "name": "Wildwood-The Villages, FL",
+      "medianRealEstateTaxes": 3039,
+      "rentalVacancyRate": 17.7
+    },
+    "48700": {
+      "name": "Williamsport, PA",
+      "medianRealEstateTaxes": 2578,
+      "rentalVacancyRate": null
+    },
+    "48900": {
+      "name": "Wilmington, NC",
+      "medianRealEstateTaxes": 2107,
+      "rentalVacancyRate": 16.3
+    },
+    "49020": {
+      "name": "Winchester, VA-WV",
+      "medianRealEstateTaxes": 1591,
+      "rentalVacancyRate": null
+    },
+    "49180": {
+      "name": "Winston-Salem, NC",
+      "medianRealEstateTaxes": 1644,
+      "rentalVacancyRate": 3.4
+    },
+    "49340": {
+      "name": "Worcester, MA",
+      "medianRealEstateTaxes": 5669,
+      "rentalVacancyRate": 3.1
+    },
+    "49420": {
+      "name": "Yakima, WA",
+      "medianRealEstateTaxes": 2848,
+      "rentalVacancyRate": null
+    },
+    "49620": {
+      "name": "York-Hanover, PA",
+      "medianRealEstateTaxes": 4020,
+      "rentalVacancyRate": null
+    },
+    "49660": {
+      "name": "Youngstown-Warren, OH",
+      "medianRealEstateTaxes": 2023,
+      "rentalVacancyRate": 4.1
+    },
+    "49700": {
+      "name": "Yuba City, CA",
+      "medianRealEstateTaxes": 3292,
+      "rentalVacancyRate": null
+    },
+    "49740": {
+      "name": "Yuma, AZ",
+      "medianRealEstateTaxes": 1370,
+      "rentalVacancyRate": 5.4
+    }
+  }
+}
