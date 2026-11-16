@@ -4,7 +4,11 @@ import { notFound } from 'next/navigation'
 import { JsonLd, breadcrumbJsonLd, faqJsonLd } from '@/components/json-ld'
 import { lenderComparisons, getComparisonBySlug, getComparisonData, getComparisonsForLender } from '@/data/lender-comparisons'
 import { loanTypes } from '@/data/loan-types'
-import { formatCurrency } from '@/data/lenders'
+import {
+  formatRate, formatLtv, formatCredit, formatLoanRange, formatText, formatYesNo,
+  formatExperience, formatCoverage,
+} from '@/data/lenders'
+import { LenderVerification } from '@/components/lender-verification'
 import { LenderOutboundLink } from '@/components/lender-outbound-link'
 import { normalizeTitle } from '@/lib/page-title'
 import { freshnessStamp } from '@/lib/content-freshness'
@@ -27,14 +31,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-const experienceLabels: Record<string, string> = {
-  none: 'No experience required',
-  beginner: '1–2 deals',
-  intermediate: '3–5 deals',
-  experienced: '5+ deals',
-  varies: 'Varies',
-}
-
 const propertyTypeLabels: Record<string, string> = {
   sfr: 'SFR (1-4)', multifamily: 'Multifamily (5+)', 'mixed-use': 'Mixed Use',
   commercial: 'Commercial', str: 'STR / Airbnb', condo: 'Condo', townhouse: 'Townhouse',
@@ -45,7 +41,6 @@ type ComparisonRow = {
   label: string
   getA: string
   getB: string
-  winner: 'a' | 'b' | 'tie' | null
 }
 
 export default async function LenderVsLenderPage({ params }: Props) {
@@ -63,131 +58,56 @@ export default async function LenderVsLenderPage({ params }: Props) {
     .map((s) => loanTypes.find((lt) => lt.slug === s)?.shortName)
     .filter(Boolean)
 
-  // Honest freshness stamp: explicit lastReviewed ("Reviewed") or the data file's
-  // real git change date ("Updated") — never a frozen literal. See content-freshness.ts.
+  // Honest freshness stamp: the older of the two lenders' verification dates.
   const stamp = freshnessStamp('lenderComparisons', comparison.lastReviewed)
 
-  // Build comparison rows with winner determination
+  // Side-by-side facts only — no winner, no score. "Not published" means the
+  // lender does not state the figure on its own site.
   const rows: ComparisonRow[] = [
+    { label: 'Published rates', getA: formatRate(a), getB: formatRate(b) },
+    { label: 'Max LTV', getA: formatLtv(a), getB: formatLtv(b) },
+    { label: 'Min credit score', getA: formatCredit(a), getB: formatCredit(b) },
+    { label: 'Loan range', getA: formatLoanRange(a), getB: formatLoanRange(b) },
+    { label: 'Origination / fees', getA: formatText(a.originationFee), getB: formatText(b.originationFee) },
+    { label: 'Speed to close', getA: formatText(a.speedToClose), getB: formatText(b.speedToClose) },
+    { label: 'Experience required', getA: formatExperience(a.experienceRequired), getB: formatExperience(b.experienceRequired) },
+    { label: 'LLC borrowing', getA: formatYesNo(a.allowsLlc), getB: formatYesNo(b.allowsLlc) },
+    { label: 'Interest-only', getA: formatYesNo(a.interestOnlyAvailable, 'Available'), getB: formatYesNo(b.interestOnlyAvailable, 'Available') },
+    { label: 'Prepayment penalty', getA: formatText(a.prepaymentPenalty), getB: formatText(b.prepaymentPenalty) },
+    { label: 'Foreign nationals', getA: formatYesNo(a.foreignNational), getB: formatYesNo(b.foreignNational) },
+    { label: 'State coverage', getA: formatCoverage(a), getB: formatCoverage(b) },
     {
-      label: 'Interest Rates',
-      getA: `${a.minRate}%–${a.maxRate}%`,
-      getB: `${b.minRate}%–${b.maxRate}%`,
-      winner: a.minRate < b.minRate ? 'a' : b.minRate < a.minRate ? 'b' : 'tie',
-    },
-    {
-      label: 'Max LTV',
-      getA: `${a.maxLtv}%`,
-      getB: `${b.maxLtv}%`,
-      winner: a.maxLtv > b.maxLtv ? 'a' : b.maxLtv > a.maxLtv ? 'b' : 'tie',
-    },
-    {
-      label: 'Min Credit Score',
-      getA: `${a.minCreditScore}`,
-      getB: `${b.minCreditScore}`,
-      winner: a.minCreditScore < b.minCreditScore ? 'a' : b.minCreditScore < a.minCreditScore ? 'b' : 'tie',
-    },
-    {
-      label: 'Loan Range',
-      getA: `${formatCurrency(a.minLoanAmount)}–${formatCurrency(a.maxLoanAmount)}`,
-      getB: `${formatCurrency(b.minLoanAmount)}–${formatCurrency(b.maxLoanAmount)}`,
-      winner: null,
-    },
-    {
-      label: 'Origination Fee',
-      getA: a.originationFee,
-      getB: b.originationFee,
-      winner: null,
-    },
-    {
-      label: 'Speed to Close',
-      getA: a.speedToClose,
-      getB: b.speedToClose,
-      winner: null,
-    },
-    {
-      label: 'Experience Required',
-      getA: experienceLabels[a.experienceRequired] || a.experienceRequired,
-      getB: experienceLabels[b.experienceRequired] || b.experienceRequired,
-      winner: null,
-    },
-    {
-      label: 'LLC Borrowing',
-      getA: a.allowsLlc ? 'Yes' : 'No',
-      getB: b.allowsLlc ? 'Yes' : 'No',
-      winner: null,
-    },
-    {
-      label: 'Interest-Only',
-      getA: a.interestOnlyAvailable ? 'Available' : 'No',
-      getB: b.interestOnlyAvailable ? 'Available' : 'No',
-      winner: null,
-    },
-    {
-      label: 'Prepayment Penalty',
-      getA: a.prepaymentPenalty,
-      getB: b.prepaymentPenalty,
-      winner: null,
-    },
-    {
-      label: 'Foreign National',
-      getA: a.foreignNational ? 'Yes' : 'No',
-      getB: b.foreignNational ? 'Yes' : 'No',
-      winner: a.foreignNational && !b.foreignNational ? 'a' : !a.foreignNational && b.foreignNational ? 'b' : 'tie',
-    },
-    {
-      label: 'Coverage',
-      getA: a.nationwide ? 'Nationwide' : 'Regional',
-      getB: b.nationwide ? 'Nationwide' : 'Regional',
-      winner: null,
-    },
-    {
-      label: 'Property Types',
+      label: 'Property types',
       getA: a.propertyTypes.map((pt) => propertyTypeLabels[pt] || pt).join(', '),
       getB: b.propertyTypes.map((pt) => propertyTypeLabels[pt] || pt).join(', '),
-      winner: a.propertyTypes.length > b.propertyTypes.length ? 'a' : b.propertyTypes.length > a.propertyTypes.length ? 'b' : 'tie',
     },
     {
-      label: 'Loan Products',
-      getA: `${a.loanTypeSlugs.length} products`,
-      getB: `${b.loanTypeSlugs.length} products`,
-      winner: a.loanTypeSlugs.length > b.loanTypeSlugs.length ? 'a' : b.loanTypeSlugs.length > a.loanTypeSlugs.length ? 'b' : 'tie',
-    },
-    {
-      label: 'Founded',
-      getA: `${a.founded}`,
-      getB: `${b.founded}`,
-      winner: null,
-    },
-    {
-      label: 'Editor Rating',
-      getA: `${a.editorRating.toFixed(1)} / 5.0`,
-      getB: `${b.editorRating.toFixed(1)} / 5.0`,
-      winner: a.editorRating > b.editorRating ? 'a' : b.editorRating > a.editorRating ? 'b' : 'tie',
+      label: 'Loan products',
+      getA: a.loanTypeSlugs.map((s) => loanTypes.find((lt) => lt.slug === s)?.shortName || s).join(', '),
+      getB: b.loanTypeSlugs.map((s) => loanTypes.find((lt) => lt.slug === s)?.shortName || s).join(', '),
     },
   ]
-
-  const winsA = rows.filter((r) => r.winner === 'a').length
-  const winsB = rows.filter((r) => r.winner === 'b').length
 
   // Related comparisons
   const relatedA = getComparisonsForLender(a.slug).filter((c) => c.slug !== slug).slice(0, 3)
   const relatedB = getComparisonsForLender(b.slug).filter((c) => c.slug !== slug).slice(0, 3)
   const related = [...new Map([...relatedA, ...relatedB].map((c) => [c.slug, c])).values()].slice(0, 4)
 
-  // FAQs
+  // FAQs — restate only verified, published figures.
   const faqs = [
     {
-      question: `Is ${a.name} or ${b.name} better for real estate investors?`,
+      question: `How do ${a.name} and ${b.name} compare?`,
       answer: comparison.angle,
     },
     {
       question: `What loan types do ${a.name} and ${b.name} both offer?`,
-      answer: `Both lenders offer ${sharedLoanTypeNames.join(', ')}. ${a.loanTypeSlugs.length > b.loanTypeSlugs.length ? `${a.name} offers ${a.loanTypeSlugs.length} total products vs ${b.name}'s ${b.loanTypeSlugs.length}` : b.loanTypeSlugs.length > a.loanTypeSlugs.length ? `${b.name} offers ${b.loanTypeSlugs.length} total products vs ${a.name}'s ${a.loanTypeSlugs.length}` : `Both offer ${a.loanTypeSlugs.length} products`}.`,
+      answer: sharedLoanTypeNames.length
+        ? `Both lenders list ${sharedLoanTypeNames.join(', ')} on their sites.`
+        : `They do not list the same loan types.`,
     },
     {
-      question: `Which has lower rates, ${a.name} or ${b.name}?`,
-      answer: `${a.name} advertises rates starting at ${a.minRate}% while ${b.name} starts at ${b.minRate}%. ${a.minRate < b.minRate ? `${a.name} has the lower starting rate` : b.minRate < a.minRate ? `${b.name} has the lower starting rate` : 'Both have the same starting rate'}, but actual rates depend on your credit score, LTV, property type, and loan product. Always get quotes from both lenders.`,
+      question: `What rates do ${a.name} and ${b.name} publish?`,
+      answer: `${a.name}: ${formatRate(a).toLowerCase() === 'not published' ? 'no published rates' : formatRate(a)}. ${b.name}: ${formatRate(b).toLowerCase() === 'not published' ? 'no published rates' : formatRate(b)}. Published rates are the lenders' own starting figures; your rate depends on credit, leverage, property and loan product, so get a written quote from each.`,
     },
   ]
 
@@ -224,27 +144,10 @@ export default async function LenderVsLenderPage({ params }: Props) {
           Shared products: {sharedLoanTypeNames.join(', ')}
           {stamp && (
             <>
-              {' '}&middot; {stamp.verb} {stamp.date}
+              {' '}&middot; Figures verified {stamp.date} from each lender&apos;s site
             </>
           )}
         </p>
-      </div>
-
-      {/* Score Summary */}
-      <div className="grid grid-cols-3 gap-4 mb-10">
-        <div className={`rounded-xl border p-6 text-center ${winsA > winsB ? 'border-primary/30 bg-primary/5' : 'border-border bg-white'}`}>
-          <p className="text-2xl font-bold text-primary">{a.editorRating.toFixed(1)}</p>
-          <p className="text-sm font-semibold text-text mt-1">{a.name}</p>
-          <p className="text-xs text-text-light mt-1">Wins {winsA} categories</p>
-        </div>
-        <div className="rounded-xl border border-border bg-white p-6 text-center flex items-center justify-center">
-          <span className="text-2xl font-bold text-text-light">VS</span>
-        </div>
-        <div className={`rounded-xl border p-6 text-center ${winsB > winsA ? 'border-primary/30 bg-primary/5' : 'border-border bg-white'}`}>
-          <p className="text-2xl font-bold text-primary">{b.editorRating.toFixed(1)}</p>
-          <p className="text-sm font-semibold text-text mt-1">{b.name}</p>
-          <p className="text-xs text-text-light mt-1">Wins {winsB} categories</p>
-        </div>
       </div>
 
       {/* Full Comparison Table */}
@@ -271,18 +174,16 @@ export default async function LenderVsLenderPage({ params }: Props) {
               {rows.map((row) => (
                 <tr key={row.label} className="hover:bg-surface transition-colors">
                   <td className="px-4 py-3 font-medium text-text-muted">{row.label}</td>
-                  <td className={`px-4 py-3 ${row.winner === 'a' ? 'font-semibold text-primary bg-primary/5' : 'text-text'}`}>
-                    {row.getA}
-                    {row.winner === 'a' && <span className="ml-2 text-xs text-primary">Better</span>}
-                  </td>
-                  <td className={`px-4 py-3 ${row.winner === 'b' ? 'font-semibold text-primary bg-primary/5' : 'text-text'}`}>
-                    {row.getB}
-                    {row.winner === 'b' && <span className="ml-2 text-xs text-primary">Better</span>}
-                  </td>
+                  <td className="px-4 py-3 text-text">{row.getA}</td>
+                  <td className="px-4 py-3 text-text">{row.getB}</td>
                 </tr>
               ))}
             </tbody>
           </table>
+        </div>
+        <div className="mt-4 grid gap-4 md:grid-cols-2">
+          <LenderVerification lender={a} />
+          <LenderVerification lender={b} />
         </div>
       </section>
 
@@ -326,7 +227,7 @@ export default async function LenderVsLenderPage({ params }: Props) {
           <div key={lender.slug} className="rounded-xl border border-border bg-white p-6 text-center">
             <p className="text-lg font-bold text-text mb-2">{lender.name}</p>
             <p className="text-xs text-text-muted mb-4">
-              {lender.editorRating.toFixed(1)} editor rating &middot; {lender.speedToClose} closing
+              {lender.coverage ?? 'State coverage not published'}
             </p>
             <div className="flex flex-col gap-2">
               <LenderOutboundLink
@@ -334,7 +235,6 @@ export default async function LenderVsLenderPage({ params }: Props) {
                 lenderName={lender.name}
                 lenderSlug={lender.slug}
                 placement="comparison-table"
-                editorRating={lender.editorRating}
                 className="rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-white hover:bg-primary-light transition-colors"
               >
                 Visit {lender.name}

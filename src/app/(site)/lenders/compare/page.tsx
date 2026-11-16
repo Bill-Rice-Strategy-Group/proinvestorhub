@@ -46,7 +46,9 @@ export default function LenderComparePage() {
         <p className="mt-4 text-lg text-text-muted leading-7">
           Select 2–3 lenders to see a detailed comparison across every key metric:
           rates, LTV, credit requirements, closing speed, fees, property types,
-          and more. The best value in each category is highlighted.
+          and more. Every figure is the lender&apos;s own published number,
+          checked against its site; &ldquo;Not published&rdquo; means the lender
+          doesn&apos;t state it. We don&apos;t pick winners.
         </p>
       </div>
 

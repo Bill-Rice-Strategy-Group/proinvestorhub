@@ -2,7 +2,13 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { JsonLd, breadcrumbJsonLd, faqJsonLd } from '@/components/json-ld'
-import { lenders, getLenderBySlug, formatCurrency, type LenderData } from '@/data/lenders'
+import {
+  lenders, getLenderBySlug, type LenderData,
+  formatRate, formatLtv, formatCredit, formatLoanRange, formatText, formatYesNo,
+  formatExperience, formatCoverage, NOT_PUBLISHED,
+} from '@/data/lenders'
+import { LenderVerification } from '@/components/lender-verification'
+import { formatMonthYear } from '@/lib/content-freshness'
 import { loanTypes } from '@/data/loan-types'
 import { getComparisonsForLender } from '@/data/lender-comparisons'
 import { LenderOutboundLink } from '@/components/lender-outbound-link'
@@ -28,14 +34,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description: lender.metaDescription,
     },
   }
-}
-
-const experienceLabels: Record<string, string> = {
-  none: 'No experience required',
-  beginner: '1–2 completed deals',
-  intermediate: '3–5 completed deals',
-  experienced: '5+ completed deals',
-  varies: 'Varies by product',
 }
 
 const propertyTypeLabels: Record<string, string> = {
@@ -78,10 +76,17 @@ function buildLenderFaqs(lender: LenderData): { question: string; answer: string
       ? `${loanList.slice(0, -1).join(', ')} and ${loanList[loanList.length - 1]}`
       : loanList[0] || 'investment property loans'
 
+  const verified = lender.lastReviewed
+    ? ` Figures checked against ${lender.name}'s own site in ${formatMonthYear(lender.lastReviewed)}.`
+    : ''
+
+  const facts: string[] = []
+  if (lender.founded) facts.push(`founded in ${lender.founded}`)
+  if (lender.headquarters) facts.push(`headquartered in ${lender.headquarters}`)
   const faqs: { question: string; answer: string }[] = [
     {
       question: `Is ${lender.name} a legitimate lender?`,
-      answer: `${lender.name} is an established lender founded in ${lender.founded}${lender.headquarters ? ` and headquartered in ${lender.headquarters}` : ''}. It ${lender.nationwide ? 'lends nationwide' : 'operates in select states'} and specializes in ${loanStr}. To verify it for yourself, confirm ${lender.name}'s current NMLS registration and state licensing, check its Better Business Bureau (BBB) profile and reviews, and compare written quotes before you apply.`,
+      answer: `${lender.name}${facts.length ? ` (${facts.join(', ')})` : ''} ${lender.capitalProvider ? 'funds' : 'offers'} ${loanStr}${lender.coverage ? `; state coverage per its site: ${lender.coverage}` : ''}. To verify it for yourself, confirm ${lender.name}'s current NMLS registration and state licensing, check its Better Business Bureau (BBB) profile and reviews, and compare written quotes before you apply.`,
     },
   ]
 
@@ -95,31 +100,48 @@ function buildLenderFaqs(lender: LenderData): { question: string; answer: string
   if (lender.loanTypeSlugs.includes('bank-statement-loans')) {
     faqs.push({
       question: `Does ${lender.name} offer bank statement loans?`,
-      answer: `Yes. ${lender.name} offers bank statement loan programs that qualify self-employed borrowers using 12–24 months of bank deposits instead of tax returns or W-2s — useful for investors with non-traditional income.`,
+      answer: `Yes. ${lender.name} lists bank statement loan programs, which qualify self-employed borrowers on bank deposits instead of tax returns or W-2s.`,
     })
   }
 
-  faqs.push({
-    question: `What credit score do you need for ${lender.name}?`,
-    answer: `${lender.name}'s published minimum credit score is ${lender.minCreditScore}. A higher score generally unlocks better rates and higher leverage. Requirements vary by loan program and are subject to change.`,
-  })
+  // Credit, rates and speed: restate only what the lender publishes.
+  if (lender.minCreditScore != null || lender.noCreditMinimum) {
+    faqs.push({
+      question: `What credit score do you need for ${lender.name}?`,
+      answer: (lender.minCreditScore != null
+        ? `The lowest minimum credit score ${lender.name} publishes is ${lender.minCreditScore}.`
+        : `${lender.name} publishes that at least one of its programs has no credit-score minimum.`)
+        + (lender.termsNote ? ` By program: ${lender.termsNote}` : '') + verified,
+    })
+  }
 
-  faqs.push({
-    question: `What rates and fees does ${lender.name} charge?`,
-    answer: `${lender.name}'s rates run approximately ${lender.minRate}%–${lender.maxRate}% with origination fees of ${lender.originationFee}, on loans from ${formatCurrency(lender.minLoanAmount)} to ${formatCurrency(lender.maxLoanAmount)} (up to ${lender.maxLtv}% LTV). All figures are approximate and subject to change — request a written quote for your scenario.`,
-  })
+  const rate = formatRate(lender)
+  if (rate !== NOT_PUBLISHED || lender.originationFee) {
+    const bits: string[] = []
+    if (rate !== NOT_PUBLISHED) bits.push(`published rates: ${rate}`)
+    if (lender.originationFee) bits.push(`fees: ${lender.originationFee}`)
+    const range = formatLoanRange(lender)
+    if (range !== NOT_PUBLISHED) bits.push(`loan sizes: ${range}`)
+    if (lender.maxLtv != null) bits.push(`leverage up to ${lender.maxLtv}% LTV`)
+    faqs.push({
+      question: `What rates and fees does ${lender.name} charge?`,
+      answer: `From ${lender.name}'s site — ${bits.join('; ')}. These are the lender's headline figures, not a quote; request a written quote for your scenario.${verified}`,
+    })
+  }
 
   if (lender.allowsLlc) {
     faqs.push({
       question: `Can you close with ${lender.name} in an LLC?`,
-      answer: `Yes. ${lender.name} allows investors to take title in an LLC, which many use for liability protection and cleaner portfolio organization.`,
+      answer: `Yes. ${lender.name} lends to LLCs and other business entities, which many investors use for liability protection and cleaner portfolio organization.`,
     })
   }
 
-  faqs.push({
-    question: `How fast can ${lender.name} close a loan?`,
-    answer: `${lender.name} typically closes in ${lender.speedToClose}, depending on the loan program, the property, and how quickly you provide documentation.`,
-  })
+  if (lender.speedToClose) {
+    faqs.push({
+      question: `How fast can ${lender.name} close a loan?`,
+      answer: `${lender.name} publishes: ${lender.speedToClose}. Actual timing depends on the loan program, the property, and how quickly you provide documentation.`,
+    })
+  }
 
   return faqs
 }
@@ -153,23 +175,10 @@ export default async function LenderProfilePage({ params }: Props) {
           name: lender.name,
           url: lender.website,
           description: lender.description,
-          foundingDate: lender.founded.toString(),
-          areaServed: lender.nationwide ? 'US' : undefined,
+          foundingDate: lender.founded ? lender.founded.toString() : undefined,
           address: lender.headquarters
             ? { '@type': 'PostalAddress', addressLocality: lender.headquarters }
             : undefined,
-          aggregateRating: {
-            '@type': 'AggregateRating',
-            ratingValue: lender.editorRating,
-            bestRating: 5,
-            worstRating: 1,
-            ratingCount: 1,
-            author: {
-              '@type': 'Person',
-              name: 'Bill Rice',
-              url: `${baseUrl}/about`,
-            },
-          },
         }}
       />
       <JsonLd data={faqJsonLd(faqs)} />
@@ -191,30 +200,15 @@ export default async function LenderProfilePage({ params }: Props) {
               {lender.name} Review
             </h1>
             <p className="mt-1 text-sm text-text-light">
-              Founded {lender.founded} &middot; {lender.headquarters}
-              {lender.nationwide && ' · Nationwide'}
+              {[
+                lender.founded ? `Founded ${lender.founded}` : null,
+                lender.headquarters,
+                lender.coverage,
+                lender.lastReviewed ? `Verified ${formatMonthYear(lender.lastReviewed)} from ${lender.name}'s site` : null,
+              ]
+                .filter(Boolean)
+                .join(' · ')}
             </p>
-          </div>
-          <div className="flex items-center gap-3">
-            <div className="text-center">
-              <p className="text-3xl font-bold text-primary">{lender.editorRating.toFixed(1)}</p>
-              <p className="text-xs text-text-light">Editor Rating</p>
-            </div>
-            <div className="flex flex-col gap-1">
-              {[1, 2, 3, 4, 5].map((star) => (
-                <div key={star} className="flex items-center gap-0.5">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <svg
-                      key={i}
-                      className={`h-3 w-3 ${i < Math.round(lender.editorRating) ? 'fill-primary' : 'fill-border'}`}
-                      viewBox="0 0 20 20"
-                    >
-                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                    </svg>
-                  ))}
-                </div>
-              )).slice(0, 1)}
-            </div>
           </div>
         </div>
         <p className="mt-4 text-lg text-text-muted leading-7">
@@ -397,69 +391,56 @@ export default async function LenderProfilePage({ params }: Props) {
             <div className="rounded-xl border border-border bg-white p-6 shadow-sm">
               <h3 className="text-lg font-bold text-text mb-4">Key Terms</h3>
               <dl className="space-y-3 text-sm">
-                <div className="flex justify-between">
-                  <dt className="text-text-muted">Interest Rates</dt>
-                  <dd className="font-semibold text-text tabular-nums">
-                    {lender.minRate}%–{lender.maxRate}%
-                  </dd>
+                <div className="flex justify-between gap-4">
+                  <dt className="text-text-muted">Published Rates</dt>
+                  <dd className="font-semibold text-text text-right max-w-[160px]">{formatRate(lender)}</dd>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex justify-between gap-4">
                   <dt className="text-text-muted">Max LTV</dt>
-                  <dd className="font-semibold text-text tabular-nums">{lender.maxLtv}%</dd>
+                  <dd className="font-semibold text-text text-right max-w-[160px]">{formatLtv(lender)}</dd>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex justify-between gap-4">
                   <dt className="text-text-muted">Min Credit Score</dt>
-                  <dd className="font-semibold text-text tabular-nums">{lender.minCreditScore}</dd>
+                  <dd className="font-semibold text-text text-right max-w-[160px]">{formatCredit(lender)}</dd>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex justify-between gap-4">
                   <dt className="text-text-muted">Loan Range</dt>
-                  <dd className="font-semibold text-text tabular-nums">
-                    {formatCurrency(lender.minLoanAmount)}–{formatCurrency(lender.maxLoanAmount)}
-                  </dd>
+                  <dd className="font-semibold text-text text-right max-w-[160px]">{formatLoanRange(lender)}</dd>
                 </div>
-                <div className="flex justify-between">
-                  <dt className="text-text-muted">Origination Fee</dt>
-                  <dd className="font-semibold text-text">{lender.originationFee}</dd>
+                <div className="flex justify-between gap-4">
+                  <dt className="text-text-muted">Origination / Fees</dt>
+                  <dd className="font-semibold text-text text-right max-w-[160px]">{formatText(lender.originationFee)}</dd>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex justify-between gap-4">
                   <dt className="text-text-muted">Speed to Close</dt>
-                  <dd className="font-semibold text-text">{lender.speedToClose}</dd>
+                  <dd className="font-semibold text-text text-right max-w-[160px]">{formatText(lender.speedToClose)}</dd>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex justify-between gap-4">
                   <dt className="text-text-muted">Experience Required</dt>
-                  <dd className="font-semibold text-text">
-                    {experienceLabels[lender.experienceRequired] || lender.experienceRequired}
-                  </dd>
+                  <dd className="font-semibold text-text text-right max-w-[160px]">{formatExperience(lender.experienceRequired)}</dd>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex justify-between gap-4">
                   <dt className="text-text-muted">LLC Borrowing</dt>
-                  <dd className="font-semibold text-text">{lender.allowsLlc ? 'Yes' : 'No'}</dd>
+                  <dd className="font-semibold text-text text-right max-w-[160px]">{formatYesNo(lender.allowsLlc)}</dd>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex justify-between gap-4">
                   <dt className="text-text-muted">Interest-Only</dt>
-                  <dd className="font-semibold text-text">
-                    {lender.interestOnlyAvailable ? 'Available' : 'Not available'}
-                  </dd>
+                  <dd className="font-semibold text-text text-right max-w-[160px]">{formatYesNo(lender.interestOnlyAvailable, 'Available', 'Not available')}</dd>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex justify-between gap-4">
                   <dt className="text-text-muted">Prepayment Penalty</dt>
-                  <dd className="font-semibold text-text text-right max-w-[140px]">
-                    {lender.prepaymentPenalty}
-                  </dd>
+                  <dd className="font-semibold text-text text-right max-w-[160px]">{formatText(lender.prepaymentPenalty)}</dd>
                 </div>
-                <div className="flex justify-between">
-                  <dt className="text-text-muted">Foreign National</dt>
-                  <dd className="font-semibold text-text">
-                    {lender.foreignNational ? 'Yes' : 'No'}
-                  </dd>
+                <div className="flex justify-between gap-4">
+                  <dt className="text-text-muted">Foreign Nationals</dt>
+                  <dd className="font-semibold text-text text-right max-w-[160px]">{formatYesNo(lender.foreignNational)}</dd>
                 </div>
-                <div className="flex justify-between">
-                  <dt className="text-text-muted">Coverage</dt>
-                  <dd className="font-semibold text-text">
-                    {lender.nationwide ? 'Nationwide' : 'Regional'}
-                  </dd>
+                <div className="flex justify-between gap-4">
+                  <dt className="text-text-muted">State Coverage</dt>
+                  <dd className="font-semibold text-text text-right max-w-[160px]">{formatCoverage(lender)}</dd>
                 </div>
               </dl>
+              <LenderVerification lender={lender} className="mt-4 border-t border-border pt-4" />
             </div>
 
             {/* CTA */}
@@ -475,7 +456,6 @@ export default async function LenderProfilePage({ params }: Props) {
                 lenderName={lender.name}
                 lenderSlug={lender.slug}
                 placement="profile-cta"
-                editorRating={lender.editorRating}
                 className="inline-block rounded-lg bg-primary px-6 py-2.5 text-sm font-semibold text-white hover:bg-primary-light transition-colors"
               >
                 Visit {lender.name}
@@ -521,13 +501,14 @@ export default async function LenderProfilePage({ params }: Props) {
       {/* Disclaimer */}
       <section className="mt-12 rounded-xl border border-border bg-surface-raised p-6">
         <p className="text-xs text-text-light leading-5">
-          <strong className="text-text-muted">Disclaimer:</strong> Rates, terms, and
-          requirements shown are approximate and based on publicly available
-          information as of March 2026. Actual terms may vary based on your
-          credit profile, property details, and market conditions. Always verify
-          current terms directly with the lender before making financing
-          decisions. ProInvestorHub provides editorial reviews for educational
-          purposes and does not guarantee loan approval or specific terms.
+          <strong className="text-text-muted">Disclaimer:</strong> The rates, terms
+          and requirements above are {lender.name}&apos;s own published figures
+          {lender.lastReviewed ? <>, checked against its site in {formatMonthYear(lender.lastReviewed)}</> : null}.
+          They are headline figures, not a quote: your terms depend on your credit
+          profile, the property and market conditions, and lenders change them
+          without notice. Confirm current terms with the lender before making a
+          financing decision. ProInvestorHub reviews are for educational purposes;
+          we do not make loans or arrange financing.
         </p>
       </section>
     </div>

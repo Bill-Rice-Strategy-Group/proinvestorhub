@@ -9,7 +9,6 @@ type Props = {
   placement: LenderCTAPlacement
   loanType?: string
   state?: string
-  editorRating?: number
   className?: string
   children: React.ReactNode
 }
@@ -21,7 +20,6 @@ export function LenderOutboundLink({
   placement,
   loanType,
   state,
-  editorRating,
   className,
   children,
 }: Props) {
@@ -35,7 +33,6 @@ export function LenderOutboundLink({
       destinationUrl: href,
       loanType,
       state,
-      editorRating,
     })
   }
 

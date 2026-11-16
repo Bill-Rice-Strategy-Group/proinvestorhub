@@ -56,7 +56,6 @@ export function trackLenderClick({
   destinationUrl,
   loanType,
   state,
-  editorRating,
 }: {
   lenderName: string
   lenderSlug: string
@@ -64,7 +63,6 @@ export function trackLenderClick({
   destinationUrl: string
   loanType?: string
   state?: string
-  editorRating?: number
 }) {
   track('lender_cta_click', {
     lender_name: lenderName,
@@ -73,7 +71,6 @@ export function trackLenderClick({
     destination_url: destinationUrl,
     loan_type: loanType || '',
     state: state || '',
-    editor_rating: editorRating || 0,
     cta_type: 'outbound',
   })
 }

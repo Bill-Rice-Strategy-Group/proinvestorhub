@@ -3,16 +3,12 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import type { LenderData } from '@/data/lenders'
-import { formatCurrency } from '@/data/lenders'
+import {
+  formatRate, formatLtv, formatCredit, formatLoanRange, formatText, formatYesNo,
+  formatExperience, formatCoverage,
+} from '@/data/lenders'
+import { formatMonthYear } from '@/lib/content-freshness'
 import { LenderOutboundLink } from '@/components/lender-outbound-link'
-
-const experienceLabels: Record<string, string> = {
-  none: 'No experience required',
-  beginner: '1–2 deals',
-  intermediate: '3–5 deals',
-  experienced: '5+ deals',
-  varies: 'Varies',
-}
 
 const propertyTypeLabels: Record<string, string> = {
   sfr: 'SFR (1-4)',
@@ -30,59 +26,30 @@ const propertyTypeLabels: Record<string, string> = {
 type ComparisonRow = {
   label: string
   getValue: (l: LenderData) => string
-  highlight?: 'lower-better' | 'higher-better'
 }
 
+// Side-by-side published facts only. No "best" highlighting: the directory has
+// no scoring rule, and "Not published" means the lender doesn't state the figure.
 const comparisonRows: ComparisonRow[] = [
-  { label: 'Interest Rates', getValue: (l) => `${l.minRate}%–${l.maxRate}%`, highlight: 'lower-better' },
-  { label: 'Max LTV', getValue: (l) => `${l.maxLtv}%`, highlight: 'higher-better' },
-  { label: 'Min Credit Score', getValue: (l) => `${l.minCreditScore}`, highlight: 'lower-better' },
-  { label: 'Loan Range', getValue: (l) => `${formatCurrency(l.minLoanAmount)}–${formatCurrency(l.maxLoanAmount)}` },
-  { label: 'Origination Fee', getValue: (l) => l.originationFee },
-  { label: 'Speed to Close', getValue: (l) => l.speedToClose },
-  { label: 'Experience Required', getValue: (l) => experienceLabels[l.experienceRequired] || l.experienceRequired },
-  { label: 'LLC Borrowing', getValue: (l) => l.allowsLlc ? 'Yes' : 'No' },
-  { label: 'Interest-Only', getValue: (l) => l.interestOnlyAvailable ? 'Available' : 'Not available' },
-  { label: 'Prepayment Penalty', getValue: (l) => l.prepaymentPenalty },
-  { label: 'Foreign National', getValue: (l) => l.foreignNational ? 'Yes' : 'No' },
-  { label: 'Coverage', getValue: (l) => l.nationwide ? 'Nationwide' : 'Regional' },
-  { label: 'Property Types', getValue: (l) => l.propertyTypes.map((pt) => propertyTypeLabels[pt] || pt).join(', ') },
-  { label: 'Founded', getValue: (l) => `${l.founded}` },
-  { label: 'Headquarters', getValue: (l) => l.headquarters },
-  { label: 'Editor Rating', getValue: (l) => `${l.editorRating.toFixed(1)} / 5.0`, highlight: 'higher-better' },
+  { label: 'Published rates', getValue: (l) => formatRate(l) },
+  { label: 'Max LTV', getValue: (l) => formatLtv(l) },
+  { label: 'Min credit score', getValue: (l) => formatCredit(l) },
+  { label: 'Loan range', getValue: (l) => formatLoanRange(l) },
+  { label: 'Origination / fees', getValue: (l) => formatText(l.originationFee) },
+  { label: 'Speed to close', getValue: (l) => formatText(l.speedToClose) },
+  { label: 'Experience required', getValue: (l) => formatExperience(l.experienceRequired) },
+  { label: 'LLC borrowing', getValue: (l) => formatYesNo(l.allowsLlc) },
+  { label: 'Interest-only', getValue: (l) => formatYesNo(l.interestOnlyAvailable, 'Available', 'Not available') },
+  { label: 'Prepayment penalty', getValue: (l) => formatText(l.prepaymentPenalty) },
+  { label: 'Foreign nationals', getValue: (l) => formatYesNo(l.foreignNational) },
+  { label: 'State coverage', getValue: (l) => formatCoverage(l) },
+  { label: 'Property types', getValue: (l) => l.propertyTypes.map((pt) => propertyTypeLabels[pt] || pt).join(', ') },
+  { label: 'Headquarters', getValue: (l) => formatText(l.headquarters) },
+  {
+    label: 'Verified',
+    getValue: (l) => (l.lastReviewed ? `${formatMonthYear(l.lastReviewed)} from ${l.name}'s site` : 'Not yet verified'),
+  },
 ]
-
-function getBestValue(row: ComparisonRow, selected: LenderData[]): string | null {
-  if (!row.highlight || selected.length < 2) return null
-
-  if (row.highlight === 'lower-better') {
-    if (row.label === 'Interest Rates') {
-      const minRates = selected.map((l) => l.minRate)
-      const best = Math.min(...minRates)
-      return selected.find((l) => l.minRate === best)?.slug || null
-    }
-    if (row.label === 'Min Credit Score') {
-      const scores = selected.map((l) => l.minCreditScore)
-      const best = Math.min(...scores)
-      return selected.find((l) => l.minCreditScore === best)?.slug || null
-    }
-  }
-
-  if (row.highlight === 'higher-better') {
-    if (row.label === 'Max LTV') {
-      const ltvs = selected.map((l) => l.maxLtv)
-      const best = Math.max(...ltvs)
-      return selected.find((l) => l.maxLtv === best)?.slug || null
-    }
-    if (row.label === 'Editor Rating') {
-      const ratings = selected.map((l) => l.editorRating)
-      const best = Math.max(...ratings)
-      return selected.find((l) => l.editorRating === best)?.slug || null
-    }
-  }
-
-  return null
-}
 
 export function LenderComparison({ allLenders }: { allLenders: LenderData[] }) {
   const [selected, setSelected] = useState<string[]>([])
@@ -112,8 +79,8 @@ export function LenderComparison({ allLenders }: { allLenders: LenderData[] }) {
           {selected.length >= 2 && `Comparing ${selected.length} lenders. ${selected.length < 3 ? 'You can add one more.' : 'Maximum 3 selected.'}`}
         </p>
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {allLenders
-            .sort((a, b) => b.editorRating - a.editorRating)
+          {[...allLenders]
+            .sort((a, b) => a.name.localeCompare(b.name))
             .map((lender) => {
               const isSelected = selected.includes(lender.slug)
               const isDisabled = !isSelected && selected.length >= 3
@@ -131,14 +98,9 @@ export function LenderComparison({ allLenders }: { allLenders: LenderData[] }) {
                         : 'border-border bg-white text-text hover:border-primary/40 hover:text-primary'
                   }`}
                 >
-                  <div className="flex items-center justify-between">
-                    <span>{lender.name}</span>
-                    <span className="text-xs tabular-nums">
-                      {lender.editorRating.toFixed(1)}
-                    </span>
-                  </div>
+                  <span>{lender.name}</span>
                   <p className="mt-1 text-xs text-text-light">
-                    {lender.loanTypeSlugs.length} products &middot; {lender.minRate}%–{lender.maxRate}%
+                    {lender.loanTypeSlugs.length} products &middot; {formatRate(lender)}
                   </p>
                 </button>
               )
@@ -168,31 +130,18 @@ export function LenderComparison({ allLenders }: { allLenders: LenderData[] }) {
               </tr>
             </thead>
             <tbody className="divide-y divide-border bg-white">
-              {comparisonRows.map((row) => {
-                const bestSlug = getBestValue(row, selectedLenders)
-                return (
-                  <tr key={row.label} className="hover:bg-surface transition-colors">
-                    <td className="px-4 py-3 font-medium text-text-muted">
-                      {row.label}
+              {comparisonRows.map((row) => (
+                <tr key={row.label} className="hover:bg-surface transition-colors">
+                  <td className="px-4 py-3 font-medium text-text-muted">
+                    {row.label}
+                  </td>
+                  {selectedLenders.map((lender) => (
+                    <td key={lender.slug} className="px-4 py-3 text-text">
+                      {row.getValue(lender)}
                     </td>
-                    {selectedLenders.map((lender) => (
-                      <td
-                        key={lender.slug}
-                        className={`px-4 py-3 ${
-                          bestSlug === lender.slug
-                            ? 'font-semibold text-primary bg-primary/5'
-                            : 'text-text'
-                        }`}
-                      >
-                        {row.getValue(lender)}
-                        {bestSlug === lender.slug && (
-                          <span className="ml-2 text-xs text-primary">Best</span>
-                        )}
-                      </td>
-                    ))}
-                  </tr>
-                )
-              })}
+                  ))}
+                </tr>
+              ))}
               {/* Pros */}
               <tr>
                 <td className="px-4 py-3 font-medium text-text-muted align-top">Pros</td>
@@ -248,7 +197,6 @@ export function LenderComparison({ allLenders }: { allLenders: LenderData[] }) {
                 lenderName={lender.name}
                 lenderSlug={lender.slug}
                 placement="comparison-table"
-                editorRating={lender.editorRating}
                 className="rounded-lg border border-primary px-5 py-2.5 text-sm font-semibold text-primary hover:bg-primary/5 transition-colors text-center"
               >
                 Visit {lender.name}

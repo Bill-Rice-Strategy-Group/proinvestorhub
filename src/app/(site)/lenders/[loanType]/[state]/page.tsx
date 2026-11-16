@@ -3,7 +3,11 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { JsonLd, breadcrumbJsonLd } from '@/components/json-ld'
 import { loanTypes, getLoanTypeBySlug } from '@/data/loan-types'
-import { lenders, getLendersByLoanType, formatCurrency } from '@/data/lenders'
+import {
+  getLendersByLoanType, lendersServingState, lenderStateStatus,
+  formatRate, formatLtv, formatCredit, formatLoanRange, formatText,
+} from '@/data/lenders'
+import { formatMonthYear } from '@/lib/content-freshness'
 import { usStates, getStateBySlug, stateInvestingContext, hasStateInvestingContext } from '@/data/us-states'
 import { LenderCard } from '@/components/lender-card'
 
@@ -25,8 +29,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const state = getStateBySlug(stateSlug)
   if (!lt || !state) return {}
 
-  const title = `Best ${lt.shortName} Lenders in ${state.name} 2026`
-  const description = `Compare ${lt.shortName} lenders serving ${state.name}. Side-by-side rates, LTV, credit requirements, and expert reviews for ${state.name} real estate investors.`
+  const title = `${lt.shortName} Lenders in ${state.name}: Compare Rates & Terms`
+  const description = `${lt.shortName} lenders that don't exclude ${state.name}, with their published rates, LTV, credit minimums and state coverage side by side — checked against each lender's own site.`
 
   return {
     title,
@@ -55,11 +59,13 @@ export default async function StateLoanTypePage({ params }: Props) {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://proinvestorhub.com'
   const context = stateInvestingContext[stateSlug]
 
-  // Filter lenders: must offer this loan type AND serve this state
+  // Lenders that offer this loan type, minus any that say they don't lend in
+  // this state (an excluded-state list, or a published state list without it).
   const loanTypeLenders = getLendersByLoanType(ltSlug)
-  const stateLenders = loanTypeLenders.filter(
-    (l) => l.nationwide || !l.loanTypeSlugs // nationwide lenders always qualify
-  )
+  const stateLenders = lendersServingState(loanTypeLenders, state.abbreviation)
+  const excludedCount = loanTypeLenders.length - stateLenders.length
+  const verifiedDates = stateLenders.map((l) => l.lastReviewed).filter((d): d is string => !!d).sort()
+  const verifiedLabel = verifiedDates.length ? formatMonthYear(verifiedDates[0]) : null
 
   // Get other loan types for cross-linking
   const otherLoanTypes = loanTypes
@@ -99,14 +105,20 @@ export default async function StateLoanTypePage({ params }: Props) {
       {/* Hero */}
       <div className="max-w-3xl mb-10">
         <h1 className="text-3xl font-bold text-text sm:text-4xl">
-          Best {lt.shortName} Lenders in {state.name} (2026)
+          {lt.shortName} Lenders in {state.name}: Compare Rates &amp; Terms
         </h1>
         <p className="mt-4 text-lg text-text-muted leading-7">
-          Compare {lt.shortName.toLowerCase()} lenders serving {state.name} real estate investors.
           {stateLenders.length > 0
-            ? ` We found ${stateLenders.length} lenders offering ${lt.name.toLowerCase()} in ${state.name} — see rates, LTV, credit requirements, and expert reviews below.`
-            : ` Browse nationwide ${lt.shortName.toLowerCase()} lenders available to ${state.name} investors.`}
+            ? `${stateLenders.length} lender${stateLenders.length === 1 ? '' : 's'} in our directory list ${lt.name.toLowerCase()} and don't say they exclude ${state.name}. They're listed A–Z with the figures each one publishes — we don't rank them.`
+            : `None of the lenders in our directory that list ${lt.name.toLowerCase()} currently say they lend in ${state.name}.`}
+          {excludedCount > 0 &&
+            ` ${excludedCount} other ${excludedCount === 1 ? 'lender says' : 'lenders say'} ${excludedCount === 1 ? 'it doesn\'t' : 'they don\'t'} lend in ${state.name} and ${excludedCount === 1 ? 'is' : 'are'} left out.`}
         </p>
+        {verifiedLabel && (
+          <p className="mt-2 text-sm text-text-light">
+            Lender figures verified {verifiedLabel} from each lender&apos;s own site.
+          </p>
+        )}
       </div>
 
       {/* State Context Card */}
@@ -155,7 +167,7 @@ export default async function StateLoanTypePage({ params }: Props) {
       {/* Quick Stats for this loan type */}
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 mb-10">
         {[
-          { label: 'Typical Rates', value: lt.typicalRateRange },
+          { label: 'Lenders listed', value: `${stateLenders.length}` },
           { label: 'Max LTV', value: lt.typicalLtvRange },
           { label: 'Typical Terms', value: lt.typicalTermRange },
           { label: 'Min Credit', value: lt.typicalMinCredit },
@@ -186,7 +198,7 @@ export default async function StateLoanTypePage({ params }: Props) {
                   <th className="px-4 py-3 text-left font-semibold text-text">Min Credit</th>
                   <th className="px-4 py-3 text-left font-semibold text-text">Loan Range</th>
                   <th className="px-4 py-3 text-left font-semibold text-text">Speed</th>
-                  <th className="px-4 py-3 text-left font-semibold text-text">Rating</th>
+                  <th className="px-4 py-3 text-left font-semibold text-text">{state.abbreviation} coverage</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border bg-white">
@@ -199,25 +211,20 @@ export default async function StateLoanTypePage({ params }: Props) {
                       >
                         {lender.name}
                       </Link>
-                      {lender.featured && (
-                        <span className="ml-2 rounded-full bg-accent/10 px-2 py-0.5 text-xs font-semibold text-accent">
-                          Featured
-                        </span>
-                      )}
                     </td>
                     <td className="px-4 py-3 tabular-nums">
-                      {lender.minRate}%–{lender.maxRate}%
+                      {formatRate(lender)}
                     </td>
-                    <td className="px-4 py-3 tabular-nums">{lender.maxLtv}%</td>
-                    <td className="px-4 py-3 tabular-nums">{lender.minCreditScore}</td>
-                    <td className="px-4 py-3 tabular-nums text-text-muted">
-                      {formatCurrency(lender.minLoanAmount)}–{formatCurrency(lender.maxLoanAmount)}
-                    </td>
-                    <td className="px-4 py-3 text-text-muted">{lender.speedToClose}</td>
-                    <td className="px-4 py-3">
-                      <span className="font-semibold text-primary">
-                        {lender.editorRating.toFixed(1)}
-                      </span>
+                    <td className="px-4 py-3 tabular-nums">{formatLtv(lender)}</td>
+                    <td className="px-4 py-3 tabular-nums">{formatCredit(lender)}</td>
+                    <td className="px-4 py-3 tabular-nums text-text-muted">{formatLoanRange(lender)}</td>
+                    <td className="px-4 py-3 text-text-muted">{formatText(lender.speedToClose)}</td>
+                    <td className="px-4 py-3 text-text-muted">
+                      {lenderStateStatus(lender, state.abbreviation) === 'yes'
+                        ? `Lists ${state.abbreviation}`
+                        : lender.coverage
+                          ? `${lender.coverage} — confirm`
+                          : 'No state list published — confirm'}
                     </td>
                   </tr>
                 ))}
@@ -246,8 +253,8 @@ export default async function StateLoanTypePage({ params }: Props) {
           {state.name} real estate investors use {lt.name.toLowerCase()} for{' '}
           {lt.bestFor.slice(0, 2).join(' and ').toLowerCase()}.{' '}
           {context?.noStateTax
-            ? `${state.name}'s lack of state income tax makes rental property returns even more attractive when combined with ${lt.shortName.toLowerCase()} financing.`
-            : `Compare ${lt.shortName.toLowerCase()} terms from multiple lenders to find the best fit for your ${state.name} investment strategy.`}
+            ? `${state.name} has no state income tax, which affects your after-tax return on a rental — factor it into your numbers alongside the financing cost.`
+            : `Compare written ${lt.shortName.toLowerCase()} quotes from more than one lender before you commit to a ${state.name} deal.`}
         </p>
         <div className="mt-4">
           <Link

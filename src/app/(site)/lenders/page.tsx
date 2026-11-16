@@ -2,20 +2,21 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { JsonLd, breadcrumbJsonLd, faqJsonLd } from '@/components/json-ld'
 import { loanTypes, loanTypeCategories } from '@/data/loan-types'
-import { lenders, getFeaturedLenders, formatCurrency } from '@/data/lenders'
+import {
+  lenders, formatRate, formatLtv, formatCredit, formatCoverage, LENDER_VERIFICATION_DATE,
+} from '@/data/lenders'
 import { usStates } from '@/data/us-states'
-import { LenderCard } from '@/components/lender-card'
 import { freshnessStamp } from '@/lib/content-freshness'
 
 export const metadata: Metadata = {
   title: 'Real Estate Investor Lender Directory: Compare Financing Options',
   description:
-    'Compare the best lenders for real estate investors. DSCR, hard money, bridge, fix-and-flip, construction, and portfolio loans — side-by-side rates, LTV, and expert reviews.',
+    'Compare lenders for real estate investors: DSCR, hard money, bridge, fix-and-flip, construction and portfolio loans, with each lender\'s published rates, LTV and state coverage side by side.',
   alternates: { canonical: '/lenders' },
   openGraph: {
     title: 'Real Estate Investor Lender Directory | ProInvestorHub',
     description:
-      'Find and compare the best financing for your real estate investments. Expert-curated directory with honest reviews.',
+      'Compare lenders for real estate investors side by side, with figures checked against each lender\'s own site.',
   },
 }
 
@@ -28,30 +29,30 @@ const directoryFaqs = [
   {
     question: 'What type of loan do I need for a fix-and-flip?',
     answer:
-      'Fix-and-flip projects typically use hard money loans or specialized fix-and-flip loans. These are short-term (6-18 months), fund both purchase and renovation costs, and close quickly (7-14 days). Rates are higher (9-14%) because the loan is short-term and asset-based.',
+      'Fix-and-flip projects typically use hard money or fix-and-flip loans: short-term, interest-only loans that can fund both the purchase and the renovation and are underwritten mainly on the property. They cost more than long-term rental loans. Each lender page in this directory shows the rates and terms that lender publishes.',
   },
   {
     question: 'Can I get an investment property loan with bad credit?',
     answer:
-      'Yes. Hard money lenders focus on the property value rather than your credit score — some accept scores as low as 550. DSCR lenders like RCN Capital and Griffin Funding accept credit scores as low as 620. The lower your score, the higher the rate and down payment requirement.',
+      'Often, yes. Several lenders in this directory publish low or no credit minimums: Griffin Funding lists a 620 minimum on DSCR loans, Easy Street Capital a 600 minimum on fix-and-flip loans, and Tidal Loans and Velocity Mortgage Capital say some programs have no minimum credit score. A lower score usually means a higher rate and less leverage.',
   },
   {
     question: 'How much down payment do I need for an investment property?',
     answer:
-      'Typically 15-25% for long-term loans (conventional or DSCR) and 10-25% for fix-and-flip loans (depending on experience). House hackers can use owner-occupied financing with as little as 3.5% down (FHA) by living in one unit of a multi-unit property.',
+      'It depends on the loan and the lender. The DSCR lenders in this directory that publish leverage list maximums of 75% to 85% LTV, which means 15% to 25% down at best; fix-and-flip lenders often lend a share of the purchase price plus rehab costs, capped at a percentage of after-repair value. Each lender page shows what that lender publishes.',
   },
   {
     question: 'What is the difference between a DSCR loan and a hard money loan?',
     answer:
-      'DSCR loans are long-term (30-year), lower-rate (6.5-8.5%) financing for rental properties you plan to hold. Hard money loans are short-term (6-24 months), higher-rate (10-14%) financing for flips and rehabs. Many investors use hard money to acquire and renovate, then refinance into a DSCR loan to hold long-term (the BRRRR strategy).',
+      'DSCR loans are long-term (often 30-year) financing for rental properties you plan to hold, qualified on the property\'s rental income. Hard money loans are short-term (typically 6–24 months), higher-cost financing for flips and rehabs. Many investors use hard money to acquire and renovate, then refinance into a DSCR loan to hold long-term (the BRRRR strategy).',
   },
 ]
 
 export default function LenderDirectoryPage() {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://proinvestorhub.com'
-  const featured = getFeaturedLenders()
-  // Honest freshness: real git change date of the lender data, "Updated {Month YYYY}".
-  const stamp = freshnessStamp('lenders')
+  // Honest freshness: the date lender figures were last checked against lenders' own sites.
+  const stamp = freshnessStamp('lenders', LENDER_VERIFICATION_DATE)
+  const sortedLenders = [...lenders].sort((a, b) => a.name.localeCompare(b.name))
 
   return (
     <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8">
@@ -69,17 +70,17 @@ export default function LenderDirectoryPage() {
           Real Estate Investor Lender Directory
         </h1>
         <p className="mt-4 text-lg text-text-muted leading-7">
-          Find the right financing for your next deal. We&apos;ve researched and
-          curated the best lenders for every stage of your real estate investing
-          journey — from your first rental property to a portfolio of 50+. Compare
-          rates, terms, and requirements side by side with honest reviews from a
-          30-year lending industry veteran.
+          Find the right financing for your next deal. Compare lenders for every
+          stage of real estate investing — from a first rental to a portfolio —
+          using the rates, terms and requirements each lender publishes, checked
+          against its own site. We don&apos;t rank lenders or take payment for
+          listings.
         </p>
         <p className="mt-2 text-sm text-text-light">
           {lenders.length} lenders &middot; {loanTypes.length} loan types
           {stamp && (
             <>
-              {' '}&middot; {stamp.verb} {stamp.date}
+              {' '}&middot; Figures verified {stamp.date}
             </>
           )}
         </p>
@@ -143,7 +144,6 @@ export default function LenderDirectoryPage() {
                       {lt.description}
                     </p>
                     <div className="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-xs text-text-light">
-                      <span>Rate: {lt.typicalRateRange}</span>
                       <span>LTV: {lt.typicalLtvRange}</span>
                       <span>Term: {lt.typicalTermRange}</span>
                     </div>
@@ -158,30 +158,15 @@ export default function LenderDirectoryPage() {
         })}
       </section>
 
-      {/* Featured Lenders */}
-      <section className="mb-16">
-        <h2 className="text-2xl font-bold text-text mb-2">
-          Featured Lenders
-        </h2>
-        <p className="text-text-muted mb-8">
-          Our top-rated lenders for real estate investors, selected for product
-          breadth, competitive rates, and borrower experience.
-        </p>
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {featured.map((lender) => (
-            <LenderCard key={lender.slug} lender={lender} />
-          ))}
-        </div>
-      </section>
-
       {/* Quick Comparison Table */}
       <section className="mb-16">
         <h2 className="text-2xl font-bold text-text mb-2">
           Quick Lender Comparison
         </h2>
         <p className="text-text-muted mb-6">
-          At-a-glance comparison of rates, LTV, credit score requirements, and
-          closing speed across all lenders in our directory.
+          Every lender in the directory, A–Z, with the rates, LTV, credit minimum
+          and state coverage it publishes. &ldquo;Not published&rdquo; means the
+          lender doesn&apos;t state that figure on its site.
         </p>
         <div className="overflow-x-auto rounded-xl border border-border">
           <table className="min-w-full text-sm">
@@ -189,16 +174,14 @@ export default function LenderDirectoryPage() {
               <tr>
                 <th className="px-4 py-3 text-left font-semibold text-text">Lender</th>
                 <th className="px-4 py-3 text-left font-semibold text-text">Loan Types</th>
-                <th className="px-4 py-3 text-left font-semibold text-text">Rate Range</th>
+                <th className="px-4 py-3 text-left font-semibold text-text">Published Rates</th>
                 <th className="px-4 py-3 text-left font-semibold text-text">Max LTV</th>
                 <th className="px-4 py-3 text-left font-semibold text-text">Min Credit</th>
-                <th className="px-4 py-3 text-left font-semibold text-text">Speed</th>
-                <th className="px-4 py-3 text-left font-semibold text-text">Rating</th>
+                <th className="px-4 py-3 text-left font-semibold text-text">States</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border bg-white">
-              {lenders
-                .sort((a, b) => b.editorRating - a.editorRating)
+              {sortedLenders
                 .map((lender) => (
                   <tr key={lender.slug} className="hover:bg-surface transition-colors">
                     <td className="px-4 py-3 font-medium">
@@ -219,20 +202,10 @@ export default function LenderDirectoryPage() {
                         .join(', ')}
                       {lender.loanTypeSlugs.length > 3 && ` +${lender.loanTypeSlugs.length - 3}`}
                     </td>
-                    <td className="px-4 py-3 tabular-nums">
-                      {lender.minRate}%–{lender.maxRate}%
-                    </td>
-                    <td className="px-4 py-3 tabular-nums">{lender.maxLtv}%</td>
-                    <td className="px-4 py-3 tabular-nums">{lender.minCreditScore}</td>
-                    <td className="px-4 py-3 text-text-muted">{lender.speedToClose}</td>
-                    <td className="px-4 py-3">
-                      <span className="inline-flex items-center gap-1 font-semibold text-primary">
-                        {lender.editorRating.toFixed(1)}
-                        <svg className="h-3.5 w-3.5 fill-primary" viewBox="0 0 20 20">
-                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                        </svg>
-                      </span>
-                    </td>
+                    <td className="px-4 py-3 tabular-nums">{formatRate(lender)}</td>
+                    <td className="px-4 py-3 tabular-nums">{formatLtv(lender)}</td>
+                    <td className="px-4 py-3 tabular-nums">{formatCredit(lender)}</td>
+                    <td className="px-4 py-3 text-text-muted">{formatCoverage(lender)}</td>
                   </tr>
                 ))}
             </tbody>

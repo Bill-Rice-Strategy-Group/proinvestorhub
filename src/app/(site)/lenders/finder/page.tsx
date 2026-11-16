@@ -7,7 +7,7 @@ import { LenderFinder } from '@/components/lender-finder'
 export const metadata: Metadata = {
   title: 'Find Your Lender Match: Investor Loan Finder',
   description:
-    'Tell us your credit score, experience level, property type, and strategy — we\'ll match you with the best lenders for your real estate investment scenario. Free, no registration required.',
+    'Tell us your credit score, experience level, property type, and strategy — we\'ll show the lenders whose published terms fit your real estate investment scenario. Free, no registration required.',
   alternates: { canonical: '/lenders/finder' },
   openGraph: {
     title: 'Find Your Lender Match | ProInvestorHub',
@@ -33,7 +33,7 @@ export default function LenderFinderPage() {
           '@context': 'https://schema.org',
           '@type': 'WebApplication',
           name: 'Real Estate Investor Lender Finder',
-          description: 'Match your investment scenario with the best lenders for your deal.',
+          description: 'Match your investment scenario against the terms lenders publish.',
           url: `${baseUrl}/lenders/finder`,
           applicationCategory: 'FinanceApplication',
           operatingSystem: 'Any',
@@ -95,18 +95,21 @@ export default function LenderFinderPage() {
           How This Tool Works
         </h2>
         <p className="text-text-muted leading-7 mb-4">
-          This tool matches your scenario against the structured data in our
-          lender directory. We filter lenders by your hard requirements (credit
-          score, experience, loan type, property type, loan amount) and then
-          rank the remaining matches by your stated priority and our editor
-          ratings.
+          This tool checks your scenario against the figures each lender
+          publishes on its own site — credit minimum, experience, loan type,
+          property type, loan size and the states it lends in. A lender is
+          left out only when a published figure rules it out; when a lender
+          doesn&apos;t publish a figure, it stays in and we flag it so you can
+          ask. Matches are listed alphabetically. We don&apos;t score, rate or
+          rank lenders, and no lender pays to appear.
         </p>
         <p className="text-text-muted leading-7">
-          This is <strong>not</strong> a lead generation tool. We don&apos;t
-          collect your personal information or share it with lenders. The
-          matching happens entirely in your browser. When you find a lender
-          that fits, read our full review and then contact the lender directly
-          through their website.
+          This is <strong>not</strong> a lead generation tool, and we don&apos;t
+          share your information with lenders. The matching happens in your
+          browser. If you enter your name and email to get your matches, we use
+          them to send you the results and our newsletter (unsubscribe
+          anytime). When you find a lender that fits, read our review and then
+          contact the lender directly through its website.
         </p>
       </section>
 

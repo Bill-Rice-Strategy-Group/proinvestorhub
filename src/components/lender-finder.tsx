@@ -3,7 +3,10 @@
 import { useState, useMemo } from 'react'
 import Link from 'next/link'
 import type { LenderData } from '@/data/lenders'
-import { formatCurrency } from '@/data/lenders'
+import {
+  formatRate, formatLtv, formatCredit, formatLoanRange, formatText, lenderStateStatus,
+} from '@/data/lenders'
+import { formatMonthYear } from '@/lib/content-freshness'
 import { LenderOutboundLink } from '@/components/lender-outbound-link'
 import { HoneypotInput } from '@/components/honeypot-input'
 import { track } from '@/lib/track'
@@ -18,7 +21,6 @@ type Scenario = {
   propertyType: string
   loanAmount: string
   state: string
-  priority: string
 }
 
 const defaultScenario: Scenario = {
@@ -28,7 +30,6 @@ const defaultScenario: Scenario = {
   propertyType: '',
   loanAmount: '',
   state: '',
-  priority: '',
 }
 
 const creditTiers = [
@@ -56,14 +57,6 @@ const loanAmountRanges = [
   { label: '$3M+', value: '4000000' },
 ]
 
-const priorities = [
-  { label: 'Lowest rate', value: 'rate' },
-  { label: 'Fastest closing', value: 'speed' },
-  { label: 'Lowest credit requirement', value: 'credit' },
-  { label: 'Highest LTV (least cash needed)', value: 'ltv' },
-  { label: 'No experience required', value: 'experience' },
-]
-
 const propertyTypeOptions = [
   { label: 'Single Family (1-4 units)', value: 'sfr' },
   { label: 'Multifamily (5+ units)', value: 'multifamily' },
@@ -75,109 +68,73 @@ const propertyTypeOptions = [
   { label: 'New Construction', value: 'new-construction' },
 ]
 
-function matchAndScore(lender: LenderData, scenario: Scenario): { matches: boolean; score: number; reasons: string[] } {
-  let score = 0
+/**
+ * Criteria-only matching against what each lender publishes. There is no score
+ * and no rating: matching lenders are listed alphabetically. A lender is ruled
+ * out only by a published figure that conflicts with the scenario; a figure the
+ * lender doesn't publish never rules it out, but is flagged so the investor
+ * knows to ask.
+ */
+function matchLender(
+  lender: LenderData,
+  scenario: Scenario,
+): { matches: boolean; reasons: string[]; unknowns: string[] } {
   const reasons: string[] = []
+  const unknowns: string[] = []
   let matches = true
 
-  // Credit score filter
+  // Lenders that fund other lenders rather than investors are not finder results.
+  if (lender.capitalProvider) return { matches: false, reasons, unknowns }
+
   if (scenario.creditScore) {
     const credit = parseInt(scenario.creditScore)
-    if (lender.minCreditScore > credit) {
-      matches = false
+    if (lender.minCreditScore != null) {
+      if (lender.minCreditScore > credit) matches = false
+      else reasons.push(`Published credit minimum ${lender.minCreditScore}`)
+    } else if (lender.noCreditMinimum) {
+      reasons.push('No credit minimum on at least one program')
     } else {
-      const margin = credit - lender.minCreditScore
-      if (margin >= 80) { score += 2; reasons.push('Well above credit minimum') }
-      else if (margin >= 20) { score += 1; reasons.push('Meets credit requirement') }
-      else { reasons.push('Meets minimum credit score') }
+      unknowns.push('credit minimum')
     }
   }
 
-  // Experience filter
   if (scenario.experience) {
     const experienceOrder = ['none', 'beginner', 'intermediate', 'experienced']
     const userLevel = experienceOrder.indexOf(scenario.experience)
-    const lenderLevel = experienceOrder.indexOf(lender.experienceRequired)
-    if (lenderLevel > userLevel) {
+    const lenderLevel = lender.experienceRequired ? experienceOrder.indexOf(lender.experienceRequired) : -1
+    if (lender.experienceRequired == null || lender.experienceRequired === 'varies') {
+      unknowns.push('experience requirement')
+    } else if (lenderLevel > userLevel) {
       matches = false
-    } else if (lenderLevel <= userLevel) {
-      score += 1
-      if (lender.experienceRequired === 'none') reasons.push('No experience required')
+    } else if (lender.experienceRequired === 'none') {
+      reasons.push('No experience required')
     }
   }
 
-  // Loan type filter
   if (scenario.loanType) {
-    if (!lender.loanTypeSlugs.includes(scenario.loanType)) {
-      matches = false
-    } else {
-      score += 2
-    }
+    if (!lender.loanTypeSlugs.includes(scenario.loanType)) matches = false
+    else reasons.push('Offers this loan type')
   }
 
-  // Property type filter
   if (scenario.propertyType) {
-    if (!lender.propertyTypes.includes(scenario.propertyType)) {
-      matches = false
-    } else {
-      score += 1
-    }
+    if (!lender.propertyTypes.includes(scenario.propertyType)) matches = false
   }
 
-  // Loan amount filter
   if (scenario.loanAmount) {
     const amount = parseInt(scenario.loanAmount)
-    if (amount < lender.minLoanAmount || amount > lender.maxLoanAmount) {
-      matches = false
-    } else {
-      score += 1
-    }
+    const { minLoanAmount: lo, maxLoanAmount: hi } = lender
+    if ((lo != null && amount < lo) || (hi != null && amount > hi)) matches = false
+    else if (lo == null || hi == null) unknowns.push('full loan-size range')
   }
 
-  // State filter (nationwide always matches)
-  if (scenario.state && !lender.nationwide) {
-    matches = false // Regional lenders need explicit state matching — for safety, exclude
+  if (scenario.state) {
+    const status = lenderStateStatus(lender, scenario.state)
+    if (status === 'no') matches = false
+    else if (status === 'yes') reasons.push(`Lists ${scenario.state} as a lending state`)
+    else unknowns.push('state list')
   }
 
-  // Priority scoring
-  if (scenario.priority && matches) {
-    switch (scenario.priority) {
-      case 'rate':
-        score += (15 - lender.minRate) // Lower rate = higher score
-        if (lender.minRate <= 7) reasons.push('Competitive rates')
-        break
-      case 'speed':
-        // Parse first number from speed string
-        const speedMatch = lender.speedToClose.match(/(\d+)/)
-        if (speedMatch) {
-          score += (30 - parseInt(speedMatch[1])) / 3
-          if (parseInt(speedMatch[1]) <= 10) reasons.push('Fast closing')
-        }
-        break
-      case 'credit':
-        score += (750 - lender.minCreditScore) / 20
-        if (lender.minCreditScore <= 620) reasons.push('Low credit requirement')
-        break
-      case 'ltv':
-        score += lender.maxLtv / 10
-        if (lender.maxLtv >= 80) reasons.push('High LTV available')
-        break
-      case 'experience':
-        if (lender.experienceRequired === 'none') {
-          score += 5
-          reasons.push('No experience required')
-        }
-        break
-    }
-  }
-
-  // Base rating bonus
-  score += lender.editorRating
-
-  // Featured bonus
-  if (lender.featured) score += 0.5
-
-  return { matches, score, reasons: [...new Set(reasons)] }
+  return { matches, reasons: [...new Set(reasons)], unknowns }
 }
 
 export function LenderFinder({ allLenders }: { allLenders: LenderData[] }) {
@@ -194,10 +151,10 @@ export function LenderFinder({ allLenders }: { allLenders: LenderData[] }) {
     return allLenders
       .map((lender) => ({
         lender,
-        ...matchAndScore(lender, scenario),
+        ...matchLender(lender, scenario),
       }))
       .filter((r) => r.matches)
-      .sort((a, b) => b.score - a.score)
+      .sort((a, b) => a.lender.name.localeCompare(b.lender.name))
   }, [allLenders, scenario])
 
   const results = showResults ? computedResults : []
@@ -217,15 +174,8 @@ export function LenderFinder({ allLenders }: { allLenders: LenderData[] }) {
 
     setEmailStatus('loading')
 
-    const topMatches = computedResults.slice(0, 3).map(({ lender }) => ({
-      name: lender.name,
-      slug: lender.slug,
-      editorRating: lender.editorRating,
-      minRate: lender.minRate,
-      maxRate: lender.maxRate,
-      maxLtv: lender.maxLtv,
-      speedToClose: lender.speedToClose,
-    }))
+    // Only slugs go to the server; it looks the lenders up itself.
+    const lenderSlugs = computedResults.map(({ lender }) => lender.slug)
 
     try {
       const res = await fetch('/api/lender-lead', {
@@ -235,7 +185,7 @@ export function LenderFinder({ allLenders }: { allLenders: LenderData[] }) {
           firstName,
           email,
           scenario,
-          topMatches,
+          lenderSlugs,
           website,
         }),
       })
@@ -389,23 +339,6 @@ export function LenderFinder({ allLenders }: { allLenders: LenderData[] }) {
             </select>
           </div>
 
-          {/* Priority */}
-          <div className="sm:col-span-2 lg:col-span-3">
-            <label htmlFor="priority" className="block text-sm font-semibold text-text mb-1.5">
-              What Matters Most?
-            </label>
-            <select
-              id="priority"
-              value={scenario.priority}
-              onChange={(e) => updateField('priority', e.target.value)}
-              className="w-full rounded-lg border border-border px-3 py-2 text-sm text-text focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none"
-            >
-              <option value="">No preference</option>
-              {priorities.map((p) => (
-                <option key={p.value} value={p.value}>{p.label}</option>
-              ))}
-            </select>
-          </div>
         </div>
 
         <div className="mt-6 flex gap-3">
@@ -499,7 +432,7 @@ export function LenderFinder({ allLenders }: { allLenders: LenderData[] }) {
         <div>
           <h2 className="text-xl font-bold text-text mb-2">
             {results.length > 0
-              ? `${results.length} Lender${results.length !== 1 ? 's' : ''} Match Your Scenario`
+              ? `${results.length} Lender${results.length !== 1 ? 's' : ''} Match Your Scenario (A–Z)`
               : 'No Exact Matches Found'}
           </h2>
 
@@ -522,21 +455,14 @@ export function LenderFinder({ allLenders }: { allLenders: LenderData[] }) {
 
           {results.length > 0 && (
             <div className="space-y-4 mb-8">
-              {results.map(({ lender, reasons }, i) => (
+              {results.map(({ lender, reasons, unknowns }) => (
                 <div
                   key={lender.slug}
-                  className={`rounded-xl border bg-white p-6 shadow-sm transition-all ${
-                    i === 0 ? 'border-primary/30 ring-1 ring-primary/10' : 'border-border'
-                  }`}
+                  className="rounded-xl border border-border bg-white p-6 shadow-sm transition-all"
                 >
                   <div className="flex items-start justify-between gap-4 flex-wrap">
                     <div>
                       <div className="flex items-center gap-3">
-                        {i === 0 && (
-                          <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-bold text-primary">
-                            Best Match
-                          </span>
-                        )}
                         <Link
                           href={`/lenders/reviews/${lender.slug}`}
                           className="text-lg font-bold text-text hover:text-primary transition-colors"
@@ -548,12 +474,6 @@ export function LenderFinder({ allLenders }: { allLenders: LenderData[] }) {
                         {lender.description}
                       </p>
                     </div>
-                    <div className="text-right">
-                      <p className="text-2xl font-bold text-primary">
-                        {lender.editorRating.toFixed(1)}
-                      </p>
-                      <p className="text-xs text-text-light">Editor Rating</p>
-                    </div>
                   </div>
 
                   {/* Key Stats Row */}
@@ -561,32 +481,43 @@ export function LenderFinder({ allLenders }: { allLenders: LenderData[] }) {
                     <div>
                       <span className="text-text-light">Rates</span>
                       <p className="font-semibold text-text tabular-nums">
-                        {lender.minRate}%–{lender.maxRate}%
+                        {formatRate(lender)}
                       </p>
                     </div>
                     <div>
                       <span className="text-text-light">Max LTV</span>
-                      <p className="font-semibold text-text tabular-nums">{lender.maxLtv}%</p>
+                      <p className="font-semibold text-text tabular-nums">{formatLtv(lender)}</p>
                     </div>
                     <div>
                       <span className="text-text-light">Min Credit</span>
-                      <p className="font-semibold text-text tabular-nums">{lender.minCreditScore}</p>
+                      <p className="font-semibold text-text tabular-nums">{formatCredit(lender)}</p>
                     </div>
                     <div>
                       <span className="text-text-light">Close In</span>
-                      <p className="font-semibold text-text">{lender.speedToClose}</p>
+                      <p className="font-semibold text-text">{formatText(lender.speedToClose)}</p>
                     </div>
                     <div>
                       <span className="text-text-light">Loan Range</span>
                       <p className="font-semibold text-text tabular-nums">
-                        {formatCurrency(lender.minLoanAmount)}–{formatCurrency(lender.maxLoanAmount)}
+                        {formatLoanRange(lender)}
                       </p>
                     </div>
                     <div>
                       <span className="text-text-light">Fee</span>
-                      <p className="font-semibold text-text">{lender.originationFee}</p>
+                      <p className="font-semibold text-text">{formatText(lender.originationFee)}</p>
                     </div>
                   </div>
+
+                  {unknowns.length > 0 && (
+                    <p className="mt-3 text-xs text-amber-700">
+                      Not published by {lender.name}: {unknowns.join(', ')} — confirm before applying.
+                    </p>
+                  )}
+                  {lender.lastReviewed && (
+                    <p className="mt-2 text-xs text-text-light">
+                      Figures verified {formatMonthYear(lender.lastReviewed)} from {lender.name}&apos;s site.
+                    </p>
+                  )}
 
                   {/* Match Reasons */}
                   {reasons.length > 0 && (
@@ -616,7 +547,6 @@ export function LenderFinder({ allLenders }: { allLenders: LenderData[] }) {
                       placement="finder-result"
                       loanType={scenario.loanType || undefined}
                       state={scenario.state || undefined}
-                      editorRating={lender.editorRating}
                       className="rounded-lg border border-primary px-4 py-2 text-sm font-semibold text-primary hover:bg-primary/5 transition-colors"
                     >
                       Visit Website

@@ -3,7 +3,10 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { JsonLd, breadcrumbJsonLd, faqJsonLd } from '@/components/json-ld'
 import { loanTypes, getLoanTypeBySlug } from '@/data/loan-types'
-import { getLendersByLoanType } from '@/data/lenders'
+import {
+  getLendersByLoanType, formatRate, formatLtv, formatCredit, formatText, formatCoverage,
+} from '@/data/lenders'
+import { formatMonthYear } from '@/lib/content-freshness'
 import { usStates } from '@/data/us-states'
 import { LenderCard } from '@/components/lender-card'
 import { NewsletterSignup } from '@/components/newsletter-signup'
@@ -44,6 +47,8 @@ export default async function LoanTypePage({ params }: Props) {
   if (!lt) notFound()
 
   const matchingLenders = getLendersByLoanType(slug)
+  const verifiedDates = matchingLenders.map((l) => l.lastReviewed).filter((d): d is string => !!d).sort()
+  const verifiedLabel = verifiedDates.length ? formatMonthYear(verifiedDates[0]) : null
   // Mid-sentence form of the short name: "portfolio", "fix & flip", but "DSCR"/"SBA".
   const loanNoun = lt.shortName.replace(/\b(?!(?:DSCR|SBA)\b)\w+/g, (w) => w.toLowerCase())
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://proinvestorhub.com'
@@ -74,7 +79,7 @@ export default async function LoanTypePage({ params }: Props) {
           {categoryLabels[lt.category] || lt.category}
         </span>
         <h1 className="text-3xl font-bold text-text sm:text-4xl">
-          Best {lt.name.replace(' Loans', '')} Lenders for Real Estate Investors (2026)
+          {lt.name.replace(' Loans', '')} Lenders for Real Estate Investors: Compare Rates &amp; Terms
         </h1>
         <p className="mt-4 text-lg text-text-muted leading-7">
           {lt.description}
@@ -84,7 +89,7 @@ export default async function LoanTypePage({ params }: Props) {
       {/* Quick Stats */}
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 mb-12">
         {[
-          { label: 'Typical Rates', value: lt.typicalRateRange },
+          { label: 'Lenders listed', value: `${matchingLenders.length}` },
           { label: 'Max LTV', value: lt.typicalLtvRange },
           { label: 'Typical Terms', value: lt.typicalTermRange },
           { label: 'Min Credit', value: lt.typicalMinCredit },
@@ -160,11 +165,14 @@ export default async function LoanTypePage({ params }: Props) {
       {/* Lender Listings */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold text-text mb-2">
-          Best {lt.shortName} Lenders ({matchingLenders.length})
+          {lt.shortName} Lenders ({matchingLenders.length})
         </h2>
         <p className="text-text-muted mb-6">
-          These lenders offer {lt.name.toLowerCase()}, ranked by our editor rating.
-          Click any lender for a full review with detailed terms and expert analysis.
+          These lenders list {lt.name.toLowerCase()} on their sites. They&apos;re in
+          alphabetical order — we don&apos;t rank lenders. Each figure is the
+          lender&apos;s own published number; &ldquo;Not published&rdquo; means the
+          lender doesn&apos;t state it.
+          {verifiedLabel && <> Figures verified {verifiedLabel} from each lender&apos;s site.</>}
         </p>
 
         {matchingLenders.length > 0 ? (
@@ -179,8 +187,7 @@ export default async function LoanTypePage({ params }: Props) {
                     <th className="px-4 py-3 text-left font-semibold text-text">Max LTV</th>
                     <th className="px-4 py-3 text-left font-semibold text-text">Min Credit</th>
                     <th className="px-4 py-3 text-left font-semibold text-text">Speed</th>
-                    <th className="px-4 py-3 text-left font-semibold text-text">Best For</th>
-                    <th className="px-4 py-3 text-left font-semibold text-text">Rating</th>
+                    <th className="px-4 py-3 text-left font-semibold text-text">States</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border bg-white">
@@ -195,19 +202,12 @@ export default async function LoanTypePage({ params }: Props) {
                         </Link>
                       </td>
                       <td className="px-4 py-3 tabular-nums">
-                        {lender.minRate}%–{lender.maxRate}%
+                        {formatRate(lender)}
                       </td>
-                      <td className="px-4 py-3 tabular-nums">{lender.maxLtv}%</td>
-                      <td className="px-4 py-3 tabular-nums">{lender.minCreditScore}</td>
-                      <td className="px-4 py-3 text-text-muted">{lender.speedToClose}</td>
-                      <td className="px-4 py-3 text-text-muted">
-                        {lender.bestForTags.slice(0, 2).join(', ')}
-                      </td>
-                      <td className="px-4 py-3">
-                        <span className="font-semibold text-primary">
-                          {lender.editorRating.toFixed(1)}
-                        </span>
-                      </td>
+                      <td className="px-4 py-3 tabular-nums">{formatLtv(lender)}</td>
+                      <td className="px-4 py-3 tabular-nums">{formatCredit(lender)}</td>
+                      <td className="px-4 py-3 text-text-muted">{formatText(lender.speedToClose)}</td>
+                      <td className="px-4 py-3 text-text-muted">{formatCoverage(lender)}</td>
                     </tr>
                   ))}
                 </tbody>

@@ -1,25 +1,9 @@
 import Link from 'next/link'
 import type { LenderData } from '@/data/lenders'
-import { formatCurrency } from '@/data/lenders'
-
-function StarRating({ rating }: { rating: number }) {
-  return (
-    <span className="inline-flex items-center gap-1 font-semibold text-primary">
-      {rating.toFixed(1)}
-      <svg className="h-4 w-4 fill-primary" viewBox="0 0 20 20">
-        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-      </svg>
-    </span>
-  )
-}
-
-const experienceLabels: Record<string, string> = {
-  none: 'No experience required',
-  beginner: '1–2 deals',
-  intermediate: '3–5 deals',
-  experienced: '5+ deals',
-  varies: 'Varies',
-}
+import {
+  formatRate, formatLtv, formatCredit, formatLoanRange, formatText, formatExperience,
+} from '@/data/lenders'
+import { formatMonthYear } from '@/lib/content-freshness'
 
 export function LenderCard({ lender }: { lender: LenderData }) {
   return (
@@ -31,7 +15,6 @@ export function LenderCard({ lender }: { lender: LenderData }) {
         <h3 className="text-lg font-bold text-text group-hover:text-primary transition-colors">
           {lender.name}
         </h3>
-        <StarRating rating={lender.editorRating} />
       </div>
 
       {/* FTC disclosure: only renders for genuine paid affiliate partners */}
@@ -50,34 +33,44 @@ export function LenderCard({ lender }: { lender: LenderData }) {
         <div>
           <span className="text-text-light">Rates</span>
           <p className="font-semibold text-text tabular-nums">
-            {lender.minRate}%–{lender.maxRate}%
+            {formatRate(lender)}
           </p>
         </div>
         <div>
           <span className="text-text-light">Max LTV</span>
-          <p className="font-semibold text-text tabular-nums">{lender.maxLtv}%</p>
+          <p className="font-semibold text-text tabular-nums">{formatLtv(lender)}</p>
         </div>
         <div>
           <span className="text-text-light">Min Credit</span>
-          <p className="font-semibold text-text tabular-nums">{lender.minCreditScore}</p>
+          <p className="font-semibold text-text tabular-nums">{formatCredit(lender)}</p>
         </div>
         <div>
           <span className="text-text-light">Close In</span>
-          <p className="font-semibold text-text">{lender.speedToClose}</p>
+          <p className="font-semibold text-text">{formatText(lender.speedToClose)}</p>
         </div>
         <div>
           <span className="text-text-light">Loan Range</span>
           <p className="font-semibold text-text tabular-nums">
-            {formatCurrency(lender.minLoanAmount)}–{formatCurrency(lender.maxLoanAmount)}
+            {formatLoanRange(lender)}
           </p>
         </div>
         <div>
+          <span className="text-text-light">States</span>
+          <p className="font-semibold text-text">{formatText(lender.coverage)}</p>
+        </div>
+        <div className="col-span-2">
           <span className="text-text-light">Experience</span>
           <p className="font-semibold text-text">
-            {experienceLabels[lender.experienceRequired] || lender.experienceRequired}
+            {formatExperience(lender.experienceRequired)}
           </p>
         </div>
       </div>
+
+      {lender.lastReviewed && (
+        <p className="mb-3 text-[11px] text-text-light">
+          Verified {formatMonthYear(lender.lastReviewed)} from {lender.name}&apos;s site
+        </p>
+      )}
 
       {/* Best-For Tags */}
       {lender.bestForTags.length > 0 && (

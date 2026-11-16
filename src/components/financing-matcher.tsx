@@ -18,7 +18,7 @@ import {
   type DealProfile,
 } from '@/data/financing-matcher'
 import { getLoanTypeBySlug } from '@/data/loan-types'
-import { getLendersByLoanType, type LenderData } from '@/data/lenders'
+import { getLendersByLoanType, formatRate, type LenderData } from '@/data/lenders'
 
 type StepDef = {
   key: keyof DealProfile
@@ -260,8 +260,9 @@ function RecCard({
   if (!lt) return null
 
   const lenders: LenderData[] = getLendersByLoanType(rec.slug)
-    .filter((l) => (creditCeiling ? l.minCreditScore <= creditCeiling : true))
-    .sort((a, b) => Number(b.featured) - Number(a.featured) || b.editorRating - a.editorRating)
+    .filter((l) => !l.capitalProvider)
+    .filter((l) => (creditCeiling && l.minCreditScore != null ? l.minCreditScore <= creditCeiling : true))
+    .sort((a, b) => a.name.localeCompare(b.name))
     .slice(0, 3)
 
   return (
@@ -285,8 +286,7 @@ function RecCard({
       </div>
 
       {/* stat chips */}
-      <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
-        <Stat label="Rate" value={lt.typicalRateRange} />
+      <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3">
         <Stat label="LTV" value={lt.typicalLtvRange} />
         <Stat label="Term" value={lt.typicalTermRange} />
         <Stat label="Min credit" value={lt.typicalMinCredit} />
@@ -327,7 +327,7 @@ function RecCard({
       {lenders.length > 0 && (
         <div className="mt-5 border-t border-border pt-4">
           <p className="text-xs font-semibold uppercase tracking-wide text-text-muted">
-            Lenders to start with
+            Lenders that list this loan (A–Z)
           </p>
           <div className="mt-3 space-y-2">
             {lenders.map((l) => (
@@ -338,8 +338,7 @@ function RecCard({
               >
                 <span className="font-medium text-text">{l.name}</span>
                 <span className="flex items-center gap-3 text-xs text-text-muted">
-                  <span className="tabular-nums">from {l.minRate}%</span>
-                  <span className="tabular-nums text-accent">★ {l.editorRating.toFixed(1)}</span>
+                  <span className="tabular-nums">{formatRate(l)}</span>
                 </span>
               </Link>
             ))}
