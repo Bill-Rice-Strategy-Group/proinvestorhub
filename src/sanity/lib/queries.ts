@@ -233,7 +233,7 @@ export const LOAN_TYPE_SLUGS_QUERY = defineQuery(/* groq */ `
 // ── Lenders ──────────────────────────────────────────
 export const LENDERS_QUERY = defineQuery(/* groq */ `
   *[_type == "lender" && defined(slug.current)]
-  | order(editorRating desc) {
+  | order(name asc) {
     _id,
     name,
     "slug": slug.current,
@@ -303,7 +303,7 @@ export const LENDER_SLUGS_QUERY = defineQuery(/* groq */ `
 
 export const LENDERS_BY_LOAN_TYPE_QUERY = defineQuery(/* groq */ `
   *[_type == "lender" && defined(slug.current) && $loanTypeId in loanTypes[]._ref]
-  | order(editorRating desc) {
+  | order(name asc) {
     _id,
     name,
     "slug": slug.current,

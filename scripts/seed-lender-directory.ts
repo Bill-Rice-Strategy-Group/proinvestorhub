@@ -65,7 +65,6 @@ async function seedLoanTypes() {
       shortName: lt.shortName,
       category: lt.category,
       description: lt.description,
-      typicalRateRange: lt.typicalRateRange,
       typicalLtvRange: lt.typicalLtvRange,
       typicalTermRange: lt.typicalTermRange,
       typicalMinCredit: lt.typicalMinCredit,
@@ -146,7 +145,8 @@ async function seedLenders() {
       maxLoanAmount: l.maxLoanAmount,
       originationFee: l.originationFee,
       speedToClose: l.speedToClose,
-      nationwide: l.nationwide,
+      nationwide: false, // coverage is published per lender; see l.coverage / excludedStates
+      statesServed: l.statesServed,
       propertyTypes: l.propertyTypes,
       experienceRequired: l.experienceRequired,
       allowsLlc: l.allowsLlc,
@@ -156,7 +156,6 @@ async function seedLenders() {
       bestForTags: l.bestForTags,
       pros: l.pros,
       cons: l.cons,
-      editorRating: l.editorRating,
       featured: l.featured,
       seo: {
         metaTitle: l.metaTitle,

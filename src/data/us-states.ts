@@ -237,25 +237,9 @@ export const stateInvestingContext: Record<string, {
 }
 
 /**
- * Get lenders that serve a specific state.
- * Nationwide lenders always match. Regional lenders match if the state is in their statesServed list.
- */
-export function getLendersForState(
-  allLenders: Array<{ nationwide: boolean; statesServed?: string[] }>,
-  stateAbbr: string
-): number[] {
-  return allLenders.reduce<number[]>((indices, lender, i) => {
-    if (lender.nationwide || (lender.statesServed && lender.statesServed.includes(stateAbbr))) {
-      indices.push(i)
-    }
-    return indices
-  }, [])
-}
-
-/**
  * Whether a state has state-specific investing context. State × loan-type
  * lender pages for states without it differ from each other only by the state
- * name (the lender list is the same nationwide set), so they are kept for
+ * name and the few lenders that exclude that state, so they are kept for
  * visitors but marked noindex and left out of the sitemap. Adding a state to
  * stateInvestingContext makes its pages indexable again automatically.
  */
