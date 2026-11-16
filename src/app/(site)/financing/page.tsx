@@ -217,12 +217,7 @@ export default function FinancingPillarPage() {
                   href={`/lenders/${lt.slug}`}
                   className="rounded-xl border border-border bg-white p-5 transition-all hover:border-primary/40 hover:shadow-md"
                 >
-                  <div className="flex items-baseline justify-between gap-3">
-                    <h3 className="text-lg font-semibold text-text">{lt.name}</h3>
-                    <span className="shrink-0 text-xs font-medium tabular-nums text-text-light">
-                      {lt.typicalRateRange}
-                    </span>
-                  </div>
+                  <h3 className="text-lg font-semibold text-text">{lt.name}</h3>
                   <p className="mt-1.5 text-sm leading-6 text-text-muted">{lt.description}</p>
                   {lt.bestFor[0] && (
                     <p className="mt-2 text-xs text-text-light">

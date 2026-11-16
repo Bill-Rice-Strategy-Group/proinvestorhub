@@ -11,7 +11,6 @@ export type LoanTypeData = {
   shortName: string
   category: LoanTypeCategory
   description: string
-  typicalRateRange: string
   typicalLtvRange: string
   typicalTermRange: string
   typicalMinCredit: string
@@ -36,7 +35,6 @@ export const loanTypes: LoanTypeData[] = [
     category: 'long-term',
     description:
       'DSCR (Debt Service Coverage Ratio) loans qualify based on the property\'s rental income, not your personal income or W-2s. The most popular loan product for buy-and-hold real estate investors scaling a rental portfolio.',
-    typicalRateRange: '6.5%–8.5%',
     typicalLtvRange: '75%–80%',
     typicalTermRange: '30-year fixed or 5/6 ARM',
     typicalMinCredit: '620–680',
@@ -54,11 +52,11 @@ export const loanTypes: LoanTypeData[] = [
       'Cash-out refinance available',
     ],
     cons: [
-      'Higher rates than conventional (typically 1–2% premium)',
-      'Requires 20–25% down payment',
+      'Typically priced above conventional investment loans',
+      'Usually 15–25% down (the DSCR lenders in this directory publish maximum LTVs of 75%–85%)',
       'Property must generate sufficient rental income (usually 1.0+ DSCR)',
       'Prepayment penalties common (3–5 year step-down)',
-      'Higher minimum loan amounts ($75K–$100K typical)',
+      'Lenders set minimum loan sizes — check each lender\'s published minimum',
     ],
     relatedStrategies: ['cash-flow', 'brrrr', 'appreciation', 'str'],
     relatedCalculator: '/calculators/mortgage',
@@ -72,7 +70,7 @@ export const loanTypes: LoanTypeData[] = [
       },
       {
         question: 'Can I use a DSCR loan for my first investment property?',
-        answer: 'Yes. While some DSCR lenders require prior investment experience, many now offer first-time investor programs. You may face slightly higher rates or lower LTV limits (70-75% instead of 80%), but DSCR loans are increasingly accessible to beginners.',
+        answer: 'Yes. While some DSCR lenders require prior investment experience, many now offer first-time investor programs. You may face higher rates or lower leverage — Velocity\'s published rate sheet, for example, trims LTV for first-time investors — so compare what each lender publishes.',
       },
       {
         question: 'Do DSCR loans work for short-term rentals and Airbnb?',
@@ -80,12 +78,12 @@ export const loanTypes: LoanTypeData[] = [
       },
       {
         question: 'What\'s the difference between a DSCR loan and a conventional investment property loan?',
-        answer: 'Conventional loans use your personal debt-to-income (DTI) ratio and require tax returns, W-2s, and pay stubs. DSCR loans use the property\'s income only. Conventional loans offer lower rates but limit you to 10 financed properties. DSCR has no property count limit but costs 1-2% more in rate.',
+        answer: 'Conventional loans use your personal debt-to-income (DTI) ratio and require tax returns, W-2s, and pay stubs. DSCR loans use the property\'s income only. Conventional loans offer lower rates but limit you to 10 financed properties. DSCR has no property count limit but usually costs more in rate.',
       },
     ],
-    metaTitle: 'Best DSCR Lenders 2026: Compare Rates, LTV & Requirements | ProInvestorHub',
+    metaTitle: 'DSCR Lenders 2026: Compare Rates, LTV & Requirements | ProInvestorHub',
     metaDescription:
-      'Compare the best DSCR lenders for real estate investors in 2026. Side-by-side rates, LTV limits, credit score requirements, and expert reviews from a 30-year lending veteran.',
+      'Compare DSCR lenders for real estate investors in 2026. Side-by-side rates, LTV limits, credit score requirements, and expert reviews from a 30-year lending veteran.',
   },
   {
     name: 'Conventional Investment Property Loans',
@@ -94,7 +92,6 @@ export const loanTypes: LoanTypeData[] = [
     category: 'long-term',
     description:
       'Traditional Fannie Mae/Freddie Mac-backed mortgages for investment properties. The lowest rates available for investors, but require personal income qualification and are limited to 10 financed properties.',
-    typicalRateRange: '6.0%–7.5%',
     typicalLtvRange: '75%–80%',
     typicalTermRange: '15 or 30-year fixed',
     typicalMinCredit: '680–720',
@@ -108,7 +105,7 @@ export const loanTypes: LoanTypeData[] = [
       'Lowest rates available for investment properties',
       'Well-understood process and widespread lender availability',
       'No prepayment penalties',
-      'Assumable by qualified buyers (potential selling advantage)',
+      'Long fixed-rate terms (15 or 30 years)',
     ],
     cons: [
       'Requires full income documentation (tax returns, W-2s, pay stubs)',
@@ -125,7 +122,7 @@ export const loanTypes: LoanTypeData[] = [
     faqs: [
       {
         question: 'How many investment properties can I finance with conventional loans?',
-        answer: 'Fannie Mae and Freddie Mac allow up to 10 financed properties per borrower. Properties 5–10 require higher reserves (6 months PITI per property) and stronger credit scores. Beyond 10, you\'ll need DSCR, portfolio, or commercial financing.',
+        answer: 'Fannie Mae and Freddie Mac allow up to 10 financed properties per borrower. Lenders apply stricter credit and reserve requirements as the number of financed properties grows. Beyond 10, you\'ll need DSCR, portfolio, or commercial financing.',
       },
       {
         question: 'What down payment do I need for a conventional investment property loan?',
@@ -136,9 +133,9 @@ export const loanTypes: LoanTypeData[] = [
         answer: 'Yes. Fannie Mae allows lenders to count 75% of expected rental income (from the subject property or existing rentals) toward your qualifying income. This helps offset the new mortgage payment in your DTI calculation.',
       },
     ],
-    metaTitle: 'Best Conventional Investment Property Lenders 2026 | ProInvestorHub',
+    metaTitle: 'Conventional Investment Property Loans 2026: Terms & Requirements | ProInvestorHub',
     metaDescription:
-      'Compare conventional mortgage lenders for investment properties. Lowest rates, 15-25% down, up to 10 properties. Expert reviews and side-by-side comparisons.',
+      'Conventional mortgages for investment properties: how they work, 15–25% down, up to 10 financed properties, and how they compare with DSCR loans.',
   },
   {
     name: 'Portfolio Loans',
@@ -147,7 +144,6 @@ export const loanTypes: LoanTypeData[] = [
     category: 'long-term',
     description:
       'Portfolio loans are held by the originating bank (not sold to Fannie/Freddie), giving lenders flexibility on guidelines. Ideal for investors with 5+ properties who need blanket financing or flexible underwriting.',
-    typicalRateRange: '7.0%–9.0%',
     typicalLtvRange: '70%–80%',
     typicalTermRange: '5–30 years (balloon or fully amortizing)',
     typicalMinCredit: '650–700',
@@ -187,7 +183,7 @@ export const loanTypes: LoanTypeData[] = [
     ],
     metaTitle: 'Portfolio Loans for Real Estate Investors: Rates, Terms & Lenders (2026)',
     metaDescription:
-      'What a portfolio loan is and how it works for investors with multiple properties — typical rates and terms, the blanket-loan option, no property limit, and the best portfolio lenders.',
+      'What a portfolio loan is and how it works for investors with multiple properties — typical rates and terms, the blanket-loan option, no property limit, and portfolio lenders to compare.',
   },
 
   // ── Short-Term / Acquisition ────────────────────────
@@ -198,7 +194,6 @@ export const loanTypes: LoanTypeData[] = [
     category: 'short-term',
     description:
       'Short-term, asset-based loans primarily used for fix-and-flip projects and bridge financing. Fast closings (7–14 days), minimal borrower qualification, but higher rates and shorter terms than permanent financing.',
-    typicalRateRange: '10%–14%',
     typicalLtvRange: '65%–75% of ARV',
     typicalTermRange: '6–24 months',
     typicalMinCredit: 'Flexible (550–650)',
@@ -217,7 +212,7 @@ export const loanTypes: LoanTypeData[] = [
       'Available for distressed properties banks won\'t touch',
     ],
     cons: [
-      'High interest rates (10–14%)',
+      'Higher interest rates than long-term loans',
       'Origination fees of 2–4 points',
       'Short terms (6–24 months) — must have an exit strategy',
       'Personal guarantee usually required',
@@ -227,7 +222,7 @@ export const loanTypes: LoanTypeData[] = [
     relatedCalculator: '/calculators/fix-flip',
     sortOrder: 3,
     heroContent:
-      'Hard money loans are the engine behind fix-and-flip investing. They\'re short-term, asset-based loans secured by the property itself rather than your personal financial situation. The lender focuses on the deal — the purchase price, rehab budget, and after-repair value (ARV) — not your tax returns or credit score. This makes hard money essential for investors buying distressed properties at auction, competing with cash buyers on REOs, or executing the acquisition phase of a BRRRR strategy. The cost is real (10-14% rates plus 2-4 points), but for a profitable flip with a 6-month timeline, the carrying costs are manageable against a $30K–$80K profit margin.',
+      'Hard money loans are the engine behind fix-and-flip investing. They\'re short-term, asset-based loans secured by the property itself rather than your personal financial situation. The lender focuses on the deal — the purchase price, rehab budget, and after-repair value (ARV) — not your tax returns or credit score. This makes hard money essential for investors buying distressed properties at auction, competing with cash buyers on REOs, or executing the acquisition phase of a BRRRR strategy. The cost is real — short-term rates plus points — so run the carrying costs against your projected margin before you commit; the lender pages in this directory show what each lender publishes.',
     faqs: [
       {
         question: 'How fast can a hard money lender close?',
@@ -235,16 +230,16 @@ export const loanTypes: LoanTypeData[] = [
       },
       {
         question: 'Do hard money lenders fund the rehab too?',
-        answer: 'Most hard money lenders offer rehab funding as part of the loan, typically held in escrow and disbursed in draws as work is completed. The total loan (purchase + rehab) is usually capped at 65–75% of the after-repair value (ARV).',
+        answer: 'Most hard money lenders offer rehab funding as part of the loan, typically held in escrow and disbursed in draws as work is completed. The total loan (purchase + rehab) is commonly capped at a percentage of the after-repair value (ARV) — 75% is the cap several lenders in this directory publish.',
       },
       {
         question: 'What happens if my flip takes longer than the loan term?',
         answer: 'Most hard money lenders offer extensions (typically 3–6 months) for a fee (0.5–1 point). However, extensions are expensive and erode your profit margin. Always build a buffer into your timeline and have a backup exit strategy (sell at a discount or refinance to DSCR).',
       },
     ],
-    metaTitle: 'Best Hard Money Lenders 2026: Compare Rates & Speed | ProInvestorHub',
+    metaTitle: 'Hard Money Lenders 2026: Compare Rates & Terms | ProInvestorHub',
     metaDescription:
-      'Compare the best hard money lenders for fix-and-flip investors in 2026. Side-by-side rates, closing speed, LTV limits, and honest reviews from a lending veteran.',
+      'Compare hard money lenders for fix-and-flip investors in 2026. Side-by-side rates, closing speed, LTV limits, and honest reviews from a lending veteran.',
   },
   {
     name: 'Fix-and-Flip Loans',
@@ -253,7 +248,6 @@ export const loanTypes: LoanTypeData[] = [
     category: 'short-term',
     description:
       'Purpose-built short-term loans that fund both the purchase and renovation of investment properties intended for resale. Similar to hard money but often from tech-enabled lenders with streamlined processes.',
-    typicalRateRange: '9%–13%',
     typicalLtvRange: '85%–90% of purchase, 100% rehab, 70%–75% ARV',
     typicalTermRange: '6–18 months',
     typicalMinCredit: '620–680',
@@ -288,12 +282,12 @@ export const loanTypes: LoanTypeData[] = [
       },
       {
         question: 'Can I get a fix-and-flip loan with no experience?',
-        answer: 'Yes, but terms won\'t be as favorable. Most lenders offer first-time flipper programs with lower leverage (75-80% LTV vs. 90%) and slightly higher rates. Having a strong credit score (700+), a detailed scope of work, and a realistic ARV analysis helps compensate for lack of experience.',
+        answer: 'Yes, but terms won\'t be as favorable. Many lenders work with first-time flippers, usually with lower leverage or a higher rate than they offer experienced borrowers. Having a strong credit score (700+), a detailed scope of work, and a realistic ARV analysis helps compensate for lack of experience.',
       },
     ],
-    metaTitle: 'Best Fix-and-Flip Lenders 2026: Compare Rates & Terms | ProInvestorHub',
+    metaTitle: 'Fix-and-Flip Lenders 2026: Compare Rates & Terms | ProInvestorHub',
     metaDescription:
-      'Compare the best fix-and-flip lenders for real estate investors. Up to 90% purchase + 100% rehab funding. Side-by-side rates, leverage, and expert reviews.',
+      'Compare fix-and-flip lenders for real estate investors. Up to 90% purchase + 100% rehab funding. Side-by-side rates, leverage, and expert reviews.',
   },
   {
     name: 'Bridge Loans',
@@ -302,7 +296,6 @@ export const loanTypes: LoanTypeData[] = [
     category: 'short-term',
     description:
       'Short-term financing that bridges the gap between acquiring a property and securing permanent financing or selling. Used for value-add acquisitions, lease-up periods, and time-sensitive purchases.',
-    typicalRateRange: '8%–12%',
     typicalLtvRange: '70%–80%',
     typicalTermRange: '6–36 months',
     typicalMinCredit: '620–680',
@@ -339,7 +332,7 @@ export const loanTypes: LoanTypeData[] = [
         answer: 'Yes — bridge-to-permanent financing is the standard path for value-add multifamily acquisitions. You acquire with a bridge loan, renovate units, increase rents, stabilize occupancy, then refinance to agency debt (Fannie Mae Small Balance or Freddie Mac SBL) at much better long-term rates.',
       },
     ],
-    metaTitle: 'Best Bridge Loan Lenders 2026: Compare Rates & Terms | ProInvestorHub',
+    metaTitle: 'Bridge Loan Lenders 2026: Compare Rates & Terms | ProInvestorHub',
     metaDescription:
       'Compare bridge loan lenders for real estate investors. Fast closings, interest-only, value-add and BRRRR financing. Expert reviews and side-by-side comparisons.',
   },
@@ -350,7 +343,6 @@ export const loanTypes: LoanTypeData[] = [
     category: 'short-term',
     description:
       'Financing for ground-up construction of investment properties, from single-family spec homes to build-to-rent developments. Funds disbursed in draws as construction milestones are completed.',
-    typicalRateRange: '9%–13%',
     typicalLtvRange: '70%–80% of completed value',
     typicalTermRange: '12–24 months',
     typicalMinCredit: '680+',
@@ -388,7 +380,7 @@ export const loanTypes: LoanTypeData[] = [
         answer: 'Most construction lenders want to see a track record — at least 1-2 completed projects. First-time builders can qualify by partnering with an experienced general contractor and providing detailed plans, a realistic budget with contingency, and strong personal financials.',
       },
     ],
-    metaTitle: 'Best Construction Lenders for Investors 2026 | ProInvestorHub',
+    metaTitle: 'Construction Lenders for Investors 2026: Compare Rates & Terms | ProInvestorHub',
     metaDescription:
       'Compare construction loan lenders for build-to-rent and spec builds. Ground-up financing, draw schedules, construction-to-permanent options. Expert reviews.',
   },
@@ -401,7 +393,6 @@ export const loanTypes: LoanTypeData[] = [
     category: 'transitional',
     description:
       'Hybrid loans that combine short-term rehab financing with automatic conversion to a long-term DSCR loan. The one-loan BRRRR solution — no separate refinance needed.',
-    typicalRateRange: '8%–11% (bridge) → 6.5%–8.5% (perm)',
     typicalLtvRange: '80%–85% purchase, 100% rehab, 75% perm',
     typicalTermRange: '12–18 month bridge → 30-year permanent',
     typicalMinCredit: '660–700',
@@ -426,14 +417,14 @@ export const loanTypes: LoanTypeData[] = [
     relatedCalculator: '/calculators/brrrr',
     sortOrder: 7,
     heroContent:
-      'Fix-and-rent loans are the BRRRR investor\'s dream product. Instead of getting a hard money loan for acquisition and rehab, then finding a separate DSCR lender for the refinance, a fix-and-rent loan does both in one. You close once, complete your renovation, get the property leased, and the loan automatically converts to a 30-year DSCR loan. This eliminates double closing costs ($3,000–$8,000 saved), removes refinance timing risk, and simplifies the entire process. Lenders like Kiavi, Lima One, and RCN Capital have made this product increasingly competitive.',
+      'Fix-and-rent loans are the BRRRR investor\'s dream product. Instead of getting a hard money loan for acquisition and rehab, then finding a separate DSCR lender for the refinance, a fix-and-rent loan does both in one. You close once, complete your renovation, get the property leased, and the loan automatically converts to a 30-year DSCR loan. That avoids a second set of closing costs, removes refinance timing risk, and simplifies the process. In this directory, Kiavi, Lima One and OfferMarket list fix-and-rent financing.',
     faqs: [
       {
         question: 'How does the bridge-to-permanent conversion work?',
         answer: 'After your rehab is complete and the property is leased, the lender orders a new appraisal. If the property meets the DSCR requirements (typically 1.0+ DSCR), the loan automatically converts to a 30-year permanent loan. You don\'t apply again or pay new origination fees — just the conversion costs (typically an appraisal and small processing fee).',
       },
     ],
-    metaTitle: 'Best Fix-and-Rent (BRRRR) Lenders 2026 | ProInvestorHub',
+    metaTitle: 'Fix-and-Rent (BRRRR) Lenders 2026: Compare Rates & Terms | ProInvestorHub',
     metaDescription:
       'Compare fix-and-rent lenders for BRRRR investors. One-loan bridge-to-permanent financing. No refinance needed. Expert reviews and side-by-side comparisons.',
   },
@@ -446,7 +437,6 @@ export const loanTypes: LoanTypeData[] = [
     category: 'specialty',
     description:
       'Financing for 5+ unit multifamily, office, retail, industrial, and mixed-use investment properties. Includes agency debt (Fannie/Freddie Small Balance), CMBS, bank loans, and private credit.',
-    typicalRateRange: '5.5%–9.0%',
     typicalLtvRange: '65%–80%',
     typicalTermRange: '5–30 years',
     typicalMinCredit: '660+',
@@ -464,10 +454,10 @@ export const loanTypes: LoanTypeData[] = [
     ],
     cons: [
       'More complex underwriting and documentation',
-      'Higher minimum loan amounts ($500K–$1M+)',
+      'Higher minimum loan amounts than residential loans',
       'Experience requirements for most products',
       'Longer closing timelines (30–60+ days)',
-      'Commercial appraisals are expensive ($3,000–$10,000)',
+      'Commercial appraisals cost far more than residential ones',
     ],
     relatedStrategies: ['cash-flow', 'appreciation'],
     relatedCalculator: '/calculators/rental-cashflow',
@@ -481,10 +471,10 @@ export const loanTypes: LoanTypeData[] = [
       },
       {
         question: 'What is agency debt?',
-        answer: 'Agency debt refers to loans backed by Fannie Mae or Freddie Mac for multifamily properties (5+ units). These offer the best rates, longest terms (up to 30 years), and non-recourse options. Fannie Mae Small Balance Loans (SBL) start at $750K and are the most popular product for investors scaling into apartments.',
+        answer: 'Agency debt refers to loans backed by Fannie Mae or Freddie Mac for multifamily properties (5+ units). These offer the best rates, longest terms (up to 30 years), and non-recourse options. Ask agency lenders about their small-balance programs if you are scaling into apartments.',
       },
     ],
-    metaTitle: 'Best Commercial Real Estate Lenders 2026 | ProInvestorHub',
+    metaTitle: 'Commercial Real Estate Lenders 2026: Compare Rates & Terms | ProInvestorHub',
     metaDescription:
       'Compare commercial real estate lenders for multifamily and investment properties. Agency debt, CMBS, bank loans. Expert reviews for 5+ unit investors.',
   },
@@ -495,7 +485,6 @@ export const loanTypes: LoanTypeData[] = [
     category: 'specialty',
     description:
       'Non-QM loans that use 12–24 months of bank statements instead of tax returns to verify income. Designed for self-employed investors and business owners whose tax returns understate their actual income.',
-    typicalRateRange: '7.0%–9.5%',
     typicalLtvRange: '75%–80%',
     typicalTermRange: '30-year fixed or ARM',
     typicalMinCredit: '660–700',
@@ -511,7 +500,7 @@ export const loanTypes: LoanTypeData[] = [
       'Available for both primary residence and investment properties',
     ],
     cons: [
-      'Higher rates than conventional (1–3% premium)',
+      'Typically priced above conventional loans',
       'Requires consistent deposits over 12–24 months',
       'Higher credit score requirements',
       'Not all lenders offer investment property bank statement programs',
@@ -527,7 +516,7 @@ export const loanTypes: LoanTypeData[] = [
         answer: 'Lenders total your deposits over 12 or 24 months of bank statements, then apply an expense factor (typically 50% for business accounts, meaning they count 50% of deposits as income). Personal bank statements may use a higher income percentage. The calculated income is then used in a standard DTI calculation.',
       },
     ],
-    metaTitle: 'Best Bank Statement Lenders for Investors 2026 | ProInvestorHub',
+    metaTitle: 'Bank Statement Lenders for Investors 2026: Compare Rates & Terms | ProInvestorHub',
     metaDescription:
       'Compare bank statement loan lenders for self-employed real estate investors. No tax returns needed. 12-24 month statements qualify you. Expert reviews.',
   },
@@ -538,7 +527,6 @@ export const loanTypes: LoanTypeData[] = [
     category: 'specialty',
     description:
       'Loans from individual private investors, family offices, or small funds — outside the institutional lending system. The most flexible financing available, with terms negotiated directly between borrower and lender.',
-    typicalRateRange: '8%–15%',
     typicalLtvRange: '50%–75%',
     typicalTermRange: 'Negotiable (6 months–5 years)',
     typicalMinCredit: 'Negotiable',
@@ -588,7 +576,6 @@ export const loanTypes: LoanTypeData[] = [
     category: 'specialty',
     description:
       'Small Business Administration-backed loans (SBA 504 and 7(a)) for owner-occupied commercial real estate. Low down payments (10%) and competitive rates for investors who operate a business from the property.',
-    typicalRateRange: '5.5%–8.0%',
     typicalLtvRange: '80%–90%',
     typicalTermRange: '10–25 years',
     typicalMinCredit: '680+',
@@ -615,7 +602,7 @@ export const loanTypes: LoanTypeData[] = [
     relatedCalculator: '/calculators/mortgage',
     sortOrder: 12,
     heroContent:
-      'SBA loans are the best-kept secret for real estate investors who also operate a business. If you\'ll occupy at least 51% of a commercial property (think: office with rental units above, or a mixed-use building where you run your business from the ground floor), SBA 504 and 7(a) loans offer unbeatable terms: 10% down, competitive rates, and up to 25-year terms. The catch is the owner-occupancy requirement and the paperwork-intensive process. But for the right deal structure, SBA financing provides leverage and terms that no other commercial loan product can match.',
+      'SBA loans are the best-kept secret for real estate investors who also operate a business. If you\'ll occupy at least 51% of a commercial property (think: office with rental units above, or a mixed-use building where you run your business from the ground floor), SBA 504 and 7(a) loans can offer favorable terms, including down payments as low as 10% and long amortizations. The catch is the owner-occupancy requirement and the paperwork-intensive process. But for the right deal structure, SBA financing provides leverage and terms that no other commercial loan product can match.',
     faqs: [
       {
         question: 'What\'s the difference between SBA 504 and SBA 7(a)?',
