@@ -52,9 +52,7 @@ export function YearOverYear() {
         Year over year: {priorYear} &rarr; {reportMeta.year}
       </h2>
       <p className="mt-1 max-w-2xl text-text-muted">
-        How investor financing shifted in one year. Rates eased, investors borrowed
-        more, and the premium they pay over owner-occupants narrowed across most of
-        the country.
+        How investor financing shifted in one year, state by state.
       </p>
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -99,13 +97,14 @@ export function YearOverYear() {
       {/* Headline takeaway */}
       <div className="mt-6 rounded-2xl border border-accent/30 bg-accent/10 p-6">
         <p className="leading-7 text-text">
-          The investor rate premium <strong>compressed in {down} states</strong>, held
-          flat in {flat}, and <strong>widened in {up}</strong> &mdash; the national
-          median fell from {fmtBps(n.ratePremiumBps.prior)} to{' '}
-          {fmtBps(n.ratePremiumBps.current)} as the investor median rate eased from{' '}
-          {n.investorMedianRate.prior}% to {n.investorMedianRate.current}%. Even so,
-          investors still borrowed {fmtPctChange(n.investorOriginations.pct)} more by
-          count and {fmtPctChange(n.investorVolume.pct)} more by dollar volume.
+          Among the {up + flat + down} states with enough rate data in both years, the
+          investor rate premium <strong>compressed in {down}</strong>, held flat in {flat},
+          and <strong>widened in {up}</strong>. Nationally the premium went from{' '}
+          {fmtBps(n.ratePremiumBps.prior)} to {fmtBps(n.ratePremiumBps.current)}, and the
+          investor median rate from {n.investorMedianRate.prior}% to{' '}
+          {n.investorMedianRate.current}%. Investor loans changed{' '}
+          {fmtPctChange(n.investorOriginations.pct)} by count and{' '}
+          {fmtPctChange(n.investorVolume.pct)} by dollar volume.
         </p>
       </div>
 

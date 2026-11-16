@@ -64,7 +64,7 @@ const reports = [
     source: 'CFPB HMDA',
     year: reportMeta.year,
     blurb:
-      'A 50-state analysis of how real estate investors finance deals — the rate premium they pay over owner-occupants, denial rates, DSCR/business-purpose lending, and leverage.',
+      'A 50-state + DC analysis of how real estate investors finance deals — the rate premium they pay over owner-occupants, denial rates, DSCR/business-purpose lending, and leverage.',
     stats: [
       { label: 'Investor rate premium', value: fmtBps(national.ratePremiumBps) },
       { label: 'Investor denial rate', value: fmtPct(national.denialRate) },

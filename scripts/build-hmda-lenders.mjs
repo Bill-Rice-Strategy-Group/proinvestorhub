@@ -20,9 +20,12 @@
  *      stable across years, so the 2024 registry covers nearly all 2025 filers;
  *   2. the public GLEIF API (https://api.gleif.org) for any LEI still unmatched.
  *
- * INPUT (stream, never held in memory):
+ * INPUT (stream, never held in memory) — either:
  *   unzip -p 2025_combined_mlar_header.zip | node scripts/build-hmda-lenders.mjs
  *   # or: MLAR_FILE=/path/to/file.txt node scripts/build-hmda-lenders.mjs
+ * or the per-state CFPB Data Browser CSVs (the finalized dataset), downloaded with curl:
+ *   curl -sSL "https://ffiec.cfpb.gov/v2/data-browser-api/view/csv?states=TX&years=2025&actions_taken=1,3&loan_purposes=1,31,32" -o csv/TX.csv
+ *   CSV_DIR=csv node scripts/build-hmda-lenders.mjs
  *
  * OUTPUT:
  *   src/data/hmda-lenders/national.json
@@ -37,10 +40,17 @@
  *   BUILD_DATE=...       stamped into meta.generatedAt
  *   MLAR_FILE=...        read this file instead of stdin
  *   NO_GLEIF=1           skip the GLEIF fallback (offline / test)
+ *   CSV_DIR=...          read <CSV_DIR>/<ABBR>.csv Data Browser files instead of the MLAR
+ *   FILERS_MAP=...       HMDA filers registry JSON to use alone (default: hmda-filers-2024.json,
+ *                        then scripts/data/hmda-filers-<YEAR>.json for LEIs not in it). Fetch with:
+ *                        curl -sSL https://ffiec.cfpb.gov/v2/reporting/filers/<YEAR> -o scripts/data/hmda-filers-<YEAR>.json
+ *
+ * RANKS are competition ranks: 1 + the number of lenders with strictly more
+ * originations, so lenders with equal counts share a rank.
  */
 
 import { mkdir, writeFile, readFile } from 'node:fs/promises'
-import { createReadStream } from 'node:fs'
+import { createReadStream, existsSync } from 'node:fs'
 import { createInterface } from 'node:readline'
 import path from 'node:path'
 
@@ -55,9 +65,22 @@ const NO_GLEIF = process.env.NO_GLEIF === '1'
 const ROOT = path.resolve(process.cwd())
 const OUT_DATA = path.join(ROOT, 'src', 'data', 'hmda-lenders')
 const OUT_PUBLIC = path.join(ROOT, 'public', 'data')
-const FILERS_MAP = path.join(ROOT, 'scripts', 'data', 'hmda-filers-2024.json')
+const CSV_DIR = process.env.CSV_DIR || null
+// Name registries, tried in order. The 2024 registry carries full legal names;
+// the data year's registry (respondent names, sometimes truncated) fills in any
+// LEI that first filed later.
+const FILERS_MAPS = (
+  process.env.FILERS_MAP
+    ? [process.env.FILERS_MAP]
+    : [
+        path.join(ROOT, 'scripts', 'data', 'hmda-filers-2024.json'),
+        path.join(ROOT, 'scripts', 'data', `hmda-filers-${YEAR}.json`),
+      ]
+).filter((f, i, a) => a.indexOf(f) === i)
 
-const SOURCE = 'CFPB / FFIEC HMDA combined Modified LAR (loan-level public dataset, early release)'
+const SOURCE = CSV_DIR
+  ? 'CFPB / FFIEC HMDA Data Browser (loan-level public dataset)'
+  : 'CFPB / FFIEC HMDA combined Modified LAR (loan-level public dataset, early release)'
 const UNIVERSE =
   'Investment-property (owner-occupancy = investor), single-family 1-4 unit, site-built originations'
 
@@ -124,13 +147,17 @@ function titleCase(s) {
 
 // ---- name resolution ----
 async function loadFilersMap() {
-  try {
-    const j = JSON.parse(await readFile(FILERS_MAP, 'utf8'))
-    return new Map(j.institutions.map((i) => [i.lei, i.name]))
-  } catch {
-    console.warn(`  (no filers map at ${path.relative(ROOT, FILERS_MAP)} — names from GLEIF only)`)
-    return new Map()
+  const map = new Map()
+  for (const f of FILERS_MAPS) {
+    if (!existsSync(f)) continue
+    try {
+      const j = JSON.parse(await readFile(f, 'utf8'))
+      for (const i of j.institutions) if (!map.has(i.lei)) map.set(i.lei, i.name)
+    } catch {
+      console.warn(`  (no filers map at ${path.relative(ROOT, f)})`)
+    }
   }
+  return map
 }
 
 async function gleifBatch(leis) {
@@ -200,15 +227,23 @@ async function main() {
     if (biz) a.biz++
   }
 
-  const input = MLAR_FILE ? createReadStream(MLAR_FILE) : process.stdin
-  const rl = createInterface({ input, crlfDelay: Infinity })
-  console.log(`HMDA investment-property lenders build (Modified LAR) — year ${YEAR}\n`)
+  // Line sources: one MLAR stream ('|'-delimited), or one Data Browser CSV per state (',').
+  const sources = CSV_DIR
+    ? STATES.map(([abbr]) => ({ file: path.join(CSV_DIR, `${abbr}.csv`), delim: ',' }))
+    : [{ file: MLAR_FILE, delim: '|' }]
+  console.log(`HMDA investment-property lenders build (${CSV_DIR ? 'Data Browser CSV' : 'Modified LAR'}) — year ${YEAR}\n`)
 
+  for (const src of sources) {
+  if (CSV_DIR && !existsSync(src.file)) throw new Error(`${src.file} not found`)
+  const input = src.file ? createReadStream(src.file) : process.stdin
+  const rl = createInterface({ input, crlfDelay: Infinity })
+  header = null
   for await (const line of rl) {
     if (!line) continue
-    const cells = line.split('|')
+    const cells = line.split(src.delim)
     if (!header) {
       header = cells.map((c) => c.trim())
+      for (const k of Object.keys(idx)) delete idx[k]
       header.forEach((name, i) => (idx[name] = i))
       for (const col of need) if (!(col in idx)) throw new Error(`missing column "${col}"`)
       continue
@@ -238,6 +273,7 @@ async function main() {
     bump(national, lei, amt, biz)
     stateTotals.set(abbr, (stateTotals.get(abbr) || 0) + 1)
   }
+  }
 
   console.log(`scanned ${rows.toLocaleString()} rows; kept ${kept.toLocaleString()} investor originations`)
   console.log(`distinct lenders: ${national.size.toLocaleString()}\n`)
@@ -266,6 +302,9 @@ async function main() {
     const raw = names.get(lei)
     return raw ? titleCase(raw) : `Lender ${lei.slice(0, 8)}…`
   }
+  // Competition rank within a sorted list: 1 + count of lenders with strictly more originations.
+  const withRanks = (list) =>
+    list.map(([lei, agg]) => [lei, agg, 1 + list.filter(([, a]) => a.count > agg.count).length])
   const lenderRow = (lei, agg, rank) => ({
     rank,
     lei,
@@ -286,14 +325,14 @@ async function main() {
     distinctLenders: national.size,
     nameResolution: { viaFilers, viaGleif, unresolved, of: neededLeis.size },
     nameNote:
-      'Lender names resolved from the 2024 HMDA filers registry (LEIs are stable across years) ' +
-      'with a GLEIF fallback. The 2025 HMDA institution registry was not yet published at build time.',
+      `Lender names resolved by LEI from the CFPB HMDA filers registries (${FILERS_MAPS.map((f) => path.basename(f).match(/\d{4}/)?.[0]).join(', then ')}), ` +
+      'with GLEIF for any LEI in neither.',
   }
 
   const nationalOut = {
     meta,
     totalInvestorOriginations: kept,
-    lenders: topNational.map(([lei, agg], i) => lenderRow(lei, agg, i + 1)),
+    lenders: withRanks(topNational).map(([lei, agg, rank]) => lenderRow(lei, agg, rank)),
   }
 
   const statesOut = {
@@ -305,7 +344,7 @@ async function main() {
         name,
         slug,
         totalInvestorOriginations: stateTotals.get(abbr) || 0,
-        lenders: top.map(([lei, agg], i) => lenderRow(lei, agg, i + 1)),
+        lenders: withRanks(top).map(([lei, agg, rank]) => lenderRow(lei, agg, rank)),
       }
     }),
   }

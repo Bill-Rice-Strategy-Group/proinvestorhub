@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import type { InvestorFinancingRow } from '@/data/hmda-investor'
-import { fmtBps, fmtPct, fmtRate, fmtCount, fmtUSD } from '@/data/hmda-investor'
+import { fmtBps, fmtPct, fmtRate, fmtCount, fmtUSD, hasRateCoverage } from '@/data/hmda-investor'
 
 type Col = {
   key: keyof InvestorFinancingRow
@@ -13,12 +13,18 @@ type Col = {
 }
 
 const COLS: Col[] = [
-  { key: 'ratePremiumBps', label: 'Rate premium', fmt: (r) => fmtBps(r.ratePremiumBps), numeric: true },
+  {
+    key: 'ratePremiumBps',
+    label: 'Rate premium',
+    fmt: (r) => (hasRateCoverage(r) ? fmtBps(r.ratePremiumBps) : `${fmtBps(r.ratePremiumBps)} †`),
+    numeric: true,
+  },
   { key: 'denialRate', label: 'Denial rate', fmt: (r) => fmtPct(r.denialRate), numeric: true },
   { key: 'investorShare', label: 'Investor share', fmt: (r) => fmtPct(r.investorShare), numeric: true },
   { key: 'investorMedianRate', label: 'Median rate', fmt: (r) => fmtRate(r.investorMedianRate), numeric: true },
   { key: 'investorMedianLtv', label: 'Median LTV', fmt: (r) => (r.investorMedianLtv == null ? '—' : `${r.investorMedianLtv.toFixed(0)}%`), numeric: true },
   { key: 'businessPurposeShare', label: 'DSCR share', fmt: (r) => fmtPct(r.businessPurposeShare, 0), numeric: true },
+  { key: 'rateCoverage', label: 'Rate reported', fmt: (r) => fmtPct(r.rateCoverage, 0), numeric: true },
   { key: 'investorOriginations', label: 'Loans', fmt: (r) => fmtCount(r.investorOriginations), numeric: true },
   { key: 'investorVolume', label: 'Volume', fmt: (r) => fmtUSD(r.investorVolume), numeric: true },
 ]

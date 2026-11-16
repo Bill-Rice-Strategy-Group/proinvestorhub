@@ -13,6 +13,7 @@ import { KeyTakeaways } from '@/components/key-takeaways'
 import {
   national,
   statesByYield,
+  stateRank,
   metrosByYield,
   yieldMeta,
   isPlaceholder,
@@ -48,7 +49,7 @@ const faqs = [
   {
     question: 'Which states have the best rental yield?',
     answer: topStates.length
-      ? `In ${yieldMeta.year}, gross rental yield was highest in ${topStates[0].name} (${fmtYield(topStates[0].grossYield)}), ${topStates[1]?.name} (${fmtYield(topStates[1]?.grossYield ?? null)}), and ${topStates[2]?.name} (${fmtYield(topStates[2]?.grossYield ?? null)}). High-cost coastal states sit at the bottom.`
+      ? `In ${yieldMeta.year}, gross rental yield was highest in ${topStates[0].name} (${fmtYield(topStates[0].grossYield)}), ${topStates[1]?.name} (${fmtYield(topStates[1]?.grossYield ?? null)}), and ${topStates[2]?.name} (${fmtYield(topStates[2]?.grossYield ?? null)}). It was lowest in ${bottomStates[0]?.name} (${fmtYield(bottomStates[0]?.grossYield ?? null)}), ${bottomStates[1]?.name}, and ${bottomStates[2]?.name}.`
       : '',
   },
   {
@@ -57,7 +58,7 @@ const faqs = [
   },
   {
     question: 'What data is this based on?',
-    answer: `${yieldMeta.source}. Rent is median gross rent (B25064) and value is median owner-occupied home value (B25077), from the same survey and vintage so they're directly comparable. Coverage is geographies with population of at least 65,000.`,
+    answer: `${yieldMeta.source}. Rent is median gross rent (B25064) and value is median owner-occupied home value (B25077), from the same survey and vintage. They describe different housing stock (renter- vs owner-occupied), so the ratio is a market screen, not the yield on any one property. Coverage is geographies with population of at least 65,000.`,
   },
 ]
 
@@ -99,6 +100,10 @@ export default function RentalYieldReport() {
           downloadUrl: `${baseUrl}${csvHref}`,
           temporalCoverage: String(yieldMeta.year),
           datePublished: PUBLISHED,
+          sourceOrganization: {
+            name: 'U.S. Census Bureau (American Community Survey)',
+            url: 'https://www.census.gov/programs-surveys/acs',
+          },
         })}
       />
 
@@ -133,7 +138,7 @@ export default function RentalYieldReport() {
       </header>
 
       <section className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <Stat label="U.S. gross rental yield" value={fmtYield(national.grossYield)} sub={`${yieldMeta.year} national median`} />
+        <Stat label="U.S. gross rental yield" value={fmtYield(national.grossYield)} sub={`${yieldMeta.year}, U.S. median rent ÷ U.S. median value`} />
         <Stat label="Median gross rent" value={fmtRent(national.medianGrossRent)} sub="incl. utilities (ACS)" />
         <Stat label="Median home value" value={fmtValue(national.medianHomeValue)} sub="owner-occupied (ACS)" />
       </section>
@@ -179,7 +184,7 @@ export default function RentalYieldReport() {
           subtitle={`Annual rent ÷ home value, top ${topStates.length} states`}
           unit="%"
           highlightTop={3}
-          reference={{ value: (national.grossYield ?? 0) * 100, label: 'U.S. median' }}
+          reference={{ value: (national.grossYield ?? 0) * 100, label: 'U.S.' }}
           data={topStates.map((s) => ({
             label: s.name,
             value: (s.grossYield ?? 0) * 100,
@@ -191,7 +196,7 @@ export default function RentalYieldReport() {
           subtitle={`Annual rent ÷ home value, top ${topMetros.length} metros`}
           unit="%"
           highlightTop={3}
-          reference={{ value: (national.grossYield ?? 0) * 100, label: 'U.S. median' }}
+          reference={{ value: (national.grossYield ?? 0) * 100, label: 'U.S.' }}
           data={topMetros.map((m) => ({
             label: m.name,
             value: (m.grossYield ?? 0) * 100,
@@ -205,7 +210,7 @@ export default function RentalYieldReport() {
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
             <h2 className="text-2xl font-bold text-text">Gross yield by state</h2>
-            <p className="mt-1 text-text-muted">All states, ranked by gross rental yield.</p>
+            <p className="mt-1 text-text-muted">All 50 states and DC, ranked by gross rental yield.</p>
           </div>
           <a
             href={csvHref}
@@ -229,7 +234,7 @@ export default function RentalYieldReport() {
             <tbody>
               {statesByYield.map((s, i) => (
                 <tr key={s.slug} className="border-b border-border/60 last:border-0">
-                  <td className="px-4 py-2.5 text-text-muted">{i + 1}</td>
+                  <td className="px-4 py-2.5 text-text-muted">{stateRank(s.slug) ?? i + 1}</td>
                   <td className="px-4 py-2.5 font-medium text-text">
                     <Link href={`/reports/rental-yield/${s.slug}`} className="hover:text-primary hover:underline">
                       {s.name}
@@ -251,7 +256,8 @@ export default function RentalYieldReport() {
           <h2 className="text-lg font-bold text-text">How we built this</h2>
           <p className="mt-2 text-sm leading-6 text-text-muted">
             {yieldMeta.metric}. Source: {yieldMeta.source}. Rent and value come from
-            the same survey and vintage, so they&apos;re directly comparable. Gross
+            the same survey and vintage; they describe renter- and owner-occupied
+            homes respectively, so the ratio is a market screen. Gross
             yield excludes taxes, insurance, and financing — it&apos;s a market screen,
             not a net return.
           </p>

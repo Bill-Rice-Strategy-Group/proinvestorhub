@@ -31,12 +31,19 @@
  *   YEAR=2024 node scripts/build-hmda-investor.mjs
  *   ONLY=DC,MI node scripts/build-hmda-investor.mjs      # subset of states (testing)
  *   FRESH=1 node scripts/build-hmda-investor.mjs         # ignore cache, re-pull
+ *   CSV_DIR=/path/to/csvs node scripts/build-hmda-investor.mjs
+ *       # read <CSV_DIR>/<ABBR>.csv (same Data Browser CSV, downloaded with curl) instead of
+ *       # fetching — for machines where Node's fetch cannot reach the API (e.g. behind a proxy):
+ *       #   curl -sSL "https://ffiec.cfpb.gov/v2/data-browser-api/view/csv?states=TX&years=2024&actions_taken=1,3&loan_purposes=1,31,32" -o TX.csv
+ *   OUT_SUFFIX=-2024 ...   # write national-2024.json / states-2024.json (the prior-year
+ *                          # baseline the trend layer diffs against) instead of national.json / states.json
  *
  * No API key/token required. Data: https://ffiec.cfpb.gov/documentation/api/data-browser/
  */
 
-import { mkdir, writeFile, readFile, readdir } from 'node:fs/promises'
-import { existsSync } from 'node:fs'
+import { mkdir, writeFile, readFile } from 'node:fs/promises'
+import { existsSync, createReadStream } from 'node:fs'
+import { Readable } from 'node:stream'
 import path from 'node:path'
 
 const YEAR = process.env.YEAR ? Number(process.env.YEAR) : 2024
@@ -46,6 +53,8 @@ const ONLY = process.env.ONLY ? process.env.ONLY.split(',').map((s) => s.trim().
 const ROOT = path.resolve(process.cwd())
 const OUT_DATA = path.join(ROOT, 'src', 'data', 'hmda-investor')
 const OUT_PUBLIC = path.join(ROOT, 'public', 'data')
+const CSV_DIR = process.env.CSV_DIR || null
+const OUT_SUFFIX = process.env.OUT_SUFFIX || ''
 const CACHE_DIR = path.join(process.env.CLAUDE_JOB_DIR || ROOT, 'tmp', 'hmda-cache', String(YEAR))
 
 const API = 'https://ffiec.cfpb.gov/v2/data-browser-api/view'
@@ -126,12 +135,20 @@ function addHist(hist, key) {
 
 async function streamState(abbr) {
   const url = `${API}/csv?states=${abbr}&years=${YEAR}&${QUERY}`
-  const res = await fetch(url, { redirect: 'follow' })
-  if (!res.ok) throw new Error(`${abbr}: HTTP ${res.status}`)
-  if (!res.body) throw new Error(`${abbr}: no response body`)
+  let body
+  if (CSV_DIR) {
+    const file = path.join(CSV_DIR, `${abbr}.csv`)
+    if (!existsSync(file)) throw new Error(`${abbr}: ${file} not found`)
+    body = Readable.toWeb(createReadStream(file))
+  } else {
+    const res = await fetch(url, { redirect: 'follow' })
+    if (!res.ok) throw new Error(`${abbr}: HTTP ${res.status}`)
+    if (!res.body) throw new Error(`${abbr}: no response body`)
+    body = res.body
+  }
 
   const acc = newAccumulator()
-  const reader = res.body.getReader()
+  const reader = body.getReader()
   const decoder = new TextDecoder()
   let buf = ''
   let header = null
@@ -323,11 +340,11 @@ async function main() {
   }
 
   await writeFile(
-    path.join(OUT_DATA, 'national.json'),
+    path.join(OUT_DATA, `national${OUT_SUFFIX}.json`),
     JSON.stringify({ meta, ...nationalSummary }, null, 2)
   )
   await writeFile(
-    path.join(OUT_DATA, 'states.json'),
+    path.join(OUT_DATA, `states${OUT_SUFFIX}.json`),
     JSON.stringify({ meta, states: stateRows }, null, 2)
   )
 
@@ -356,8 +373,8 @@ async function main() {
     `denial=${(nationalSummary.denialRate * 100).toFixed(1)}%  ` +
     `premium=${nationalSummary.ratePremiumBps}bps  ` +
     `inv median rate=${nationalSummary.investorMedianRate}  owner=${nationalSummary.ownerMedianRate}`)
-  console.log(`\nWrote:\n  ${path.relative(ROOT, path.join(OUT_DATA, 'national.json'))}` +
-    `\n  ${path.relative(ROOT, path.join(OUT_DATA, 'states.json'))}` +
+  console.log(`\nWrote:\n  ${path.relative(ROOT, path.join(OUT_DATA, `national${OUT_SUFFIX}.json`))}` +
+    `\n  ${path.relative(ROOT, path.join(OUT_DATA, `states${OUT_SUFFIX}.json`))}` +
     `\n  ${path.relative(ROOT, path.join(OUT_PUBLIC, `investor-financing-${YEAR}.csv`))}`)
 }
 

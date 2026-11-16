@@ -1,24 +1,24 @@
 {
   "meta": {
     "year": 2025,
-    "source": "CFPB / FFIEC HMDA combined Modified LAR (loan-level public dataset, early release)",
+    "source": "CFPB / FFIEC HMDA Data Browser (loan-level public dataset)",
     "universe": "Single-family 1-4 unit, site-built; home purchase + refinance + cash-out; originated & denied",
-    "generatedAt": "2026-06-15",
+    "generatedAt": "2026-11-16",
     "stateCount": 51
   },
   "abbr": "US",
   "name": "United States",
   "slug": "united-states",
-  "investorOriginations": 524314,
-  "investorVolume": 181562490000,
-  "investorShare": 0.09810139667736467,
-  "denialRate": 0.17522565462650974,
+  "investorOriginations": 524318,
+  "investorVolume": 181563230000,
+  "investorShare": 0.09810205331793591,
+  "denialRate": 0.17522455207563198,
   "investorMedianRate": 7.25,
   "ownerMedianRate": 6.49,
   "ratePremiumBps": 76,
   "investorMedianLtv": 74,
-  "businessPurposeShare": 0.7161204926818662,
-  "cashOutShare": 0.20486960104059782,
+  "businessPurposeShare": 0.7161150294287055,
+  "cashOutShare": 0.20410514229913906,
   "topDenialReasons": [
     {
       "reason": "Collateral",
@@ -33,5 +33,5 @@
       "count": 20245
     }
   ],
-  "rateCoverage": 0.9038076419855278
+  "rateCoverage": 0.9038007468749881
 }

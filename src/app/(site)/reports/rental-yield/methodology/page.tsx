@@ -16,6 +16,9 @@ const caveats = [
   ['Gross, not net', 'Gross yield excludes property taxes, insurance, maintenance, vacancy, management, and financing. It is a market-comparison screen, not a return projection. Run a specific deal through a cap-rate or cash-flow calculator for a net figure.'],
   ['Medians, not matched pairs', 'Median rent and median home value describe different parts of a market — the typical rental versus the typical owner-occupied home. They are not the rent and price of the same property, so yield is a market indicator, not a single-asset cap rate.'],
   ['Gross rent includes utilities', 'ACS median gross rent includes the cost of utilities and fuels paid by the renter. That slightly overstates the rent a landlord collects where utilities are tenant-paid.'],
+  ['Ranks and ties', 'States are ranked 1 (highest yield) to 51 — the 50 states plus DC. Ranks are competition ranks: a state\'s rank is 1 plus the number of states with a strictly higher yield, so equal values share a rank.'],
+  ['Multi-state metros', 'A metro that crosses state lines (e.g. Huntington-Ashland, WV-KY-OH) is listed on each of its states\' pages and marked "partly in" that state. Its figures cover the whole metro, not just one state\'s part of it.'],
+  ['Thin state pages', 'A state page with fewer than two qualifying ACS metros adds little beyond the statewide row in the main table, so it is kept for readers but not indexed by search engines.'],
   ['Population coverage', 'ACS 1-year estimates cover geographies with at least 65,000 people. Smaller rural counties and metros fall below that threshold and are not included; the trade-off is the most current vintage.'],
   ['Top-coded values', 'ACS top-codes the highest home values, which compresses yields slightly in the most expensive markets.'],
 ]
@@ -57,8 +60,8 @@ export default function RentalYieldMethodology() {
         <h2 className="text-2xl font-bold text-text">Data source</h2>
         <p className="mt-3 leading-7 text-text-muted">
           {yieldMeta.source}. We use the 1-year estimates — the most current vintage —
-          so rent and home value are drawn from the same survey and period and are
-          directly comparable. {yieldMeta.universe}. ACS is a U.S. government work in
+          so rent and home value are drawn from the same survey and period.{' '}
+          {yieldMeta.universe}. ACS is a U.S. government work in
           the public domain.
         </p>
       </section>

@@ -1,9 +1,9 @@
 {
   "meta": {
     "year": 2025,
-    "source": "CFPB / FFIEC HMDA combined Modified LAR (loan-level public dataset, early release)",
+    "source": "CFPB / FFIEC HMDA Data Browser (loan-level public dataset)",
     "universe": "Single-family 1-4 unit, site-built; home purchase + refinance + cash-out; originated & denied",
-    "generatedAt": "2026-06-15",
+    "generatedAt": "2026-11-16",
     "stateCount": 51
   },
   "states": [
@@ -50,7 +50,7 @@
       "ratePremiumBps": 101,
       "investorMedianLtv": 75,
       "businessPurposeShare": 0.49612195774271195,
-      "cashOutShare": 0.15164482481947045,
+      "cashOutShare": 0.14348756351965766,
       "topDenialReasons": [
         {
           "reason": "Collateral",
@@ -103,7 +103,7 @@
       "slug": "alabama",
       "investorOriginations": 9484,
       "investorVolume": 1953890000,
-      "investorShare": 0.10595109090299733,
+      "investorShare": 0.10594990727707397,
       "denialRate": 0.15600249176826556,
       "investorMedianRate": 7.375,
       "ownerMedianRate": 6.375,
@@ -230,7 +230,7 @@
       "ratePremiumBps": 88,
       "investorMedianLtv": 74.8,
       "businessPurposeShare": 0.828665568369028,
-      "cashOutShare": 0.2943437671609006,
+      "cashOutShare": 0.29013362621270367,
       "topDenialReasons": [
         {
           "reason": "Collateral",
@@ -260,7 +260,7 @@
       "ratePremiumBps": 88,
       "investorMedianLtv": 71.4,
       "businessPurposeShare": 0.7996518638023266,
-      "cashOutShare": 0.22444170841470662,
+      "cashOutShare": 0.2234227732020039,
       "topDenialReasons": [
         {
           "reason": "Collateral",
@@ -320,7 +320,7 @@
       "ratePremiumBps": 88,
       "investorMedianLtv": 75,
       "businessPurposeShare": 0.7493500866551126,
-      "cashOutShare": 0.2270363951473137,
+      "cashOutShare": 0.22692807625649913,
       "topDenialReasons": [
         {
           "reason": "Collateral",
@@ -410,7 +410,7 @@
       "ratePremiumBps": 88,
       "investorMedianLtv": 71.3,
       "businessPurposeShare": 0.8158641835112423,
-      "cashOutShare": 0.28117192823075177,
+      "cashOutShare": 0.27560754031342266,
       "topDenialReasons": [
         {
           "reason": "Collateral",
@@ -431,16 +431,16 @@
       "abbr": "OH",
       "name": "Ohio",
       "slug": "ohio",
-      "investorOriginations": 19768,
-      "investorVolume": 3329640000,
-      "investorShare": 0.0935648156913232,
-      "denialRate": 0.17917203006269983,
+      "investorOriginations": 19775,
+      "investorVolume": 3331045000,
+      "investorShare": 0.09359484672216885,
+      "denialRate": 0.17911996679119968,
       "investorMedianRate": 7.5,
       "ownerMedianRate": 6.625,
       "ratePremiumBps": 88,
       "investorMedianLtv": 75,
-      "businessPurposeShare": 0.7643160663698907,
-      "cashOutShare": 0.22227842978551193,
+      "businessPurposeShare": 0.7640455120101137,
+      "cashOutShare": 0.22225031605562579,
       "topDenialReasons": [
         {
           "reason": "Collateral",
@@ -455,7 +455,7 @@
           "count": 730
         }
       ],
-      "rateCoverage": 0.9377276406313233
+      "rateCoverage": 0.9373957016434893
     },
     {
       "abbr": "OK",
@@ -500,7 +500,7 @@
       "ratePremiumBps": 88,
       "investorMedianLtv": 75,
       "businessPurposeShare": 0.7810235009883594,
-      "cashOutShare": 0.22956292554359764,
+      "cashOutShare": 0.22877223808477926,
       "topDenialReasons": [
         {
           "reason": "Collateral",
@@ -590,7 +590,7 @@
       "ratePremiumBps": 88,
       "investorMedianLtv": 75,
       "businessPurposeShare": 0.6889503710376185,
-      "cashOutShare": 0.19090207180543045,
+      "cashOutShare": 0.1908377300218762,
       "topDenialReasons": [
         {
           "reason": "Collateral",
@@ -751,7 +751,7 @@
           "count": 107
         },
         {
-          "reason": "Credit application incomplete",
+          "reason": "Other",
           "count": 88
         }
       ],
@@ -793,14 +793,14 @@
       "slug": "arizona",
       "investorOriginations": 11106,
       "investorVolume": 4333690000,
-      "investorShare": 0.07802499666289632,
+      "investorShare": 0.07802444850358298,
       "denialRate": 0.18380245461894612,
       "investorMedianRate": 7.125,
       "ownerMedianRate": 6.375,
       "ratePremiumBps": 75,
       "investorMedianLtv": 70,
       "businessPurposeShare": 0.6820637493246894,
-      "cashOutShare": 0.2276247073653881,
+      "cashOutShare": 0.2275346659463353,
       "topDenialReasons": [
         {
           "reason": "Collateral",
@@ -860,7 +860,7 @@
       "ratePremiumBps": 75,
       "investorMedianLtv": 70,
       "businessPurposeShare": 0.6925886650170849,
-      "cashOutShare": 0.19865676917638742,
+      "cashOutShare": 0.1987745964416166,
       "topDenialReasons": [
         {
           "reason": "Debt-to-income ratio",
@@ -1010,7 +1010,7 @@
       "ratePremiumBps": 75,
       "investorMedianLtv": 70,
       "businessPurposeShare": 0.8630200379471517,
-      "cashOutShare": 0.27604238974501366,
+      "cashOutShare": 0.2692396686565783,
       "topDenialReasons": [
         {
           "reason": "Collateral",
@@ -1033,7 +1033,7 @@
       "slug": "north-carolina",
       "investorOriginations": 20219,
       "investorVolume": 5708015000,
-      "investorShare": 0.0921583999562431,
+      "investorShare": 0.09215882001704703,
       "denialRate": 0.16753129117259552,
       "investorMedianRate": 7,
       "ownerMedianRate": 6.25,
@@ -1121,16 +1121,16 @@
       "abbr": "IA",
       "name": "Iowa",
       "slug": "iowa",
-      "investorOriginations": 5392,
-      "investorVolume": 860730000,
-      "investorShare": 0.09051232122473646,
-      "denialRate": 0.06873920552677029,
+      "investorOriginations": 5389,
+      "investorVolume": 860065000,
+      "investorShare": 0.0904665178196713,
+      "denialRate": 0.06877484015897702,
       "investorMedianRate": 7,
       "ownerMedianRate": 6.375,
       "ratePremiumBps": 63,
       "investorMedianLtv": 75,
-      "businessPurposeShare": 0.48089762611275966,
-      "cashOutShare": 0.06064540059347181,
+      "businessPurposeShare": 0.48116533679717943,
+      "cashOutShare": 0.060864724438671365,
       "topDenialReasons": [
         {
           "reason": "Debt-to-income ratio",
@@ -1145,7 +1145,7 @@
           "count": 82
         }
       ],
-      "rateCoverage": 0.5610163204747775
+      "rateCoverage": 0.561328632399332
     },
     {
       "abbr": "MN",
@@ -1280,7 +1280,7 @@
       "ratePremiumBps": 63,
       "investorMedianLtv": 70,
       "businessPurposeShare": 0.7802340702210663,
-      "cashOutShare": 0.32769830949284784,
+      "cashOutShare": 0.32639791937581275,
       "topDenialReasons": [
         {
           "reason": "Debt-to-income ratio",
@@ -1430,7 +1430,7 @@
       "ratePremiumBps": 55,
       "investorMedianLtv": 70,
       "businessPurposeShare": 0.7455516014234875,
-      "cashOutShare": 0.20023027004396066,
+      "cashOutShare": 0.20012560184216036,
       "topDenialReasons": [
         {
           "reason": "Collateral",

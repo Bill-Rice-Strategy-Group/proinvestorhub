@@ -12,15 +12,17 @@ import { BrandBarChart } from '@/components/reports/brand-bar-chart'
 import {
   states,
   national,
-  statesByYield,
   getStateBySlug,
   metrosInState,
-  stateRank,
+  metroLabelForState,
+  isMultiStateMetro,
+  isRentalYieldStateIndexable,
+  stateRankInfo,
+  fmtYieldRank,
   yieldMeta,
   fmtYield,
   fmtRent,
   fmtValue,
-  ordinal,
 } from '@/data/rental-yield'
 
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://proinvestorhub.com'
@@ -38,13 +40,15 @@ export async function generateMetadata({
   const { state } = await params
   const s = getStateBySlug(state)
   if (!s) return {}
-  const rank = stateRank(s.slug)
+  const rank = stateRankInfo(s.slug)
   const title = `${s.name} Rental Yield (${yieldMeta.year}): Best Cash-Flow Markets`
-  const description = `Gross rental yield in ${s.name} was ${fmtYield(s.grossYield)} in ${yieldMeta.year}${rank ? ` — ${ordinal(rank)} of ${statesByYield.length} states` : ''}: ${fmtRent(s.medianGrossRent)} median rent against a ${fmtValue(s.medianHomeValue)} median home value, plus its top metros ranked.`
+  const description = `Gross rental yield in ${s.name} was ${fmtYield(s.grossYield)} in ${yieldMeta.year}${rank ? ` — ${fmtYieldRank(rank)}` : ''}: ${fmtRent(s.medianGrossRent)} median rent against a ${fmtValue(s.medianHomeValue)} median home value, plus its metros ranked.`
   return {
     title,
     description,
     alternates: { canonical: `/reports/rental-yield/${s.slug}` },
+    // Thin pages (fewer than two ACS metros) stay up for visitors but are not indexed.
+    ...(isRentalYieldStateIndexable(s.slug) ? {} : { robots: { index: false, follow: true } }),
     openGraph: { title, description },
   }
 }
@@ -69,8 +73,7 @@ export default async function StateRentalYieldPage({
   if (!s) notFound()
 
   const url = `${baseUrl}/reports/rental-yield/${s.slug}`
-  const rank = stateRank(s.slug)
-  const n = statesByYield.length
+  const rank = stateRankInfo(s.slug)
   const metros = s.abbr ? metrosInState(s.abbr) : []
   const topMetros = metros.slice(0, 12)
   const vsNational =
@@ -81,14 +84,14 @@ export default async function StateRentalYieldPage({
   const faqs = [
     {
       question: `What is the gross rental yield in ${s.name}?`,
-      answer: `In ${yieldMeta.year}, ${s.name} had a gross rental yield of ${fmtYield(s.grossYield)} — ${fmtRent(s.medianGrossRent)} median gross rent against a ${fmtValue(s.medianHomeValue)} median home value${rank ? `. That ranks ${ordinal(rank)} of ${n} states (1 = highest yield).` : '.'} Nationally the figure was ${fmtYield(national.grossYield)}.`,
+      answer: `In ${yieldMeta.year}, ${s.name} had a gross rental yield of ${fmtYield(s.grossYield)} — ${fmtRent(s.medianGrossRent)} median gross rent against a ${fmtValue(s.medianHomeValue)} median home value${rank ? `. That ranks ${fmtYieldRank(rank)} (1 = highest yield).` : '.'} The same ratio for the U.S. as a whole was ${fmtYield(national.grossYield)}.`,
     },
     {
       question: topMetros.length
         ? `Which ${s.name} metros have the best rental yield?`
         : `Are there metro-level figures for ${s.name}?`,
       answer: topMetros.length
-        ? `Among ${s.name} metros covered by the data, gross yield was highest in ${topMetros[0].name} (${fmtYield(topMetros[0].grossYield)})${topMetros[1] ? `, ${topMetros[1].name} (${fmtYield(topMetros[1].grossYield)})` : ''}${topMetros[2] ? `, and ${topMetros[2].name} (${fmtYield(topMetros[2].grossYield)})` : ''}.`
+        ? `Among metros wholly or partly in ${s.name} covered by the data, gross yield was highest in ${metroLabelForState(topMetros[0], s.name)} (${fmtYield(topMetros[0].grossYield)})${topMetros[1] ? `, ${metroLabelForState(topMetros[1], s.name)} (${fmtYield(topMetros[1].grossYield)})` : ''}${topMetros[2] ? `, and ${metroLabelForState(topMetros[2], s.name)} (${fmtYield(topMetros[2].grossYield)})` : ''}.`
         : `ACS 1-year estimates cover geographies with at least 65,000 people, so ${s.name} has no qualifying metros in this dataset. The statewide figure above still applies.`,
     },
     {
@@ -136,13 +139,14 @@ export default async function StateRentalYieldPage({
           Rental yield in {s.name}
         </h1>
         <p className="mt-4 text-lg leading-7 text-text-muted">
-          In {yieldMeta.year}, the typical rental in {s.name} produced a gross yield of{' '}
-          <strong className="text-text">{fmtYield(s.grossYield)}</strong> —{' '}
-          {fmtRent(s.medianGrossRent)} median rent against a {fmtValue(s.medianHomeValue)}{' '}
-          median home value
+          In {yieldMeta.year}, {s.name}&apos;s median gross rent of{' '}
+          {fmtRent(s.medianGrossRent)}, annualized, came to{' '}
+          <strong className="text-text">{fmtYield(s.grossYield)}</strong> of its{' '}
+          {fmtValue(s.medianHomeValue)} median home value — a ratio of two medians, not the
+          return on any one property
           {rank ? (
             <>
-              , ranking <strong className="text-text">{ordinal(rank)}</strong> of {n} states
+              . That ranks <strong className="text-text">{fmtYieldRank(rank)}</strong>
             </>
           ) : null}
           .
@@ -157,7 +161,7 @@ export default async function StateRentalYieldPage({
           sub={
             vsNational == null
               ? undefined
-              : `${vsNational ? 'above' : 'below'} the ${fmtYield(national.grossYield)} U.S. median`
+              : `${vsNational ? 'above' : 'below'} the ${fmtYield(national.grossYield)} U.S. figure`
           }
         />
         <Stat label="Median gross rent" value={fmtRent(s.medianGrossRent)} sub="incl. utilities (ACS)" />
@@ -174,7 +178,7 @@ export default async function StateRentalYieldPage({
             highlightTop={1}
             reference={{ value: (s.grossYield ?? 0) * 100, label: `${s.abbr} statewide` }}
             data={topMetros.map((m) => ({
-              label: m.name,
+              label: isMultiStateMetro(m) ? `${m.name} (partly)` : m.name,
               value: (m.grossYield ?? 0) * 100,
               display: fmtYield(m.grossYield),
             }))}
@@ -187,8 +191,9 @@ export default async function StateRentalYieldPage({
         <section className="mt-12">
           <h2 className="text-2xl font-bold text-text">{s.name} metros by yield</h2>
           <p className="mt-1 text-text-muted">
-            Metropolitan areas in {s.name} with at least 65,000 residents, ranked by gross
-            rental yield.
+            Metropolitan areas wholly or partly in {s.name} with at least 65,000 residents,
+            ranked by gross rental yield. Figures for a multi-state metro cover the whole
+            metro, not just its {s.name} part.
           </p>
           <div className="mt-6 overflow-x-auto rounded-2xl border border-border bg-white">
             <table className="w-full text-left text-sm">
@@ -203,7 +208,7 @@ export default async function StateRentalYieldPage({
               <tbody>
                 {metros.map((m) => (
                   <tr key={m.slug} className="border-b border-border/60 last:border-0">
-                    <td className="px-4 py-2.5 font-medium text-text">{m.name}</td>
+                    <td className="px-4 py-2.5 font-medium text-text">{metroLabelForState(m, s.name)}</td>
                     <td className="px-4 py-2.5 text-right font-semibold text-primary">{fmtYield(m.grossYield)}</td>
                     <td className="px-4 py-2.5 text-right text-text-muted">{fmtRent(m.medianGrossRent)}</td>
                     <td className="px-4 py-2.5 text-right text-text-muted">{fmtValue(m.medianHomeValue)}</td>

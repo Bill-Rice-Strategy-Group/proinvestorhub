@@ -14,11 +14,14 @@ import {
   national,
   getStateBySlug,
   getStateTrendBySlug,
+  getPriorStateBySlug,
   reportMeta,
   priorYear,
   rankedBy,
-  rankOf,
-  ordinal,
+  rankInfo,
+  fmtRankInfo,
+  hasRateCoverage,
+  RATE_COVERAGE_MIN,
   fmtBps,
   fmtPct,
   fmtRate,
@@ -61,7 +64,7 @@ function vs(label: string, stateVal: string, natVal: string) {
     <div className="rounded-2xl border border-border bg-white p-5">
       <p className="text-sm font-medium text-text">{label}</p>
       <p className="mt-1 text-3xl font-bold text-primary">{stateVal}</p>
-      <p className="mt-0.5 text-xs text-text-muted">U.S. median: {natVal}</p>
+      <p className="mt-0.5 text-xs text-text-muted">U.S.: {natVal}</p>
     </div>
   )
 }
@@ -102,10 +105,17 @@ export default async function StateReportPage({
 
   const trend = getStateTrendBySlug(s.slug)
   const url = `${baseUrl}/reports/investor-financing/${s.slug}`
-  const premiumRank = rankOf(s.slug, 'ratePremiumBps')
-  const denialRank = rankOf(s.slug, 'denialRate')
-  const dscrRank = rankOf(s.slug, 'businessPurposeShare')
-  const n = states.length
+  const premiumRank = rankInfo(s.slug, 'ratePremiumBps')
+  const denialRank = rankInfo(s.slug, 'denialRate')
+  const dscrRank = rankInfo(s.slug, 'businessPurposeShare')
+  const rateOk = hasRateCoverage(s)
+  const prior = getPriorStateBySlug(s.slug)
+  const priorRateOk = prior ? hasRateCoverage(prior) : false
+  const coveragePct = fmtPct(s.rateCoverage, 0)
+  // Sentence fragment placing the premium among states, or why it is not ranked.
+  const premiumPlacement = premiumRank
+    ? `ranks ${fmtRankInfo(premiumRank)} (1 = highest premium)`
+    : `is not ranked: an interest rate was reported on only ${coveragePct} of investor loans here, below our ${fmtPct(RATE_COVERAGE_MIN, 0)} floor`
   const premiumRanked = rankedBy('ratePremiumBps')
   // Anchor the comparison bar to the national high, unless this IS the high state —
   // then anchor to the national low so the bar isn't a duplicate of itself.
@@ -113,7 +123,7 @@ export default async function StateReportPage({
   const anchor = isTop ? premiumRanked[premiumRanked.length - 1] : premiumRanked[0]
   const premiumChart = [
     { label: s.name, value: s.ratePremiumBps ?? 0, display: String(s.ratePremiumBps ?? 0) },
-    { label: 'U.S. median', value: national.ratePremiumBps ?? 0, display: String(national.ratePremiumBps ?? 0) },
+    { label: 'U.S.', value: national.ratePremiumBps ?? 0, display: String(national.ratePremiumBps ?? 0) },
     {
       label: `${isTop ? 'Lowest' : 'Highest'} (${anchor.name})`,
       value: anchor.ratePremiumBps ?? 0,
@@ -124,15 +134,15 @@ export default async function StateReportPage({
   const faqs = [
     {
       question: `How much more do investors pay for a mortgage in ${s.name}?`,
-      answer: `In ${reportMeta.year}, the median investment-property loan in ${s.name} carried a rate of ${fmtRate(s.investorMedianRate)} versus ${fmtRate(s.ownerMedianRate)} for an owner-occupant — a premium of ${fmtBps(s.ratePremiumBps)}. That ranks ${premiumRank ? ordinal(premiumRank) : '—'} of ${n} states (1 = highest premium).`,
+      answer: `In ${reportMeta.year}, the median investment-property loan in ${s.name} carried a rate of ${fmtRate(s.investorMedianRate)} versus ${fmtRate(s.ownerMedianRate)} for an owner-occupant — a premium of ${fmtBps(s.ratePremiumBps)}. That ${premiumPlacement}.`,
     },
     {
       question: `What share of investor loan applications are denied in ${s.name}?`,
-      answer: `${fmtPct(s.denialRate)} of investment-property applications were denied in ${s.name} in ${reportMeta.year}${denialRank ? `, the ${ordinal(denialRank)}-highest denial rate among the ${n} states` : ''}. The most common denial reasons were ${s.topDenialReasons.map((d) => d.reason.toLowerCase()).slice(0, 3).join(', ')}.`,
+      answer: `${fmtPct(s.denialRate)} of investment-property applications were denied in ${s.name} in ${reportMeta.year}${denialRank ? ` — ${fmtRankInfo(denialRank, '-highest')}` : ''}. The most common denial reasons were ${s.topDenialReasons.map((d) => d.reason.toLowerCase()).slice(0, 3).join(', ')}.`,
     },
     {
       question: `How common are DSCR and business-purpose investor loans in ${s.name}?`,
-      answer: `${fmtPct(s.businessPurposeShare, 0)} of investor loans in ${s.name} were flagged as primarily business or commercial purpose — the bucket that includes DSCR and LLC-held loans${dscrRank ? ` (${ordinal(dscrRank)} of ${n})` : ''}. The median loan-to-value was ${s.investorMedianLtv?.toFixed(0)}%.`,
+      answer: `${fmtPct(s.businessPurposeShare, 0)} of investor loans in ${s.name} were flagged as primarily business or commercial purpose — the bucket that includes DSCR and LLC-held loans${dscrRank ? ` (${fmtRankInfo(dscrRank, '-highest')})` : ''}. The median combined loan-to-value was ${s.investorMedianLtv?.toFixed(0)}%.`,
     },
   ]
 
@@ -198,7 +208,7 @@ export default async function StateReportPage({
           </p>
           <div className="mt-3 flex flex-wrap gap-x-10 gap-y-3">
             <YoYItem
-              label="Rate premium"
+              label={priorRateOk && rateOk ? 'Rate premium' : 'Rate premium (partial rate data)'}
               from={fmtBps(trend.ratePremiumBps.prior)}
               to={fmtBps(trend.ratePremiumBps.current)}
               delta={fmtSignedBps(trend.ratePremiumBps.abs)}
@@ -236,8 +246,13 @@ export default async function StateReportPage({
           Investors in {s.name} borrowed at a median rate of{' '}
           <strong className="text-text">{fmtRate(s.investorMedianRate)}</strong>, versus{' '}
           {fmtRate(s.ownerMedianRate)} for owner-occupants — a{' '}
-          <strong className="text-text">{fmtBps(s.ratePremiumBps)}</strong> premium that ranks{' '}
-          {premiumRank ? ordinal(premiumRank) : '—'} of {n} states.
+          <strong className="text-text">{fmtBps(s.ratePremiumBps)}</strong> premium that{' '}
+          {premiumPlacement}.
+        </p>
+        <p className={rateOk ? undefined : 'rounded-xl border border-accent/40 bg-accent/10 px-4 py-3 text-text'}>
+          {rateOk
+            ? `An interest rate was reported on ${coveragePct} of ${s.name}'s investor originations; the medians above use those loans.`
+            : `Caveat: an interest rate was reported on only ${coveragePct} of ${s.name}'s investor originations (rows marked exempt or not applicable carry none), so the investor median rate and the premium rest on a partial sample. Treat them as indicative, not comparable with other states.`}
         </p>
         <p>
           Their applications were denied{' '}
@@ -251,9 +266,9 @@ export default async function StateReportPage({
         <p>
           {fmtPct(s.businessPurposeShare, 0)} of investor loans were business- or
           commercial-purpose — the category that includes DSCR and LLC-held loans —
-          and {fmtPct(s.cashOutShare, 0)} were cash-out refinances. The typical loan-to-value
-          was {s.investorMedianLtv?.toFixed(0)}%, implying about{' '}
-          {(100 - (s.investorMedianLtv ?? 0)).toFixed(0)}% down.
+          and {fmtPct(s.cashOutShare, 0)} were cash-out refinances. The median combined
+          loan-to-value across purchase and refinance loans was{' '}
+          {s.investorMedianLtv?.toFixed(0)}%.
         </p>
       </article>
 
@@ -288,7 +303,7 @@ export default async function StateReportPage({
           tools={[
             { label: 'DSCR Loan Qualifier', href: '/calculators/dscr' },
             { label: 'Mortgage / DSCR Payment', href: '/calculators/mortgage' },
-            { label: `All 50 states ranked`, href: '/reports/investor-financing' },
+            { label: 'All 50 states + DC ranked', href: '/reports/investor-financing' },
             { label: 'How we built this', href: '/reports/investor-financing/methodology', muted: true },
           ]}
         />
@@ -296,7 +311,8 @@ export default async function StateReportPage({
 
       <p className="mt-10 text-xs text-text-muted">
         Source: {reportMeta.source}, {reportMeta.year}. Single-family 1-4 unit,
-        site-built loans; financed purchases only.
+        site-built loans: home purchases, refinances, and cash-out refinances,
+        originated or denied. Financed loans only — all-cash purchases are not in HMDA.
       </p>
     </div>
   )

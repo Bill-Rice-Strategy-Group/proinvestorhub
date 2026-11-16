@@ -102,6 +102,10 @@ export default function RentGrowthReport() {
           downloadUrl: `${baseUrl}${csvHref}`,
           temporalCoverage: `${fmrMeta.prevYear}/${fmrMeta.curYear}`,
           datePublished: PUBLISHED,
+          sourceOrganization: {
+            name: 'U.S. Department of Housing and Urban Development (Fair Market Rents)',
+            url: 'https://www.huduser.gov/portal/datasets/fmr.html',
+          },
         })}
       />
 

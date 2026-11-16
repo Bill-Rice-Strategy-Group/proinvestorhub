@@ -1,19 +1,19 @@
 {
   "meta": {
     "year": 2025,
-    "source": "CFPB / FFIEC HMDA combined Modified LAR (loan-level public dataset, early release)",
+    "source": "CFPB / FFIEC HMDA Data Browser (loan-level public dataset)",
     "universe": "Investment-property (owner-occupancy = investor), single-family 1-4 unit, site-built originations",
-    "generatedAt": "2026-06-18",
+    "generatedAt": "2026-11-16",
     "topPerState": 10,
     "minOriginations": 10,
     "distinctLenders": 4051,
     "nameResolution": {
-      "viaFilers": 231,
-      "viaGleif": 1,
+      "viaFilers": 229,
+      "viaGleif": 0,
       "unresolved": 0,
-      "of": 232
+      "of": 229
     },
-    "nameNote": "Lender names resolved from the 2024 HMDA filers registry (LEIs are stable across years) with a GLEIF fallback. The 2025 HMDA institution registry was not yet published at build time."
+    "nameNote": "Lender names resolved by LEI from the CFPB HMDA filers registries (2024, then 2025), with GLEIF for any LEI in neither."
   },
   "states": [
     {
@@ -203,11 +203,11 @@
         },
         {
           "rank": 10,
-          "lei": "KB1H1DSPRFMYMCUFXT09",
-          "name": "Wells Fargo Bank, National Association",
+          "lei": "549300U3721PJGQZYY68",
+          "name": "Guaranteed Rate, Inc.",
           "originations": 13,
-          "volume": 3305000,
-          "businessPurposeShare": 0,
+          "volume": 4995000,
+          "businessPurposeShare": 1,
           "resolved": true
         }
       ]
@@ -380,7 +380,7 @@
           "resolved": true
         },
         {
-          "rank": 8,
+          "rank": 7,
           "lei": "549300JQEF6V2RNWCC75",
           "name": "Southern Bancorp Bank",
           "originations": 152,
@@ -763,7 +763,7 @@
           "resolved": true
         },
         {
-          "rank": 7,
+          "rank": 6,
           "lei": "549300VZVN841I2ILS84",
           "name": "Crosscountry Mortgage, Inc.",
           "originations": 42,
@@ -844,24 +844,6 @@
         },
         {
           "rank": 5,
-          "lei": "549300623VT8YKPHWM78",
-          "name": "Anchor Loans, LP",
-          "originations": 21,
-          "volume": 57895000,
-          "businessPurposeShare": 1,
-          "resolved": true
-        },
-        {
-          "rank": 6,
-          "lei": "549300RYTR2RVL4SFJ90",
-          "name": "Temple View Capital Funding, LP",
-          "originations": 21,
-          "volume": 19645000,
-          "businessPurposeShare": 1,
-          "resolved": true
-        },
-        {
-          "rank": 7,
           "lei": "254900RUCO27MVGTO768",
           "name": "Loan Funder LLC",
           "originations": 21,
@@ -870,11 +852,38 @@
           "resolved": true
         },
         {
-          "rank": 8,
+          "rank": 5,
           "lei": "549300TA4MQM8WN2XG31",
           "name": "Velocity Commercial Capital, LLC",
           "originations": 21,
           "volume": 10775000,
+          "businessPurposeShare": 1,
+          "resolved": true
+        },
+        {
+          "rank": 5,
+          "lei": "549300623VT8YKPHWM78",
+          "name": "Anchor Loans, LP",
+          "originations": 21,
+          "volume": 57895000,
+          "businessPurposeShare": 1,
+          "resolved": true
+        },
+        {
+          "rank": 5,
+          "lei": "549300RYTR2RVL4SFJ90",
+          "name": "Temple View Capital Funding, LP",
+          "originations": 21,
+          "volume": 19645000,
+          "businessPurposeShare": 1,
+          "resolved": true
+        },
+        {
+          "rank": 9,
+          "lei": "549300ZTT08EKQRVTR15",
+          "name": "Atlantic Union Bank",
+          "originations": 17,
+          "volume": 16555000,
           "businessPurposeShare": 1,
           "resolved": true
         },
@@ -885,15 +894,6 @@
           "originations": 17,
           "volume": 8905000,
           "businessPurposeShare": 0,
-          "resolved": true
-        },
-        {
-          "rank": 10,
-          "lei": "549300ZTT08EKQRVTR15",
-          "name": "Atlantic Union Bank",
-          "originations": 17,
-          "volume": 16555000,
-          "businessPurposeShare": 1,
           "resolved": true
         }
       ]
@@ -1155,7 +1155,7 @@
           "resolved": true
         },
         {
-          "rank": 7,
+          "rank": 6,
           "lei": "549300RYTR2RVL4SFJ90",
           "name": "Temple View Capital Funding, LP",
           "originations": 93,
@@ -1490,7 +1490,7 @@
       "abbr": "IA",
       "name": "Iowa",
       "slug": "iowa",
-      "totalInvestorOriginations": 5392,
+      "totalInvestorOriginations": 5389,
       "lenders": [
         {
           "rank": 1,
@@ -1940,20 +1940,20 @@
         },
         {
           "rank": 7,
-          "lei": "254900CEBR2F5Y0F1A15",
-          "name": "Kennebec Savings Bank",
-          "originations": 46,
-          "volume": 10440000,
-          "businessPurposeShare": 1,
-          "resolved": true
-        },
-        {
-          "rank": 8,
           "lei": "549300GKFNPRWNS0GF29",
           "name": "CMG Mortgage, Inc.",
           "originations": 46,
           "volume": 16080000,
           "businessPurposeShare": 0.5434782608695652,
+          "resolved": true
+        },
+        {
+          "rank": 7,
+          "lei": "254900CEBR2F5Y0F1A15",
+          "name": "Kennebec Savings Bank",
+          "originations": 46,
+          "volume": 10440000,
+          "businessPurposeShare": 1,
           "resolved": true
         },
         {
@@ -2322,7 +2322,7 @@
           "resolved": true
         },
         {
-          "rank": 6,
+          "rank": 5,
           "lei": "549300VZVN841I2ILS84",
           "name": "Crosscountry Mortgage, Inc.",
           "originations": 101,
@@ -2331,7 +2331,7 @@
           "resolved": true
         },
         {
-          "rank": 7,
+          "rank": 5,
           "lei": "RVDPPPGHCGZ40J4VQ731",
           "name": "Pennymac Loan Services, LLC",
           "originations": 101,
@@ -2555,11 +2555,11 @@
         },
         {
           "rank": 10,
-          "lei": "549300LXKO1O7CSK5J52",
-          "name": "Flat Branch Mortgage, Inc.",
+          "lei": "254900CTT87ZKAUTIJ37",
+          "name": "CV3 Financial Services, LLC",
           "originations": 201,
-          "volume": 33805000,
-          "businessPurposeShare": 0.01990049751243781,
+          "volume": 32625000,
+          "businessPurposeShare": 1,
           "resolved": true
         }
       ]
@@ -2732,7 +2732,7 @@
           "resolved": true
         },
         {
-          "rank": 8,
+          "rank": 7,
           "lei": "254900HEPQK96AEXHS12",
           "name": "Frontier Bank",
           "originations": 91,
@@ -2911,19 +2911,19 @@
         },
         {
           "rank": 6,
-          "lei": "549300RA3E0BUFO7YZ21",
-          "name": "Hometown Equity Mortgage, LLC",
-          "originations": 31,
-          "volume": 12085000,
-          "businessPurposeShare": 1,
-          "resolved": true
-        },
-        {
-          "rank": 7,
           "lei": "549300U3721PJGQZYY68",
           "name": "Guaranteed Rate, Inc.",
           "originations": 31,
           "volume": 14885000,
+          "businessPurposeShare": 1,
+          "resolved": true
+        },
+        {
+          "rank": 6,
+          "lei": "549300RA3E0BUFO7YZ21",
+          "name": "Hometown Equity Mortgage, LLC",
+          "originations": 31,
+          "volume": 12085000,
           "businessPurposeShare": 1,
           "resolved": true
         },
@@ -3125,28 +3125,28 @@
         },
         {
           "rank": 8,
-          "lei": "549300ZPSJZO10ZAX556",
-          "name": "American Heritage Lending, LLC",
-          "originations": 37,
-          "volume": 9535000,
-          "businessPurposeShare": 1,
-          "resolved": true
-        },
-        {
-          "rank": 9,
-          "lei": "254900DTLHVWQ7NP7R34",
-          "name": "The Loan Store, Inc.",
-          "originations": 37,
-          "volume": 8805000,
-          "businessPurposeShare": 0.24324324324324326,
-          "resolved": true
-        },
-        {
-          "rank": 10,
           "lei": "549300L5PE7ZGYRW5Q15",
           "name": "Citizens Bank of Las Cruces",
           "originations": 37,
           "volume": 7925000,
+          "businessPurposeShare": 1,
+          "resolved": true
+        },
+        {
+          "rank": 8,
+          "lei": "254900RUCO27MVGTO768",
+          "name": "Loan Funder LLC",
+          "originations": 37,
+          "volume": 10835000,
+          "businessPurposeShare": 1,
+          "resolved": true
+        },
+        {
+          "rank": 8,
+          "lei": "549300ZPSJZO10ZAX556",
+          "name": "American Heritage Lending, LLC",
+          "originations": 37,
+          "volume": 9535000,
           "businessPurposeShare": 1,
           "resolved": true
         }
@@ -3196,19 +3196,19 @@
         },
         {
           "rank": 5,
-          "lei": "2549002VH9C0PKB8K153",
-          "name": "Logan Finance Corporation",
-          "originations": 546,
-          "volume": 315400000,
-          "businessPurposeShare": 1,
-          "resolved": true
-        },
-        {
-          "rank": 6,
           "lei": "549300VZVN841I2ILS84",
           "name": "Crosscountry Mortgage, Inc.",
           "originations": 546,
           "volume": 286620000,
+          "businessPurposeShare": 1,
+          "resolved": true
+        },
+        {
+          "rank": 5,
+          "lei": "2549002VH9C0PKB8K153",
+          "name": "Logan Finance Corporation",
+          "originations": 546,
+          "volume": 315400000,
           "businessPurposeShare": 1,
           "resolved": true
         },
@@ -3409,7 +3409,7 @@
           "resolved": true
         },
         {
-          "rank": 7,
+          "rank": 6,
           "lei": "5493002POZ4RFS6X0Z30",
           "name": "Dakota Community Bank & Trust, National Association",
           "originations": 42,
@@ -3450,7 +3450,7 @@
       "abbr": "OH",
       "name": "Ohio",
       "slug": "ohio",
-      "totalInvestorOriginations": 19768,
+      "totalInvestorOriginations": 19775,
       "lenders": [
         {
           "rank": 1,
@@ -3909,15 +3909,6 @@
         },
         {
           "rank": 8,
-          "lei": "54930048P8RWCQHQM310",
-          "name": "ARC Home LLC",
-          "originations": 40,
-          "volume": 16270000,
-          "businessPurposeShare": 0.925,
-          "resolved": true
-        },
-        {
-          "rank": 9,
           "lei": "549300GKFNPRWNS0GF29",
           "name": "CMG Mortgage, Inc.",
           "originations": 40,
@@ -3926,12 +3917,21 @@
           "resolved": true
         },
         {
+          "rank": 8,
+          "lei": "54930048P8RWCQHQM310",
+          "name": "ARC Home LLC",
+          "originations": 40,
+          "volume": 16270000,
+          "businessPurposeShare": 0.925,
+          "resolved": true
+        },
+        {
           "rank": 10,
-          "lei": "549300HKYBSATM44Q425",
-          "name": "The Washington Trust Company, of Westerly",
+          "lei": "549300J7I82PNDVU8H22",
+          "name": "OCMBC, Inc.",
           "originations": 32,
-          "volume": 9390000,
-          "businessPurposeShare": 0.9375,
+          "volume": 12440000,
+          "businessPurposeShare": 0.96875,
           "resolved": true
         }
       ]
@@ -4514,7 +4514,7 @@
           "resolved": true
         },
         {
-          "rank": 10,
+          "rank": 9,
           "lei": "549300I3PFIO81O8JD40",
           "name": "Union Bank",
           "originations": 18,
@@ -4978,20 +4978,20 @@
         },
         {
           "rank": 7,
-          "lei": "549300QG83M0EX7VC434",
-          "name": "Pinnacle Bank - Wyoming",
-          "originations": 28,
-          "volume": 8960000,
-          "businessPurposeShare": 0,
-          "resolved": true
-        },
-        {
-          "rank": 8,
           "lei": "549300HW662MN1WU8550",
           "name": "United Shore Financial Services, LLC",
           "originations": 28,
           "volume": 5850000,
           "businessPurposeShare": 1,
+          "resolved": true
+        },
+        {
+          "rank": 7,
+          "lei": "549300QG83M0EX7VC434",
+          "name": "Pinnacle Bank - Wyoming",
+          "originations": 28,
+          "volume": 8960000,
+          "businessPurposeShare": 0,
           "resolved": true
         },
         {
