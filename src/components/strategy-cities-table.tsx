@@ -5,7 +5,7 @@ import Link from 'next/link'
 import type { CityWithScore } from '@/data/market-strategies'
 import { track } from '@/lib/track'
 
-type SortKey = 'score' | 'city' | 'capRate' | 'medianHomeValue' | 'medianRent' | 'rentToPrice' | 'rentChange'
+type SortKey = 'score' | 'city' | 'rentYield' | 'medianHomeValue' | 'medianRent' | 'rentToPrice' | 'rentChange'
 type SortDir = 'asc' | 'desc'
 
 function formatCurrency(value: number): string {
@@ -101,9 +101,9 @@ export function StrategyCitiesTable({
             </th>
             <th
               className="px-4 py-3 cursor-pointer hover:text-text transition-colors text-right"
-              onClick={() => handleSort('capRate')}
+              onClick={() => handleSort('rentYield')}
             >
-              Est. Cap Rate {renderSortIcon('capRate')}
+              Gross Rent Yield {renderSortIcon('rentYield')}
             </th>
             <th
               className="px-4 py-3 cursor-pointer hover:text-text transition-colors text-right"
@@ -155,7 +155,7 @@ export function StrategyCitiesTable({
                   </span>
                 </td>
                 <td className="px-4 py-3 text-right tabular-nums text-text-muted">
-                  {formatPercent(city.capRate)}
+                  {formatPercent(city.rentYield)}
                 </td>
                 <td className="px-4 py-3 text-right tabular-nums text-text-muted">
                   {formatCurrency(city.medianHomeValue)}

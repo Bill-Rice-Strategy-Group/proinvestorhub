@@ -2,9 +2,9 @@
 
 import { useState, useMemo } from 'react'
 import Link from 'next/link'
-import { cities, capRateBand, fmtCapRate, type CapRateBand } from '@/data/cap-rate-cities'
+import { cities, rentYieldBand, fmtYieldPct, type YieldBand } from '@/data/cap-rate-cities'
 
-type SortKey = 'capRate' | 'medianHomeValue' | 'medianRent' | 'rentToPrice' | 'city'
+type SortKey = 'rentYield' | 'medianHomeValue' | 'medianRent' | 'rentToPrice' | 'city'
 type SortDir = 'asc' | 'desc'
 
 function formatCurrency(value: number): string {
@@ -16,14 +16,14 @@ function formatCurrency(value: number): string {
   }).format(value)
 }
 
-const BAND_BADGE: Record<CapRateBand, { label: string; className: string }> = {
+const BAND_BADGE: Record<YieldBand, { label: string; className: string }> = {
   upper: { label: 'Upper third', className: 'bg-emerald-100 text-emerald-700' },
   middle: { label: 'Middle third', className: 'bg-amber-50 text-amber-700' },
   lower: { label: 'Lower third', className: 'bg-red-50 text-red-600' },
 }
 
 export function CapRateCitiesTable() {
-  const [sortKey, setSortKey] = useState<SortKey>('capRate')
+  const [sortKey, setSortKey] = useState<SortKey>('rentYield')
   const [sortDir, setSortDir] = useState<SortDir>('desc')
 
   function toggleSort(key: SortKey) {
@@ -73,7 +73,7 @@ export function CapRateCitiesTable() {
               {renderSortHeader('Metro', 'city')}
             </th>
             <th className="py-3 px-4 text-left">
-              {renderSortHeader('Est. Cap Rate', 'capRate')}
+              {renderSortHeader('Gross Rent Yield', 'rentYield')}
             </th>
             <th className="py-3 px-4 text-left">
               {renderSortHeader('Median Home Value', 'medianHomeValue')}
@@ -88,7 +88,7 @@ export function CapRateCitiesTable() {
         </thead>
         <tbody className="text-text-muted">
           {sorted.map((city, i) => {
-            const badge = BAND_BADGE[capRateBand(city.slug)]
+            const badge = BAND_BADGE[rentYieldBand(city.slug)]
             return (
               <tr
                 key={city.slug}
@@ -107,7 +107,7 @@ export function CapRateCitiesTable() {
                 <td className="py-3 px-4">
                   <span className="flex items-center gap-2">
                     <span className="tabular-nums font-semibold text-text">
-                      {fmtCapRate(city.capRate)}
+                      {fmtYieldPct(city.rentYield)}
                     </span>
                     <span
                       className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${badge.className}`}

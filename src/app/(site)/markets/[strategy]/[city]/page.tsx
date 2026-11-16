@@ -9,10 +9,10 @@ import { CityStrategyComparison } from '@/components/city-strategy-comparison'
 import { strategies, hasStrategyCityInsight } from '@/data/market-strategies'
 import {
   cities,
-  computeCapRate,
-  fmtCapRate,
+  computeRentYield,
+  fmtYieldPct,
   fmtRentChange,
-  OPEX_RATIO,
+  ILLUSTRATIVE_OPEX_RATIO,
   TRACKED_MARKET_COUNT,
   ACS_SOURCE_LABEL,
   FMR_SOURCE_LABEL,
@@ -43,7 +43,7 @@ export async function generateMetadata({
   if (!strategy || !city) return {}
 
   const title = `${strategy.shortTitle} Investing in ${city.city}, ${city.state} 2026 | ProInvestorHub`
-  const description = `${strategy.shortTitle} analysis for the ${city.metroName} metro: score, Census-based market data (est. cap rate ${fmtCapRate(city.capRate)}), and how it compares to the other ${TRACKED_MARKET_COUNT - 1} metros we track. Educational research for real estate investors.`
+  const description = `${strategy.shortTitle} analysis for the ${city.metroName} metro: score, Census-based market data (gross rent yield ${fmtYieldPct(city.rentYield)}), and how it compares to the other ${TRACKED_MARKET_COUNT - 1} metros we track. Educational research for real estate investors.`
 
   return {
     title,
@@ -103,8 +103,8 @@ export default async function CityStrategyPage({
   const thesis = insight ?? data.investorTakeaway
 
   // Quick math — identical formula and inputs to /calculators/cap-rate/[city]
-  const math = computeCapRate(data.medianRent, data.medianHomeValue)
-  const opexPct = Math.round(OPEX_RATIO * 100)
+  const math = computeRentYield(data.medianRent, data.medianHomeValue)
+  const opexPct = Math.round(ILLUSTRATIVE_OPEX_RATIO * 100)
 
   return (
     <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8">
@@ -231,7 +231,7 @@ export default async function CityStrategyPage({
           {/* Quick Math */}
           <section>
             <h2 className="text-2xl font-bold text-text mb-4">
-              Quick Math: Estimated Cap Rate
+              Quick Math: Gross Rent Yield
             </h2>
             <div className="rounded-xl border border-border bg-white p-6 shadow-sm">
               <div className="space-y-3 text-sm">
@@ -243,36 +243,36 @@ export default async function CityStrategyPage({
                     {usd.format(math.annualRent)}
                   </span>
                 </div>
-                <div className="flex justify-between text-red-600">
-                  <span>Less: Operating-Expense Allowance ({opexPct}% of rent)</span>
-                  <span>-{usd.format(math.opex)}</span>
-                </div>
-                <div className="border-t border-border pt-3 flex justify-between font-bold">
-                  <span className="text-text">Estimated NOI</span>
-                  <span className="text-emerald-600">{usd.format(math.noi)}</span>
-                </div>
                 <div className="flex justify-between">
                   <span className="text-text-muted">&divide; Median Home Value</span>
                   <span className="font-medium text-text">
                     {usd.format(data.medianHomeValue)}
                   </span>
                 </div>
-                <div className="flex justify-between font-bold">
-                  <span className="text-text">Estimated Cap Rate</span>
-                  <span className="text-primary">{fmtCapRate(math.capRate)}</span>
+                <div className="border-t border-border pt-3 flex justify-between font-bold">
+                  <span className="text-text">Gross Rent Yield</span>
+                  <span className="text-primary">{fmtYieldPct(math.rentYield)}</span>
+                </div>
+                <div className="flex justify-between text-text-muted">
+                  <span>
+                    Illustration only: cap rate if {opexPct}% of rent went to
+                    operating expenses
+                  </span>
+                  <span>{fmtYieldPct(math.illustrativeNetYield)}</span>
                 </div>
               </div>
               <p className="mt-4 text-xs text-text-light leading-5">
                 Same method as our{' '}
                 <Link href={`/calculators/cap-rate/${citySlug}`} className="underline hover:text-primary">
-                  {data.city} cap rate page
+                  {data.city} rent yield vs cap rate page
                 </Link>
                 : metro median gross rent and median home value (Census ACS 2024
-                1-year) with a {opexPct}% allowance for vacancy, taxes,
-                insurance, maintenance, management and reserves (the
-                &ldquo;50% rule&rdquo;). A market-level estimate, not the return
-                on any specific property; educational only, not investment
-                advice.
+                1-year), before any expenses. A cap rate is NOI &divide; value,
+                so it is lower than gross yield once vacancy, taxes, insurance,
+                maintenance and management are paid; the {opexPct}% line uses
+                the &ldquo;50% rule&rdquo; of thumb as an illustration, not a
+                measured figure. A market-level screen, not the return on any
+                specific property; educational only, not investment advice.
               </p>
             </div>
           </section>
@@ -316,8 +316,8 @@ export default async function CityStrategyPage({
                   insurance: 0,
                   maintenance: 0,
                   management: 0,
-                  // The page's 50% allowance, as one line — replace with real figures.
-                  otherExpenses: Math.round(math.opex),
+                  // Illustrative 50%-rule expenses as one line — replace with real figures.
+                  otherExpenses: Math.round(math.illustrativeOpex),
                 })}`}
                 className="rounded-lg bg-accent px-5 py-2.5 text-sm font-bold text-primary-dark hover:bg-accent-light transition-colors"
               >
@@ -371,7 +371,7 @@ export default async function CityStrategyPage({
                 href={`/calculators/cap-rate/${citySlug}`}
                 className="block rounded-lg border border-border/50 px-4 py-3 text-sm font-medium text-text hover:border-primary/40 hover:text-primary hover:shadow-sm transition-all"
               >
-                {data.city} Cap Rate Details
+                {data.city} Rent Yield vs Cap Rate
               </Link>
               <Link
                 href={`/markets/${strategySlug}`}
@@ -487,10 +487,10 @@ function getKeyMetrics(strategySlug: string, city: CityCapRate) {
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   })
-  const capRate = {
-    label: 'Est. Cap Rate',
-    value: fmtCapRate(city.capRate),
-    note: `Rent less ${Math.round(OPEX_RATIO * 100)}% allowance ÷ value`,
+  const rentYield = {
+    label: 'Gross Rent Yield',
+    value: fmtYieldPct(city.rentYield),
+    note: 'Annual rent ÷ value, before expenses',
   }
   const rentToValue = {
     label: 'Rent-to-Value',
@@ -515,18 +515,18 @@ function getKeyMetrics(strategySlug: string, city: CityCapRate) {
 
   switch (strategySlug) {
     case 'cash-flow':
-      return [capRate, rentToValue, rent, rentChange]
+      return [rentYield, rentToValue, rent, rentChange]
     case 'brrrr':
-      return [homeValue, capRate, rentToValue, rentChange]
+      return [homeValue, rentYield, rentToValue, rentChange]
     case 'house-hacking':
       return [
         { ...homeValue, note: `3.5% down: ${usdFmt.format(Math.round(city.medianHomeValue * 0.035))}` },
         rent,
-        capRate,
+        rentYield,
         rentChange,
       ]
     case 'appreciation':
-      return [rentChange, homeValue, rent, capRate]
+      return [rentChange, homeValue, rent, rentYield]
     default:
       return []
   }

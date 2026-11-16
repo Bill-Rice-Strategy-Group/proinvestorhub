@@ -4,7 +4,7 @@ import { CapRateCalculator } from '@/components/calculators/cap-rate-calculator'
 import { CalculatorEmbed } from '@/components/calculator-embed'
 import { JsonLd, calculatorJsonLd, breadcrumbJsonLd, faqJsonLd, howToJsonLd } from '@/components/json-ld'
 import { CalculatorRelatedTools } from '@/components/calculator-related-tools'
-import { cities, fmtCapRate, OPEX_RATIO, TRACKED_MARKET_COUNT } from '@/data/cap-rate-cities'
+import { cities, fmtYieldPct, TRACKED_MARKET_COUNT } from '@/data/cap-rate-cities'
 
 export const metadata: Metadata = {
   title: 'Cap Rate Calculator + Formula: How to Calculate Cap Rate',
@@ -394,9 +394,10 @@ export default function CapRateCalculatorPage() {
               Cap Rates by City
             </h2>
             <p className="mt-2 text-text-muted">
-              Estimated cap rates for the {TRACKED_MARKET_COUNT} metros we
-              track, from Census ACS 2024 median rent and home value with a{' '}
-              {Math.round(OPEX_RATIO * 100)}% operating-expense allowance.
+              Gross rent yield (median rent &times; 12 &divide; median home
+              value, Census ACS 2024) for the {TRACKED_MARKET_COUNT} metros we
+              track. A cap rate on a real deal will be lower once operating
+              expenses are paid.
             </p>
           </div>
           <Link
@@ -417,9 +418,9 @@ export default function CapRateCalculatorPage() {
                 {city.city}, {city.state}
               </p>
               <p className="mt-2 text-2xl font-bold text-primary tabular-nums">
-                {fmtCapRate(city.capRate)}
+                {fmtYieldPct(city.rentYield)}
               </p>
-              <p className="mt-1 text-xs text-text-light">est. cap rate (metro)</p>
+              <p className="mt-1 text-xs text-text-light">gross rent yield (metro)</p>
               <p className="mt-2 text-xs text-text-light">
                 {new Intl.NumberFormat('en-US', {
                   style: 'currency',

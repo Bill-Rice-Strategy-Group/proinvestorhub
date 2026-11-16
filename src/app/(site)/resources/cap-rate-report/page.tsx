@@ -3,25 +3,23 @@ import Link from 'next/link'
 import {
   cities,
   TRACKED_MARKET_COUNT,
-  OPEX_RATIO,
   ACS_SOURCE_FULL,
   FMR_SOURCE_LABEL,
   fmtRentChange,
 } from '@/data/cap-rate-cities'
 
 const N = TRACKED_MARKET_COUNT
-const OPEX = Math.round(OPEX_RATIO * 100)
 import { getCitiesForStrategy } from '@/data/market-strategies'
 import { PrintButton } from '../deal-analysis-checklist/print-button'
 import { GatedContent } from '@/components/gated-content'
 
 export const metadata: Metadata = {
-  title: `${N}-Metro Cap Rate Report — Census ACS 2024 Data`,
-  description: `Free report comparing estimated cap rates, median home values, rents, rent changes, and strategy scores across ${N} US metros, built from Census ACS 2024 and HUD Fair Market Rent data.`,
+  title: `${N}-Metro Rent Yield & Cap Rate Report — Census ACS 2024 Data`,
+  description: `Free report comparing gross rent yields, median home values, rents, rent changes, and strategy scores across ${N} US metros, built from Census ACS 2024 and HUD Fair Market Rent data.`,
   alternates: { canonical: '/resources/cap-rate-report' },
   openGraph: {
-    title: `${N}-Metro Cap Rate Report | ProInvestorHub`,
-    description: `Free market data: estimated cap rates, home values, rents, and strategy scores for ${N} US metros.`,
+    title: `${N}-Metro Rent Yield & Cap Rate Report | ProInvestorHub`,
+    description: `Free market data: gross rent yields, home values, rents, and strategy scores for ${N} US metros.`,
     url: '/resources/cap-rate-report',
     images: [
       {
@@ -48,18 +46,18 @@ export default function CapRateReportPage() {
   const houseHackCities = getCitiesForStrategy('house-hacking')
   const appreciationCities = getCitiesForStrategy('appreciation')
 
-  const avgCapRate =
-    cities.reduce((sum, c) => sum + c.capRate, 0) / cities.length
+  const avgRentYield =
+    cities.reduce((sum, c) => sum + c.rentYield, 0) / cities.length
   const avgPrice =
     cities.reduce((sum, c) => sum + c.medianHomeValue, 0) / cities.length
-  // Data-derived takeaways (cities is sorted by estimated cap rate, desc)
+  // Data-derived takeaways (cities is sorted by gross rent yield, desc)
   const topCap = cities.slice(0, 4)
   const bottomCap = cities.slice(-4).reverse()
   const meetsOnePct = cities.filter((c) => c.rentToPrice >= 0.01).length
   const withRentChange = cities.filter((c) => c.rentChange != null)
   const rentDown = withRentChange.filter((c) => (c.rentChange as number) < 0).length
   const list = (xs: typeof cities) =>
-    xs.map((c) => `${c.city} (${c.capRate.toFixed(1)}%)`).join(', ')
+    xs.map((c) => `${c.city} (${c.rentYield.toFixed(1)}%)`).join(', ')
   const avgRent =
     cities.reduce((sum, c) => sum + c.medianRent, 0) / cities.length
 
@@ -83,10 +81,10 @@ export default function CapRateReportPage() {
           ProInvestorHub Market Research
         </p>
         <h1 className="mt-2 text-3xl font-bold text-text sm:text-4xl print:text-2xl">
-          {N}-Metro Cap Rate Report
+          {N}-Metro Rent Yield &amp; Cap Rate Report
         </h1>
         <p className="mt-3 text-lg text-text-muted print:text-sm">
-          Estimated cap rates, median home values, rents, and investment
+          Gross rent yields, median home values, rents, and investment
           strategy scores for the {N} US metros we track.
         </p>
         <p className="mt-2 text-xs text-text-light">
@@ -101,9 +99,9 @@ export default function CapRateReportPage() {
         </h2>
         <div className="grid grid-cols-3 gap-4">
           <div className="rounded-xl border border-border bg-white p-5 text-center print:border-gray-300">
-            <p className="text-sm text-text-muted">Avg Est. Cap Rate</p>
+            <p className="text-sm text-text-muted">Avg Gross Rent Yield</p>
             <p className="mt-1 text-2xl font-bold text-primary tabular-nums print:text-xl">
-              {avgCapRate.toFixed(1)}%
+              {avgRentYield.toFixed(1)}%
             </p>
           </div>
           <div className="rounded-xl border border-border bg-white p-5 text-center print:border-gray-300">
@@ -125,11 +123,12 @@ export default function CapRateReportPage() {
       {/* Full table */}
       <section className="mb-12 print:mb-8">
         <h2 className="text-xl font-bold text-text mb-4 print:text-lg">
-          All {N} Metros — Ranked by Estimated Cap Rate
+          All {N} Metros — Ranked by Gross Rent Yield
         </h2>
         <p className="mb-3 text-xs text-text-light">
-          Est. cap rate = (median gross rent &times; 12 &times; (1 &minus; {OPEX}%))
-          &divide; median home value. Metro-level medians; a market screen, not a
+          Gross rent yield = median gross rent &times; 12 &divide; median home
+          value, before expenses. A cap rate (NOI &divide; value) is lower once
+          operating costs are paid. Metro-level medians; a market screen, not a
           property-level return.
         </p>
         <div className="overflow-x-auto">
@@ -138,7 +137,7 @@ export default function CapRateReportPage() {
               <tr className="bg-surface text-left text-text-muted uppercase tracking-wide">
                 <th className="px-2 py-2">#</th>
                 <th className="px-2 py-2">Metro</th>
-                <th className="px-2 py-2 text-right">Est. Cap Rate</th>
+                <th className="px-2 py-2 text-right">Gross Rent Yield</th>
                 <th className="px-2 py-2 text-right">Median Value</th>
                 <th className="px-2 py-2 text-right">Median Rent</th>
                 <th className="px-2 py-2 text-right">Rent/Value</th>
@@ -160,7 +159,7 @@ export default function CapRateReportPage() {
                     {city.city}, {city.state}
                   </td>
                   <td className="px-2 py-1.5 text-right tabular-nums font-semibold text-primary">
-                    {city.capRate.toFixed(1)}%
+                    {city.rentYield.toFixed(1)}%
                   </td>
                   <td className="px-2 py-1.5 text-right tabular-nums text-text-muted">
                     {fmt(city.medianHomeValue)}
@@ -233,7 +232,7 @@ export default function CapRateReportPage() {
             <li className="flex items-start gap-2">
               <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
               <span>
-                <strong className="text-text">Highest estimated cap rates.</strong>{' '}
+                <strong className="text-text">Highest gross rent yields.</strong>{' '}
                 {list(topCap)} — the metros where median rent is highest
                 relative to median home value.
               </span>
@@ -241,7 +240,7 @@ export default function CapRateReportPage() {
             <li className="flex items-start gap-2">
               <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
               <span>
-                <strong className="text-text">Lowest estimated cap rates.</strong>{' '}
+                <strong className="text-text">Lowest gross rent yields.</strong>{' '}
                 {list(bottomCap)} — home values are high relative to rents, so
                 these are appreciation plays more than cash-flow plays.
               </span>
@@ -268,9 +267,11 @@ export default function CapRateReportPage() {
               <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
               <span>
                 <strong className="text-text">Run real expenses.</strong>{' '}
-                These estimates use a flat {OPEX}% expense allowance. Property
-                taxes and insurance vary widely by state and county, so check
-                the assessor and get quotes for any specific deal.
+                Gross yield is before any expenses; a deal&rsquo;s cap rate is
+                what is left after vacancy, taxes, insurance, maintenance and
+                management. Property taxes and insurance vary widely by state
+                and county, so check the assessor and get quotes for any
+                specific deal.
               </span>
             </li>
           </ul>

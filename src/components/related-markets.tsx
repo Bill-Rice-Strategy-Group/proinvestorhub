@@ -53,7 +53,7 @@ export function RelatedMarkets({ bodyText }: { bodyText: string }) {
               </Link>
             </div>
             <span className="text-xs text-text-muted tabular-nums">
-              {city.capRate.toFixed(1)}% est. cap
+              {city.rentYield.toFixed(1)}% gross yield
             </span>
           </div>
         ))}

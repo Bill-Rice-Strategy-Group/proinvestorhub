@@ -118,8 +118,8 @@ export default async function MarketsHubPage() {
         <p className="mt-4 text-text-muted leading-7">
           Each strategy uses a weighted composite score built from the market
           data points that matter most for that approach. Cash flow rankings
-          weight the estimated cap rate heavily. BRRRR rankings balance
-          affordable entry prices with estimated cap rate. House hacking
+          weight gross rent yield heavily. BRRRR rankings balance
+          affordable entry prices with gross rent yield. House hacking
           rankings prioritize affordability. Appreciation rankings emphasize
           recent rent change and home-value level. Every score is transparent —
           click into any strategy to see the full methodology and all{' '}

@@ -10,7 +10,7 @@
  *   - Rent change: HUD Fair Market Rents, two-bedroom, FY2026 vs FY2025, FMR area
  *     (src/data/fmr-rent/metros.json).
  * Everything else is computed from those by the formulas below, which the pages
- * also print. No vacancy, property-tax, population or income figures are shown:
+ * also print. The headline metric is gross rent yield (no expense assumption). No vacancy, property-tax, population or income figures are shown:
  * no dataset in this repo carries them for these metros.
  *
  * Which source row each city uses lives in `city-market-sources.ts`.
@@ -20,12 +20,12 @@ import { metros as fmrMetros, fmrMeta } from './fmr-rent'
 import { cityMarketSources } from './city-market-sources'
 
 /**
- * Operating-expense allowance used for the cap-rate ESTIMATE: 50% of gross rent
- * (the "50% rule" of thumb), standing in for vacancy, property tax, insurance,
- * maintenance, management and capital reserves together. Real expenses vary
- * widely by property and state; the pages say so.
+ * ILLUSTRATIVE operating-expense allowance: 50% of gross rent (the "50% rule"
+ * of thumb). Used only for the clearly labeled illustrative net step in Quick
+ * Math, to show why a cap rate (NOI / value) sits below gross yield. It is not
+ * part of the headline metric, rankings or scores.
  */
-export const OPEX_RATIO = 0.5
+export const ILLUSTRATIVE_OPEX_RATIO = 0.5
 
 export type CityCapRate = {
   city: string
@@ -40,12 +40,8 @@ export type CityCapRate = {
   medianRent: number
   /** medianRent / medianHomeValue (monthly rent-to-value). */
   rentToPrice: number
-  /** (medianRent x 12) / medianHomeValue. */
-  grossYield: number
-  /** medianRent x 12 x (1 - OPEX_RATIO). */
-  estimatedNoi: number
-  /** Estimated cap rate in percent: estimatedNoi / medianHomeValue x 100. */
-  capRate: number
+  /** HEADLINE METRIC. Gross rent yield in percent: medianRent x 12 / medianHomeValue x 100. */
+  rentYield: number
   /** HUD two-bedroom FMR change FY2026 vs FY2025, in percent; null when no FMR row is mapped. */
   rentChange: number | null
   fmr2br: number | null
@@ -61,16 +57,28 @@ export const DATA_VINTAGE_YEAR = yieldMeta.year
 /** When the ACS file was generated (ISO date) — used as the pages' "data updated" stamp. */
 export const DATA_GENERATED_AT = yieldMeta.generatedAt
 
-export function computeCapRate(monthlyRent: number, homeValue: number): {
+/**
+ * The one rent-yield calculation used everywhere. `rentYield` is the headline
+ * (no expense assumption). The `illustrative*` fields apply the 50% rule only
+ * to explain the step from gross yield to a cap rate; label them as such.
+ */
+export function computeRentYield(monthlyRent: number, homeValue: number): {
   annualRent: number
-  opex: number
-  noi: number
-  capRate: number
+  rentYield: number
+  illustrativeOpex: number
+  illustrativeNoi: number
+  illustrativeNetYield: number
 } {
   const annualRent = monthlyRent * 12
-  const opex = annualRent * OPEX_RATIO
-  const noi = annualRent - opex
-  return { annualRent, opex, noi, capRate: (noi / homeValue) * 100 }
+  const illustrativeOpex = annualRent * ILLUSTRATIVE_OPEX_RATIO
+  const illustrativeNoi = annualRent - illustrativeOpex
+  return {
+    annualRent,
+    rentYield: (annualRent / homeValue) * 100,
+    illustrativeOpex,
+    illustrativeNoi,
+    illustrativeNetYield: (illustrativeNoi / homeValue) * 100,
+  }
 }
 
 function build(): CityCapRate[] {
@@ -80,7 +88,6 @@ function build(): CityCapRate[] {
     // No sourced rent + value -> no figures for this city. Drop it rather than estimate.
     if (!acs || acs.medianGrossRent == null || acs.medianHomeValue == null) continue
     const fmr = src.fmrCode ? fmrMetros.find((m) => m.code === src.fmrCode) : undefined
-    const { noi, capRate } = computeCapRate(acs.medianGrossRent, acs.medianHomeValue)
     out.push({
       city: src.city,
       state: src.state,
@@ -90,9 +97,7 @@ function build(): CityCapRate[] {
       medianHomeValue: acs.medianHomeValue,
       medianRent: acs.medianGrossRent,
       rentToPrice: acs.medianGrossRent / acs.medianHomeValue,
-      grossYield: (acs.medianGrossRent * 12) / acs.medianHomeValue,
-      estimatedNoi: noi,
-      capRate,
+      rentYield: computeRentYield(acs.medianGrossRent, acs.medianHomeValue).rentYield,
       rentChange: fmr && fmr.yoyPct != null ? fmr.yoyPct * 100 : null,
       fmr2br: fmr?.fmr2br ?? null,
       fmrPrev2br: fmr?.fmrPrev2br ?? null,
@@ -100,10 +105,10 @@ function build(): CityCapRate[] {
       investorTakeaway: src.investorTakeaway,
     })
   }
-  return out.sort((a, b) => b.capRate - a.capRate)
+  return out.sort((a, b) => b.rentYield - a.rentYield)
 }
 
-/** The tracked markets, sorted by estimated cap rate, highest first. */
+/** The tracked markets, sorted by gross rent yield, highest first. */
 export const cities: CityCapRate[] = build()
 
 /** Number of tracked markets — use this, never a hard-coded count. */
@@ -113,14 +118,14 @@ export function getCityBySlug(slug: string): CityCapRate | undefined {
   return cities.find((c) => c.slug === slug)
 }
 
-/** 1-based rank by estimated cap rate among the tracked markets. */
-export function capRateRank(slug: string): number {
+/** 1-based rank by gross rent yield among the tracked markets. */
+export function rentYieldRank(slug: string): number {
   return cities.findIndex((c) => c.slug === slug) + 1
 }
 
 /** One decimal, as shown everywhere (title, cards, Quick Math, tables). */
-export function fmtCapRate(rate: number): string {
-  return `${rate.toFixed(1)}%`
+export function fmtYieldPct(pct: number): string {
+  return `${pct.toFixed(1)}%`
 }
 
 export function fmtRentChange(v: number | null): string {
@@ -129,14 +134,13 @@ export function fmtRentChange(v: number | null): string {
 }
 
 /**
- * Relative band: where a market's estimated cap rate sits among the tracked
- * markets (thirds by rank). Relative on purpose — the estimate compares
- * metro-wide medians, so its absolute level is not comparable to a quoted
- * property-level cap rate.
+ * Relative band: where a market's gross rent yield sits among the tracked
+ * markets (thirds by rank). Relative because a metro-median yield is not
+ * comparable to a property-level yield or cap rate quoted for a deal.
  */
-export type CapRateBand = 'upper' | 'middle' | 'lower'
-export function capRateBand(slug: string): CapRateBand {
-  const rank = capRateRank(slug)
+export type YieldBand = 'upper' | 'middle' | 'lower'
+export function rentYieldBand(slug: string): YieldBand {
+  const rank = rentYieldRank(slug)
   const n = cities.length
   if (rank <= Math.ceil(n / 3)) return 'upper'
   if (rank <= Math.ceil((2 * n) / 3)) return 'middle'

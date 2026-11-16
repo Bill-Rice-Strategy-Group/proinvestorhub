@@ -94,7 +94,7 @@ export default async function StrategyPage({
             ? { dateModified: freshness.dataUpdatedAt }
             : {}),
           measurementTechnique:
-            `Weighted composite of Census ACS 2024 1-year metro median rent and home value (and an estimated cap rate derived from them) and HUD two-bedroom Fair Market Rent change, across ${TRACKED_MARKET_COUNT} US metros.`,
+            `Weighted composite of Census ACS 2024 1-year metro median rent and home value (and the gross rent yield derived from them) and HUD two-bedroom Fair Market Rent change, across ${TRACKED_MARKET_COUNT} US metros.`,
           variableMeasured: strategy.scoreLabel,
           isAccessibleForFree: true,
           creativeWorkStatus: 'Published',
@@ -191,8 +191,8 @@ export default async function StrategyPage({
                             </strong>
                           </span>
                           <span>
-                            Est. Cap Rate:{' '}
-                            <strong>{city.capRate.toFixed(1)}%</strong>
+                            Gross Rent Yield:{' '}
+                            <strong>{city.rentYield.toFixed(1)}%</strong>
                           </span>
                           <span>
                             Median Value:{' '}
@@ -256,7 +256,7 @@ export default async function StrategyPage({
                   href="/calculators/cap-rate/cities"
                   className="text-primary hover:text-primary-light underline transition-colors"
                 >
-                  cap rates by city
+                  rent yield by city
                 </Link>{' '}
                 page.
               </p>
@@ -340,7 +340,7 @@ export default async function StrategyPage({
               href="/calculators/cap-rate/cities"
               className="mt-4 block rounded-lg border border-border/50 px-4 py-3 text-sm font-medium text-text hover:border-primary/40 hover:text-primary hover:shadow-sm transition-all"
             >
-              Cap Rates by City — Full Data
+              Rent Yield by City — Full Data
             </Link>
           </div>
 

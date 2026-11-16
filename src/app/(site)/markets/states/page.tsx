@@ -4,7 +4,7 @@ import { JsonLd, breadcrumbJsonLd } from '@/components/json-ld'
 import { fetchStatesList, getStateAverages, getStatesList } from '@/data/city-strategy-helpers'
 
 const STATE_COUNT = getStatesList().length
-const STATES_DESCRIPTION = `Compare real estate investment markets by state: average estimated cap rates, median home values, and top metros across the ${STATE_COUNT} US states we track, from Census ACS 2024 data.`
+const STATES_DESCRIPTION = `Compare real estate investment markets by state: average gross rent yields, median home values, and top metros across the ${STATE_COUNT} US states we track, from Census ACS 2024 data.`
 
 export const metadata: Metadata = {
   title: 'Best States for Real Estate Investing 2026',
@@ -62,7 +62,7 @@ export default async function StatesHubPage() {
           Browse real estate investment markets by state. We track{' '}
           {states.reduce((sum, s) => sum + s.cities.length, 0)} metro areas across{' '}
           {states.length} states, with Census ACS 2024 rent and home-value
-          data, estimated cap rates, and strategy rankings. Figures are
+          data, gross rent yields, and strategy rankings. Figures are
           metro-level; averages are simple averages of the tracked metros.
         </p>
       </div>
@@ -72,7 +72,7 @@ export default async function StatesHubPage() {
         {states.map((state) => {
           const avgs = getStateAverages(state.cities)
           const topCity = state.cities.reduce(
-            (best, c) => (c.capRate > best.capRate ? c : best),
+            (best, c) => (c.rentYield > best.rentYield ? c : best),
             state.cities[0]
           )
           return (
@@ -92,9 +92,9 @@ export default async function StatesHubPage() {
               </div>
               <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
                 <div>
-                  <p className="text-text-light text-xs">Avg Est. Cap Rate</p>
+                  <p className="text-text-light text-xs">Avg Gross Rent Yield</p>
                   <p className="font-semibold text-text">
-                    {avgs.avgCapRate.toFixed(1)}%
+                    {avgs.avgRentYield.toFixed(1)}%
                   </p>
                 </div>
                 <div>
@@ -105,7 +105,7 @@ export default async function StatesHubPage() {
                 </div>
               </div>
               <p className="mt-3 text-xs text-text-muted">
-                Highest est. cap rate: {topCity.city} ({topCity.capRate.toFixed(1)}%)
+                Highest gross rent yield: {topCity.city} ({topCity.rentYield.toFixed(1)}%)
               </p>
             </Link>
           )

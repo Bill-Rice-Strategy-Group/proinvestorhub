@@ -179,9 +179,9 @@ export const categoryHubContent: CategoryHubContent[] = [
     metaTitle:
       'Real Estate Market Analysis — Data & City Rankings | ProInvestorHub',
     metaDescription:
-      `Data-driven real estate market analysis for investors. City rankings, cap rate comparisons, and market selection guides across ${TRACKED_MARKET_COUNT} US metros.`,
+      `Data-driven real estate market analysis for investors. City rankings, rent-yield comparisons, and market selection guides across ${TRACKED_MARKET_COUNT} US metros.`,
     description:
-      `Market selection can make or break your investment returns. A mediocre deal in a great market often outperforms a great deal in a declining one. These guides cover how to evaluate markets, what metrics matter most, and where the opportunities are right now. We track ${TRACKED_MARKET_COUNT} US metros with Census ACS 2024 rent and home-value data, estimated cap rates, rent-to-value ratios, and HUD Fair Market Rent changes — and rank them across four investment strategies.`,
+      `Market selection can make or break your investment returns. A mediocre deal in a great market often outperforms a great deal in a declining one. These guides cover how to evaluate markets, what metrics matter most, and where the opportunities are right now. We track ${TRACKED_MARKET_COUNT} US metros with Census ACS 2024 rent and home-value data, gross rent yields, rent-to-value ratios, and HUD Fair Market Rent changes — and rank them across four investment strategies.`,
     faqs: [
       {
         question: 'What makes a good real estate investment market?',
@@ -196,7 +196,7 @@ export const categoryHubContent: CategoryHubContent[] = [
       {
         question: 'How many markets do you track?',
         answer:
-          `We track ${TRACKED_MARKET_COUNT} US metros across ${TRACKED_STATE_COUNT} states, ranked across four strategies: cash flow, BRRRR, house hacking, and appreciation. Each metro is scored on sourced figures: Census ACS 2024 median rent and home value, an estimated cap rate derived from them, and HUD Fair Market Rent changes.`,
+          `We track ${TRACKED_MARKET_COUNT} US metros across ${TRACKED_STATE_COUNT} states, ranked across four strategies: cash flow, BRRRR, house hacking, and appreciation. Each metro is scored on sourced figures: Census ACS 2024 median rent and home value, the gross rent yield derived from them, and HUD Fair Market Rent changes.`,
       },
     ],
     relatedCalculators: [

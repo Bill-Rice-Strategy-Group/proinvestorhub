@@ -1,7 +1,6 @@
 import {
   cities,
   TRACKED_MARKET_COUNT,
-  OPEX_RATIO,
   fmtRentChange,
   type CityCapRate,
 } from './cap-rate-cities'
@@ -12,7 +11,7 @@ import { getMarketCities } from './market-queries'
 // sourced figure (ACS / HUD) or a formula over them; see cap-rate-cities.ts.
 // ---------------------------------------------------------------------------
 
-export type FactorKey = 'capRate' | 'affordability' | 'rentChange' | 'homeValue'
+export type FactorKey = 'rentYield' | 'affordability' | 'rentChange' | 'homeValue'
 
 export type ScoreFactor = {
   key: FactorKey
@@ -31,11 +30,11 @@ const usd0 = new Intl.NumberFormat('en-US', {
 })
 
 export const scoreFactors: Record<FactorKey, ScoreFactor> = {
-  capRate: {
-    key: 'capRate',
-    label: 'Est. Cap Rate',
-    raw: (c) => c.capRate,
-    format: (c) => `${c.capRate.toFixed(1)}%`,
+  rentYield: {
+    key: 'rentYield',
+    label: 'Gross Rent Yield',
+    raw: (c) => c.rentYield,
+    format: (c) => `${c.rentYield.toFixed(1)}%`,
     higherIsBetter: true,
   },
   affordability: {
@@ -126,7 +125,7 @@ export type Strategy = {
 
 const N = TRACKED_MARKET_COUNT
 
-const METHOD_COMMON = `Each factor is scaled 0–10 relative to the lowest and highest of the ${N} tracked metros, then weighted. Inputs: median gross rent and median home value from the U.S. Census Bureau's American Community Survey (ACS 2024 1-year estimates, metro level); the estimated cap rate is annual median rent less a ${Math.round(OPEX_RATIO * 100)}% operating-expense allowance, divided by median home value; rent change is HUD's two-bedroom Fair Market Rent, FY2026 vs FY2025. If a factor is unavailable for a metro, its weight is spread across the others. The score is a relative screen built from metro-wide medians — not a forecast, an appraisal, or investment advice.`
+const METHOD_COMMON = `Each factor is scaled 0–10 relative to the lowest and highest of the ${N} tracked metros, then weighted. Inputs: median gross rent and median home value from the U.S. Census Bureau's American Community Survey (ACS 2024 1-year estimates, metro level); gross rent yield is annual median rent divided by median home value, before any expenses; rent change is HUD's two-bedroom Fair Market Rent, FY2026 vs FY2025. If a factor is unavailable for a metro, its weight is spread across the others. The score is a relative screen built from metro-wide medians — not a forecast, an appraisal, or investment advice.`
 
 function makeStrategy(
   s: Omit<Strategy, 'scoreFn' | 'scoreExplainer' | 'methodology'> & { methodologyIntro: string }
@@ -152,18 +151,18 @@ export const strategies: Strategy[] = [
     title: 'Best Cities for Cash Flow Investing in 2026',
     shortTitle: 'Cash Flow',
     description:
-      'Markets ranked by cash flow potential — estimated cap rate from Census rent and home-value data, plus recent rent change.',
+      'Markets ranked by cash flow potential — gross rent yield from Census rent and home-value data, plus recent rent change.',
     metaTitle: `Best Cities for Cash Flow Investing: ${N} Markets Ranked (2026)`,
     metaDescription: `${N} U.S. metros ranked for cash flow real estate investing, using Census ACS 2024 rent and home-value data and HUD Fair Market Rent changes. See the method and the numbers behind every rank.`,
     weights: [
-      { factor: 'capRate', weightPct: 80 },
+      { factor: 'rentYield', weightPct: 80 },
       { factor: 'rentChange', weightPct: 20 },
     ],
     scoreLabel: 'Cash Flow Score',
     heroIntro:
-      'Cash flow investing means buying property whose rent covers the mortgage, expenses, and reserves with money left over. The markets most likely to support that are the ones where typical rents are high relative to typical home values. This ranking screens metros on exactly that — an estimated cap rate built from Census rent and home-value medians — plus the most recent change in HUD Fair Market Rents.',
+      'Cash flow investing means buying property whose rent covers the mortgage, expenses, and reserves with money left over. The markets most likely to support that are the ones where typical rents are high relative to typical home values. This ranking screens metros on exactly that — gross rent yield built from Census rent and home-value medians — plus the most recent change in HUD Fair Market Rents.',
     methodologyIntro:
-      'Cash Flow Score: estimated cap rate (80%) — how much of a median home’s value the median rent could return after an operating-expense allowance; rent change (20%) — the latest year-over-year change in HUD’s two-bedroom Fair Market Rent.',
+      'Cash Flow Score: gross rent yield (80%) — a year of median rent as a share of the median home value, before expenses; rent change (20%) — the latest year-over-year change in HUD’s two-bedroom Fair Market Rent.',
     relatedCalculators: [
       { href: '/calculators/rental-cashflow', label: 'Rental Cash Flow Calculator' },
       { href: '/calculators/cash-on-cash', label: 'Cash-on-Cash Return Calculator' },
@@ -190,11 +189,11 @@ export const strategies: Strategy[] = [
     title: 'Best Cities for the BRRRR Strategy in 2026',
     shortTitle: 'BRRRR',
     description:
-      'Markets ranked by BRRRR viability — affordable entry prices, estimated cap rate, and recent rent change.',
+      'Markets ranked by BRRRR viability — affordable entry prices, gross rent yield, and recent rent change.',
     metaTitle: `Best Cities for BRRRR Investing: ${N} Markets Ranked (2026)`,
     metaDescription: `${N} U.S. metros ranked for the BRRRR strategy using Census ACS 2024 home values and rents and HUD Fair Market Rent changes. See where Buy, Rehab, Rent, Refinance, Repeat has the most room to work.`,
     weights: [
-      { factor: 'capRate', weightPct: 40 },
+      { factor: 'rentYield', weightPct: 40 },
       { factor: 'affordability', weightPct: 40 },
       { factor: 'rentChange', weightPct: 20 },
     ],
@@ -202,7 +201,7 @@ export const strategies: Strategy[] = [
     heroIntro:
       'The BRRRR strategy — Buy, Rehab, Rent, Refinance, Repeat — recycles the same capital into one property after another. It works best where purchase prices are low enough to buy and rehab without tying up much cash, and where rents are high enough relative to value that the refinanced property still cash flows. This ranking screens metros on both, plus the latest rent change.',
     methodologyIntro:
-      'BRRRR Score: estimated cap rate (40%) — higher means the refinanced property is more likely to cash flow; affordable entry (40%) — a lower median home value means lower acquisition and rehab capital; rent change (20%) — the latest change in HUD’s two-bedroom Fair Market Rent.',
+      'BRRRR Score: gross rent yield (40%) — higher means the refinanced property is more likely to cash flow; affordable entry (40%) — a lower median home value means lower acquisition and rehab capital; rent change (20%) — the latest change in HUD’s two-bedroom Fair Market Rent.',
     relatedCalculators: [
       { href: '/calculators/brrrr', label: 'BRRRR Calculator' },
       { href: '/calculators/rental-cashflow', label: 'Rental Cash Flow Calculator' },
@@ -234,14 +233,14 @@ export const strategies: Strategy[] = [
     metaDescription: `${N} U.S. metros ranked for house hacking using Census ACS 2024 home values and rents and HUD Fair Market Rent changes. Find markets where tenant rent goes furthest against the mortgage.`,
     weights: [
       { factor: 'affordability', weightPct: 50 },
-      { factor: 'capRate', weightPct: 30 },
+      { factor: 'rentYield', weightPct: 30 },
       { factor: 'rentChange', weightPct: 20 },
     ],
     scoreLabel: 'House Hack Score',
     heroIntro:
       'House hacking is a common first move in real estate investing: buy a 2–4 unit property with an owner-occupied loan (FHA allows 3.5% down), live in one unit, and rent the others to offset your mortgage. It works best where purchase prices are within reach and rents are high relative to home values. This ranking screens metros on both, plus the latest rent change.',
     methodologyIntro:
-      'House Hack Score: affordable entry (50%) — a lower median home value makes the owner-occupied loan easier to qualify for and the payment smaller; estimated cap rate (30%) — how far rent goes against the price; rent change (20%) — the latest change in HUD’s two-bedroom Fair Market Rent.',
+      'House Hack Score: affordable entry (50%) — a lower median home value makes the owner-occupied loan easier to qualify for and the payment smaller; gross rent yield (30%) — how far rent goes against the price; rent change (20%) — the latest change in HUD’s two-bedroom Fair Market Rent.',
     relatedCalculators: [
       { href: '/calculators/mortgage', label: 'Mortgage/DSCR Calculator' },
       { href: '/calculators/rental-cashflow', label: 'Rental Cash Flow Calculator' },

@@ -1,7 +1,7 @@
 import {
   cities,
   TRACKED_MARKET_COUNT,
-  OPEX_RATIO,
+  ILLUSTRATIVE_OPEX_RATIO,
   fmtRentChange,
   type CityCapRate,
 } from './cap-rate-cities'
@@ -96,7 +96,7 @@ export function getStateAverages(stateCities: CityCapRate[]) {
   const n = stateCities.length
   if (n === 0) {
     return {
-      avgCapRate: 0,
+      avgRentYield: 0,
       avgMedianHomeValue: 0,
       avgMedianRent: 0,
       avgRentToPrice: 0,
@@ -107,7 +107,7 @@ export function getStateAverages(stateCities: CityCapRate[]) {
     stateCities.reduce((acc, c) => acc + fn(c), 0)
   const withRentChange = stateCities.filter((c) => c.rentChange != null)
   return {
-    avgCapRate: Math.round((sum((c) => c.capRate) / n) * 10) / 10,
+    avgRentYield: Math.round((sum((c) => c.rentYield) / n) * 10) / 10,
     avgMedianHomeValue: Math.round(sum((c) => c.medianHomeValue) / n),
     avgMedianRent: Math.round(sum((c) => c.medianRent) / n),
     avgRentToPrice: Math.round((sum((c) => c.rentToPrice) / n) * 10000) / 10000,
@@ -237,15 +237,15 @@ export function generateCityStrategyFAQs(
 ): Array<{ question: string; answer: string }> {
   const cityName = `${city.city}, ${city.state}`
   const N = TRACKED_MARKET_COUNT
-  const opexPct = Math.round(OPEX_RATIO * 100)
+  const opexPct = Math.round(ILLUSTRATIVE_OPEX_RATIO * 100)
   const faqs: Array<{ question: string; answer: string }> = [
     {
       question: `What is the ${strategy.scoreLabel.toLowerCase()} for ${cityName}?`,
       answer: `${cityName} scores ${score.toFixed(1)} out of 10 on our ${strategy.scoreLabel.toLowerCase()}, ranking #${rank} of the ${N} metros we track. ${strategy.scoreExplainer}`,
     },
     {
-      question: `What is the estimated cap rate in ${city.city}?`,
-      answer: `Our estimate for the ${city.metroName} metro is ${city.capRate.toFixed(1)}%: the median gross rent of ${usd.format(city.medianRent)}/month (${usd.format(city.medianRent * 12)}/year), less a ${opexPct}% operating-expense allowance, divided by the median home value of ${usd.format(city.medianHomeValue)}. Rent and value are Census ACS 2024 1-year metro estimates. It is a market-level screen, not the cap rate of any specific property.`,
+      question: `What is the rent yield in ${city.city}, and how does it relate to cap rate?`,
+      answer: `Gross rent yield for the ${city.metroName} metro is ${city.rentYield.toFixed(1)}%: the median gross rent of ${usd.format(city.medianRent)}/month (${usd.format(city.medianRent * 12)}/year) divided by the median home value of ${usd.format(city.medianHomeValue)} (Census ACS 2024 1-year, metro). A cap rate is net operating income ÷ value, so it is lower than gross yield once vacancy, taxes, insurance, maintenance and management are paid — under the ${opexPct}% rule of thumb it would be roughly half. It is a market-level screen, not the yield or cap rate of any specific property.`,
     },
     {
       question: `What is the rent-to-price ratio in ${city.city}?`,
@@ -371,22 +371,22 @@ export function generateStateFAQs(
 ): Array<{ question: string; answer: string }> {
   const avgs = getStateAverages(stateCities)
   const best = stateCities.reduce(
-    (top, c) => (c.capRate > top.capRate ? c : top),
+    (top, c) => (c.rentYield > top.rentYield ? c : top),
     stateCities[0]
   )
 
   return [
     {
       question: `How many real estate investment markets do you track in ${stateName}?`,
-      answer: `We track ${stateCities.length} ${stateCities.length === 1 ? 'metro' : 'metros'} in ${stateName}: ${stateCities.map((c) => c.city).join(', ')}. Figures are metro-level Census ACS 2024 1-year estimates of median rent and home value, plus HUD Fair Market Rent changes.`,
+      answer: `We track ${stateCities.length} ${stateCities.length === 1 ? 'metro' : 'metros'} in ${stateName}: ${stateCities.map((c) => c.city).join(', ')}. Figures are metro-level Census ACS 2024 1-year estimates of median rent and home value (gross rent yield), plus HUD Fair Market Rent changes.`,
     },
     {
-      question: `What is the average estimated cap rate in ${stateName}?`,
-      answer: `The simple average of our estimated cap rates across the tracked ${stateName} metros is ${avgs.avgCapRate.toFixed(1)}% (each estimate = median rent × 12, less a ${Math.round(OPEX_RATIO * 100)}% expense allowance, ÷ median home value). ${best.city} is highest at ${best.capRate.toFixed(1)}%. The average median home value is ${usd.format(avgs.avgMedianHomeValue)}.`,
+      question: `What is the average gross rent yield in ${stateName}?`,
+      answer: `The simple average gross rent yield across the tracked ${stateName} metros is ${avgs.avgRentYield.toFixed(1)}% (each = median rent × 12 ÷ median home value, before expenses). ${best.city} is highest at ${best.rentYield.toFixed(1)}%. The average median home value is ${usd.format(avgs.avgMedianHomeValue)}.`,
     },
     {
-      question: `Which metro in ${stateName} has the highest estimated cap rate?`,
-      answer: `${best.city}, ${best.state} (the ${best.metroName} metro) has the highest estimated cap rate among our tracked ${stateName} metros at ${best.capRate.toFixed(1)}%, with a median home value of ${usd.format(best.medianHomeValue)} and median gross rent of ${usd.format(best.medianRent)}/month.`,
+      question: `Which metro in ${stateName} has the highest gross rent yield?`,
+      answer: `${best.city}, ${best.state} (the ${best.metroName} metro) has the highest gross rent yield among our tracked ${stateName} metros at ${best.rentYield.toFixed(1)}%, with a median home value of ${usd.format(best.medianHomeValue)} and median gross rent of ${usd.format(best.medianRent)}/month.`,
     },
   ]
 }

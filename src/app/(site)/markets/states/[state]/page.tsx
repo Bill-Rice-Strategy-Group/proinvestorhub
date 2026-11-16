@@ -31,7 +31,7 @@ export async function generateMetadata({
   if (!state) return {}
 
   const title = `Real Estate Investing in ${state.name} 2026 | ProInvestorHub`
-  const description = `${state.name} real estate investing data: ${state.cities.length} metro ${state.cities.length === 1 ? 'area' : 'areas'} with Census ACS 2024 rent and home-value data, estimated cap rates, and strategy rankings. Find the best investment cities in ${state.name}.`
+  const description = `${state.name} real estate investing data: ${state.cities.length} metro ${state.cities.length === 1 ? 'area' : 'areas'} with Census ACS 2024 rent and home-value data, gross rent yields, and strategy rankings. Find the best investment cities in ${state.name}.`
 
   return {
     title,
@@ -81,7 +81,7 @@ export default async function StateDetailPage({
       const best = getBestStrategyForCity(city)
       return { ...city, bestStrategy: best.strategy, bestScore: best.score }
     })
-    .sort((a, b) => b.capRate - a.capRate)
+    .sort((a, b) => b.rentYield - a.rentYield)
 
   // Find dominant strategy for the state
   const strategyCounts = new Map<string, number>()
@@ -161,10 +161,10 @@ export default async function StateDetailPage({
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
           <div className="rounded-xl border border-border bg-white p-4 shadow-sm">
             <p className="text-xs font-medium text-text-muted uppercase tracking-wide">
-              Avg Est. Cap Rate
+              Avg Gross Rent Yield
             </p>
             <p className="mt-1 text-xl font-bold text-text">
-              {avgs.avgCapRate.toFixed(1)}%
+              {avgs.avgRentYield.toFixed(1)}%
             </p>
           </div>
           <div className="rounded-xl border border-border bg-white p-4 shadow-sm">
@@ -207,7 +207,7 @@ export default async function StateDetailPage({
                   <tr className="border-b border-border text-left text-text-muted">
                     <th className="pb-2 pr-4 font-medium">Metro</th>
                     <th className="pb-2 pr-4 font-medium text-right">
-                      Est. Cap Rate
+                      Gross Rent Yield
                     </th>
                     <th className="pb-2 pr-4 font-medium text-right">
                       Median Value
@@ -236,7 +236,7 @@ export default async function StateDetailPage({
                         </Link>
                       </td>
                       <td className="py-3 pr-4 text-right font-semibold text-primary">
-                        {city.capRate.toFixed(1)}%
+                        {city.rentYield.toFixed(1)}%
                       </td>
                       <td className="py-3 pr-4 text-right text-text-muted">
                         {usd.format(city.medianHomeValue)}
@@ -357,7 +357,7 @@ export default async function StateDetailPage({
                 >
                   <span className="font-medium text-text">{city.city}</span>
                   <span className="text-primary font-semibold">
-                    {city.capRate.toFixed(1)}%
+                    {city.rentYield.toFixed(1)}%
                   </span>
                 </Link>
               ))}

@@ -6,20 +6,19 @@ import { CalculatorCTA } from '@/components/calculator-cta'
 import {
   cities,
   getRelatedCities,
-  capRateRank,
-  capRateBand,
-  computeCapRate,
-  fmtCapRate,
+  rentYieldRank,
+  rentYieldBand,
+  computeRentYield,
+  fmtYieldPct,
   fmtRentChange,
-  OPEX_RATIO,
+  ILLUSTRATIVE_OPEX_RATIO,
   TRACKED_MARKET_COUNT,
   ACS_SOURCE_LABEL,
   FMR_SOURCE_LABEL,
   DATA_GENERATED_AT,
-  type CapRateBand,
+  type YieldBand,
 } from '@/data/cap-rate-cities'
 import { strategies } from '@/data/market-strategies'
-import { client } from '@/sanity/lib/client'
 
 function formatCurrency(value: number): string {
   return new Intl.NumberFormat('en-US', {
@@ -31,25 +30,25 @@ function formatCurrency(value: number): string {
 }
 
 const BAND_INFO: Record<
-  CapRateBand,
+  YieldBand,
   { label: string; color: string; bgColor: string; description: string }
 > = {
   upper: {
-    label: 'Upper third of tracked markets',
+    label: 'Upper third by gross rent yield',
     color: 'text-emerald-700',
     bgColor: 'bg-emerald-50 border-emerald-200',
     description:
-      'Typical rent is high relative to typical home value here compared with the other tracked metros — the profile of a cash-flow-oriented market. Higher rent-to-value can also reflect higher vacancy, older housing stock, or weaker price growth, so check the neighborhood-level picture.',
+      'Typical rent is high relative to typical home value here compared with the other tracked metros — the profile of a cash-flow-oriented market. A higher yield can also reflect higher vacancy, higher operating costs, older housing stock, or weaker price growth, so check the neighborhood-level picture.',
   },
   middle: {
-    label: 'Middle third of tracked markets',
+    label: 'Middle third by gross rent yield',
     color: 'text-amber-700',
     bgColor: 'bg-amber-50 border-amber-200',
     description:
       'Rent relative to home value sits in the middle of the tracked metros. Returns here tend to depend on buying well and on the specific submarket.',
   },
   lower: {
-    label: 'Lower third of tracked markets',
+    label: 'Lower third by gross rent yield',
     color: 'text-red-700',
     bgColor: 'bg-red-50 border-red-200',
     description:
@@ -76,9 +75,9 @@ export async function generateMetadata({
   const city = cities.find((c) => c.slug === slug)
   if (!city) return {}
 
-  const cap = fmtCapRate(city.capRate)
-  const title = `${city.city}, ${city.state} Cap Rate: ${cap} Estimate (ACS 2024 Data)`
-  const description = `Estimated cap rate for the ${city.metroName} metro: ${cap}, from Census ACS 2024 median rent and home value with a ${Math.round(OPEX_RATIO * 100)}% expense allowance. See the math, the source, and a free cap rate calculator for ${city.city} deals.`
+  const yieldPct = fmtYieldPct(city.rentYield)
+  const title = `${city.city}, ${city.state} Rent Yield: ${yieldPct} (Gross) — Cap Rate vs Rent Yield`
+  const description = `Gross rent yield for the ${city.metroName} metro is ${yieldPct}: median rent × 12 ÷ median home value (Census ACS 2024). See how that relates to cap rate, the source, and a free cap rate calculator for ${city.city} deals.`
 
   return {
     title,
@@ -103,44 +102,16 @@ export default async function CityCapRatePage({
   const baseUrl =
     process.env.NEXT_PUBLIC_SITE_URL || 'https://proinvestorhub.com'
 
-  const rating = BAND_INFO[capRateBand(city.slug)]
-  const math = computeCapRate(city.medianRent, city.medianHomeValue)
-  const opexPct = Math.round(OPEX_RATIO * 100)
+  const rating = BAND_INFO[rentYieldBand(city.slug)]
+  const math = computeRentYield(city.medianRent, city.medianHomeValue)
+  const opexPct = Math.round(ILLUSTRATIVE_OPEX_RATIO * 100)
   const dataDate = formatDataDate(DATA_GENERATED_AT)
   const relatedSlugs = getRelatedCities(city.slug)
   const relatedCities = relatedSlugs
     .map((s) => cities.find((c) => c.slug === s))
     .filter(Boolean) as typeof cities
 
-  const rank = capRateRank(slug)
-
-  // Fetch neighborhood data from Sanity
-  type Neighborhood = { name: string; description: string; investorProfile: string }
-  let neighborhoods: Neighborhood[] = []
-  try {
-    const result = await client.fetch<{ neighborhoods?: Neighborhood[] } | null>(
-      `*[_type == "marketCity" && slug.current == $slug][0]{ neighborhoods }`,
-      { slug }
-    )
-    neighborhoods = result?.neighborhoods || []
-  } catch {
-    // Neighborhoods are optional — silently continue
-  }
-
-  const profileLabels: Record<string, string> = {
-    'cash-flow': 'Cash Flow',
-    brrrr: 'BRRRR',
-    'house-hacking': 'House Hacking',
-    appreciation: 'Appreciation',
-    mixed: 'Mixed Strategy',
-  }
-  const profileColors: Record<string, string> = {
-    'cash-flow': 'bg-emerald-100 text-emerald-700',
-    brrrr: 'bg-blue-100 text-blue-700',
-    'house-hacking': 'bg-purple-100 text-purple-700',
-    appreciation: 'bg-amber-100 text-amber-700',
-    mixed: 'bg-gray-100 text-gray-700',
-  }
+  const rank = rentYieldRank(slug)
 
   return (
     <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8">
@@ -180,7 +151,7 @@ export default async function CityCapRatePage({
       {/* Header */}
       <div className="max-w-3xl mb-10">
         <h1 className="text-3xl font-bold text-text sm:text-4xl">
-          Cap Rate in {city.city}, {city.state}
+          {city.city}, {city.state} Rent Yield vs Cap Rate
         </h1>
         <p className="mt-3 text-lg text-text-muted leading-7">
           Estimated from Census rent and home-value data for the{' '}
@@ -196,9 +167,9 @@ export default async function CityCapRatePage({
       {/* Key Metrics Cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-10">
         <div className="rounded-xl border border-border bg-white p-6 shadow-sm">
-          <p className="text-sm text-text-muted">Est. Cap Rate</p>
+          <p className="text-sm text-text-muted">Gross Rent Yield</p>
           <p className="mt-1 text-3xl font-bold text-primary tabular-nums">
-            {fmtCapRate(city.capRate)}
+            {fmtYieldPct(city.rentYield)}
           </p>
           <p className="mt-1 text-xs text-text-light">
             #{rank} of {cities.length} tracked metros &bull; see Quick Math
@@ -233,7 +204,7 @@ export default async function CityCapRatePage({
         </div>
       </div>
 
-      {/* Cap Rate Rating */}
+      {/* Yield band */}
       <div className={`rounded-xl border p-6 mb-10 ${rating.bgColor}`}>
         <div className="flex items-start gap-4">
           <div>
@@ -265,17 +236,6 @@ export default async function CityCapRatePage({
                     <td className="py-3">
                       {city.metroName} metropolitan statistical area
                       {city.cbsa && <> (CBSA {city.cbsa})</>}
-                    </td>
-                  </tr>
-                  <tr className="border-b border-border/50">
-                    <td className="py-3 pr-6 font-medium text-text">
-                      Gross Rental Yield
-                    </td>
-                    <td className="py-3 tabular-nums">
-                      {(city.grossYield * 100).toFixed(1)}%
-                      <span className="ml-2 text-text-light">
-                        (annual rent &divide; home value, before expenses)
-                      </span>
                     </td>
                   </tr>
                   <tr>
@@ -333,47 +293,12 @@ export default async function CityCapRatePage({
             </div>
           </section>
 
-          {/* Top Neighborhoods */}
-          {neighborhoods.length > 0 && (
-            <section>
-              <h2 className="text-2xl font-bold text-text">
-                Top Neighborhoods for Investors
-              </h2>
-              <p className="mt-2 text-sm text-text-muted">
-                Where to focus your search in {city.city}, {city.state}:
-              </p>
-              <div className="mt-4 space-y-3">
-                {neighborhoods.map((hood, i) => (
-                  <div
-                    key={i}
-                    className="rounded-xl border border-border bg-white p-5 shadow-sm"
-                  >
-                    <div className="flex items-center gap-3">
-                      <h3 className="font-semibold text-text">{hood.name}</h3>
-                      {hood.investorProfile && (
-                        <span
-                          className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${profileColors[hood.investorProfile] || 'bg-gray-100 text-gray-700'}`}
-                        >
-                          {profileLabels[hood.investorProfile] || hood.investorProfile}
-                        </span>
-                      )}
-                    </div>
-                    <p className="mt-2 text-sm text-text-muted leading-6">
-                      {hood.description}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </section>
-          )}
-
           {/* Quick Math */}
           <section>
             <h2 className="text-2xl font-bold text-text">Quick Math</h2>
             <p className="mt-2 text-sm text-text-muted leading-6">
-              How the {fmtCapRate(city.capRate)} estimate is built, for a
-              home at the metro median value renting at the metro median rent,
-              before financing:
+              Gross rent yield for a home at the metro median value renting at
+              the metro median rent, before any expenses or financing:
             </p>
             <div className="mt-4 space-y-3 text-sm">
               <div className="flex justify-between border-b border-border/50 pb-3">
@@ -385,43 +310,61 @@ export default async function CityCapRatePage({
                 </span>
               </div>
               <div className="flex justify-between border-b border-border/50 pb-3">
-                <span className="text-text-muted">
-                  Less Operating-Expense Allowance ({opexPct}% of rent)
-                </span>
-                <span className="tabular-nums text-red-500">
-                  ({formatCurrency(math.opex)})
-                </span>
-              </div>
-              <div className="flex justify-between pt-1">
-                <span className="font-semibold text-text">Estimated NOI</span>
-                <span className="tabular-nums font-semibold text-primary">
-                  {formatCurrency(math.noi)}
-                </span>
-              </div>
-              <div className="flex justify-between border-b border-border/50 pb-3">
                 <span className="text-text-muted">&divide; Median Home Value</span>
                 <span className="tabular-nums font-medium text-text">
                   {formatCurrency(city.medianHomeValue)}
                 </span>
               </div>
-              <div className="flex justify-between pt-1 border-t border-border">
-                <span className="font-semibold text-text">Estimated Cap Rate</span>
+              <div className="flex justify-between pt-1">
+                <span className="font-semibold text-text">Gross Rent Yield</span>
                 <span className="tabular-nums font-semibold text-primary">
-                  {fmtCapRate(math.capRate)}
+                  {fmtYieldPct(math.rentYield)}
+                </span>
+              </div>
+            </div>
+
+            <h3 className="mt-8 text-lg font-semibold text-text">
+              From rent yield to cap rate (illustration)
+            </h3>
+            <p className="mt-2 text-sm text-text-muted leading-6">
+              A cap rate is net operating income (NOI) &divide; value, so it is
+              always lower than gross yield once vacancy, property tax,
+              insurance, maintenance, management and reserves are paid. Using
+              the {opexPct}% rule of thumb purely as an illustration — not a
+              measured figure for {city.city}:
+            </p>
+            <div className="mt-4 space-y-3 text-sm">
+              <div className="flex justify-between border-b border-border/50 pb-3">
+                <span className="text-text-muted">
+                  Illustrative expenses ({opexPct}% of {formatCurrency(math.annualRent)})
+                </span>
+                <span className="tabular-nums text-red-500">
+                  ({formatCurrency(math.illustrativeOpex)})
+                </span>
+              </div>
+              <div className="flex justify-between border-b border-border/50 pb-3">
+                <span className="text-text-muted">Illustrative NOI</span>
+                <span className="tabular-nums text-text">
+                  {formatCurrency(math.illustrativeNoi)}
+                </span>
+              </div>
+              <div className="flex justify-between pt-1">
+                <span className="text-text-muted">
+                  Illustrative cap rate (NOI &divide; {formatCurrency(city.medianHomeValue)})
+                </span>
+                <span className="tabular-nums text-text">
+                  {fmtYieldPct(math.illustrativeNetYield)}
                 </span>
               </div>
             </div>
             <p className="mt-4 text-xs text-text-light leading-5">
-              Formula: (median gross rent &times; 12 &times; (1 &minus; {opexPct}%))
-              &divide; median home value. The {opexPct}% allowance is the
-              &ldquo;50% rule&rdquo; of thumb, standing in for vacancy,
-              property tax, insurance, maintenance, management and reserves
-              together; real expenses vary widely by property and state. Rent
-              is the median across all renter-occupied units (mostly
-              apartments) and value is the median owner-occupied home, both
-              for the whole {city.metroName} metro, not the city proper — so
-              this is a market-level comparison, not the cap rate any specific
-              property will earn. Educational estimate only; not investment
+              Formula: gross rent yield = median gross rent &times; 12 &divide;
+              median home value. Rent is the median across all renter-occupied
+              units (mostly apartments) and value is the median owner-occupied
+              home, both for the whole {city.metroName} metro, not the city
+              proper — so this is a market-level comparison, not the yield or
+              cap rate any specific property will earn. Real expenses vary
+              widely by property and state. Educational only; not investment
               advice. Run your own numbers with the calculator below.
             </p>
           </section>
@@ -451,7 +394,7 @@ export default async function CityCapRatePage({
             <h3 className="text-sm font-semibold text-text uppercase tracking-wide">
               Compare Other Markets
             </h3>
-            <p className="mt-1 text-xs text-text-light">Est. cap rate, same method</p>
+            <p className="mt-1 text-xs text-text-light">Gross rent yield, same method</p>
             <div className="mt-4 space-y-3">
               {relatedCities.map((related) => (
                 <Link
@@ -468,7 +411,7 @@ export default async function CityCapRatePage({
                     </p>
                   </div>
                   <span className="text-sm font-semibold tabular-nums text-text">
-                    {fmtCapRate(related.capRate)}
+                    {fmtYieldPct(related.rentYield)}
                   </span>
                 </Link>
               ))}
