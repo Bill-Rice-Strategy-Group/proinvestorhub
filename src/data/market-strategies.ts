@@ -145,6 +145,29 @@ function makeStrategy(
   }
 }
 
+/**
+ * Appends a sourced data sentence (ACS 2024 / HUD FMR, from cap-rate-cities.ts)
+ * to each editorial insight, so every insight carries at least one citable fact
+ * and no employer or project claims that can go stale.
+ */
+function withDataNote(insights: Record<string, string>): Record<string, string> {
+  const usd = (n: number) => usd0.format(n)
+  return Object.fromEntries(
+    Object.entries(insights).map(([slug, text]) => {
+      const c = cities.find((x) => x.slug === slug)
+      if (!c) return [slug, text]
+      const rent =
+        c.rentChange != null
+          ? ` HUD’s two-bedroom Fair Market Rent there changed ${fmtRentChange(c.rentChange)} from FY2025 to FY2026.`
+          : ''
+      return [
+        slug,
+        `${text} Census ACS 2024 data put the ${c.metroName} metro’s median home value at ${usd(c.medianHomeValue)} and median gross rent at ${usd(c.medianRent)} a month.${rent}`,
+      ]
+    }),
+  )
+}
+
 export const strategies: Strategy[] = [
   makeStrategy({
     slug: 'cash-flow',
@@ -173,16 +196,24 @@ export const strategies: Strategy[] = [
       { href: '/blog/rental-property-investing-complete-guide', label: 'Rental Property Investing: Complete Guide' },
       { href: '/blog/how-to-buy-first-rental-property', label: 'How to Buy Your First Rental Property' },
     ],
-    cityInsights: {
-      'detroit-mi': 'Detroit’s cash-flow case rests on low entry prices relative to rents in parts of the city, but results depend heavily on neighborhood selection. Focus on stabilizing areas with active renovation and avoid blocks with high vacancy; Corktown, Midtown, and Grandmont-Rosedale are areas local investors commonly cite.',
-      'cleveland-oh': 'Cleveland delivers cash flow on the back of a healthcare and education economy (Cleveland Clinic, University Hospitals, Case Western). Tremont and Ohio City have drawn institutional investor activity. Property taxes are the main drag — factor them carefully on each deal.',
-      'memphis-tn': 'Memphis is one of the best-known turnkey rental markets in the US. Multiple turnkey providers operate here, which makes it accessible for out-of-state investors — vet the provider as carefully as the property. The FedEx logistics hub supports blue-collar employment and rental demand.',
-      'indianapolis-in': 'Indianapolis is a common first market for out-of-state investors: a diversified economy, Indiana landlord-tenant law that is generally considered landlord-friendly, and a large stock of modestly priced single-family homes.',
-      'birmingham-al': 'Birmingham’s cash-flow advantage is on the expense side: Alabama property taxes are generally low, so more of the rent reaches the bottom line than in high-tax states. The UAB medical center anchors a large healthcare employment cluster.',
-      'kansas-city-mo': 'Kansas City spans two states, giving investors a choice of Missouri or Kansas tax and landlord-tenant rules. The Crossroads and Midtown neighborhoods are redeveloping, offering both cash flow and appreciation upside.',
-      'little-rock-ar': 'Little Rock is overlooked by most investors, which is part of why the numbers can still work. Lower competition and stable state-government and healthcare employment make it a quiet but steady cash-flow market.',
-      'oklahoma-city-ok': 'Oklahoma City pairs cash-flow-friendly pricing with an economy that has diversified from energy into aerospace (Tinker Air Force Base) and healthcare, reducing the boom-bust cyclicality that historically affected Oklahoma markets.',
-    },
+    cityInsights: withDataNote({
+      'detroit-mi':
+        'Detroit’s cash-flow case rests on low entry prices relative to rents in parts of the metro, but results depend heavily on neighborhood selection: underwrite vacancy and rehab risk block by block, and favor areas with active renovation.',
+      'cleveland-oh':
+        'Cleveland’s cash-flow case is a large healthcare and education employment base against modest home prices. Property taxes are the main drag — pull the actual tax bill for each deal rather than estimating it.',
+      'memphis-tn':
+        'Memphis has a large stock of single-family rentals and an established turnkey industry, which makes it accessible for out-of-state investors — vet the turnkey provider and property manager as carefully as the property itself.',
+      'indianapolis-in':
+        'Indianapolis is a common first market for out-of-state investors: a diversified economy, Indiana landlord-tenant law that is generally considered landlord-friendly, and a large stock of modestly priced single-family homes.',
+      'birmingham-al':
+        'Birmingham’s cash-flow advantage is partly on the expense side: Alabama property taxes are generally low, so more of the rent reaches the bottom line than in high-tax states. Check insurance costs, which can offset part of that.',
+      'kansas-city-mo':
+        'Kansas City spans two states, so the same metro gives investors a choice of Missouri or Kansas tax and landlord-tenant rules — compare both before you pick a side of the state line.',
+      'little-rock-ar':
+        'Little Rock gets less attention from out-of-state investors than larger Southern metros, which can mean less competition for deals. Underwrite conservatively on rent growth and confirm local property-management capacity.',
+      'oklahoma-city-ok':
+        'Oklahoma City pairs cash-flow-friendly pricing with an economy that is less dependent on energy than it once was. Underwrite insurance carefully — severe-weather risk affects premiums across the metro.',
+    }),
   }),
   makeStrategy({
     slug: 'brrrr',
@@ -212,16 +243,24 @@ export const strategies: Strategy[] = [
       { href: '/blog/brrrr-rehab-cost-estimation', label: 'BRRRR Rehab Costs: How to Estimate' },
       { href: '/blog/hard-money-loans-explained', label: 'Hard Money Loans Explained' },
     ],
-    cityInsights: {
-      'indianapolis-in': 'Indianapolis is a popular BRRRR market because distressed properties are widely available in neighborhoods like Fountain Square and Irvington, and renovated comparable sales give refinance appraisals something to stand on.',
-      'detroit-mi': 'Detroit offers very low entry prices for BRRRR in parts of the city, but be cautious — refinance appraisals can be difficult where there are too few comparable renovated sales. Focus on areas with active renovation so your after-repair value holds up.',
-      'memphis-tn': 'Memphis has a deep pool of distressed properties and contractor networks familiar with investor renovations. The turnkey industry means you can find rehab crews who specialize in investor-grade work, keeping costs more predictable.',
-      'birmingham-al': 'Birmingham BRRRR deals benefit from Alabama’s generally low property taxes, which help post-refinance cash flow compared with similar deals in higher-tax states. Southside and Avondale have seen renovation activity that supports after-repair values.',
-      'cleveland-oh': 'Cleveland has strong BRRRR fundamentals, but property taxes reduce post-refinance cash flow. West-side neighborhoods have well-established renovation comps and hard money lenders who are comfortable lending there.',
-      'oklahoma-city-ok': 'Oklahoma City combines affordable prices with a metro that keeps expanding outward from downtown. The south side and Capitol Hill neighborhoods have BRRRR potential as renovation activity spreads.',
-      'huntsville-al': 'Huntsville is the growth outlier among BRRRR markets: an aerospace and defense economy (NASA Marshall, Redstone Arsenal) and generally low Alabama property taxes. Entry prices are higher than in Midwest BRRRR markets, so the refinance math depends more on appreciation.',
-      'columbus-oh': 'Columbus BRRRR deals benefit from a growing economy that includes Intel’s planned chip plant in nearby Licking County. Linden and Hilltop have distressed inventory, and university and government employment support rental demand after renovation.',
-    },
+    cityInsights: withDataNote({
+      'indianapolis-in':
+        'Indianapolis is a popular BRRRR market because older housing stock needing renovation is widely available, and renovated comparable sales in established neighborhoods give refinance appraisals something to stand on.',
+      'detroit-mi':
+        'Detroit offers very low entry prices for BRRRR in parts of the metro, but be cautious — refinance appraisals can be difficult where there are too few comparable renovated sales. Focus on areas with active renovation so your after-repair value holds up.',
+      'memphis-tn':
+        'Memphis has a deep pool of older properties and contractor networks familiar with investor renovations, which can make rehab costs more predictable — get multiple bids and check references either way.',
+      'birmingham-al':
+        'Birmingham BRRRR deals benefit from Alabama’s generally low property taxes, which help post-refinance cash flow compared with similar deals in higher-tax states. Make sure renovated comparable sales support your after-repair value before you buy.',
+      'cleveland-oh':
+        'Cleveland has the low entry prices BRRRR needs, but property taxes reduce post-refinance cash flow. Confirm that renovated comparable sales exist on your street before counting on the refinance.',
+      'oklahoma-city-ok':
+        'Oklahoma City combines affordable entry prices with a growing metro. As with any BRRRR market, the refinance depends on renovated comparable sales near the property — check them before you buy.',
+      'huntsville-al':
+        'Huntsville is the growth outlier among BRRRR markets: an aerospace and defense economy and generally low Alabama property taxes. Entry prices are higher than in Midwest BRRRR markets, so less of the return comes from buying cheap.',
+      'columbus-oh':
+        'Columbus BRRRR deals draw on a large university and state-government employment base that supports rental demand after renovation. Ohio property taxes reduce post-refinance cash flow, so model them per property.',
+    }),
   }),
   makeStrategy({
     slug: 'house-hacking',
@@ -251,16 +290,24 @@ export const strategies: Strategy[] = [
       { href: '/blog/how-to-buy-first-rental-property', label: 'How to Buy Your First Rental Property' },
       { href: '/blog/how-to-screen-tenants', label: 'How to Screen Tenants: Complete Checklist' },
     ],
-    cityInsights: {
-      'indianapolis-in': 'Indianapolis has small multifamily properties in livable neighborhoods such as Fountain Square, Irvington, and Broad Ripple — places you would actually want to live, which matters when you are the on-site landlord.',
-      'kansas-city-mo': 'Kansas City duplexes in Westport, Midtown, and the Crossroads sit in livable neighborhoods where you would actually want to live — a crucial factor in house hacking. Moderate prices help the math on 2–4 unit properties.',
-      'louisville-ky': 'Louisville’s shotgun-style duplexes in the Highlands and Germantown are classic house-hack properties. The walkable neighborhoods attract tenants for the other unit.',
-      'columbus-oh': 'Columbus house hacking benefits from the Ohio State University population and a growing economy. Properties near campus are the obvious play, but the Short North and Clintonville also have strong rental demand with longer-term tenants.',
-      'huntsville-al': 'Huntsville is the growth pick for house hacking: an aerospace and defense economy (NASA Marshall, Redstone Arsenal) and generally low Alabama property taxes. Entry prices are higher than in Midwest markets.',
-      'oklahoma-city-ok': 'Oklahoma City offers affordable small multifamily properties. The Plaza District and Paseo Arts District are livable neighborhoods with good rental demand.',
-      'des-moines-ia': 'Des Moines is a sleeper house hacking market: an insurance and financial-services economy provides stable tenant employment, and there is less competition from large investors than in bigger metros.',
-      'richmond-va': 'Richmond combines East Coast livability with small multifamily stock in the Fan District and Church Hill, where VCU students and young professionals keep rental demand steady.',
-    },
+    cityInsights: withDataNote({
+      'indianapolis-in':
+        'Indianapolis has small multifamily properties in established neighborhoods — and as the on-site landlord, you should pick a building you would actually want to live in, not just one that pencils.',
+      'kansas-city-mo':
+        'Kansas City has 2–4 unit properties in livable, central neighborhoods, and moderate prices help the math on an owner-occupied loan. Compare Missouri and Kansas rules if you are open to either side of the state line.',
+      'louisville-ky':
+        'Louisville’s older urban neighborhoods include duplexes and small multifamily buildings suited to house hacking, and walkable areas help attract tenants for the other unit.',
+      'columbus-oh':
+        'Columbus house hacking benefits from a large university population and a broad employment base. Units near campus turn over every year; neighborhoods farther out tend to attract longer-term tenants.',
+      'huntsville-al':
+        'Huntsville is the growth pick for house hacking: an aerospace and defense economy and generally low Alabama property taxes. Entry prices are higher than in Midwest markets, so the owner-occupied loan does more of the work.',
+      'oklahoma-city-ok':
+        'Oklahoma City offers affordable small multifamily properties, which keeps the owner-occupied loan payment manageable. Check insurance costs early — they can change the math.',
+      'des-moines-ia':
+        'Des Moines has an insurance and financial-services employment base and less competition from large investors than bigger metros, which helps a first-time house hacker find a 2–4 unit property.',
+      'richmond-va':
+        'Richmond combines East Coast livability with older small multifamily stock in its central neighborhoods, where students and young professionals keep rental demand steady.',
+    }),
   }),
   makeStrategy({
     slug: 'appreciation',
@@ -289,16 +336,24 @@ export const strategies: Strategy[] = [
       { href: '/blog/real-estate-investing-beginners-guide-2026', label: 'Real Estate Investing: Beginner\'s Guide 2026' },
       { href: '/blog/real-estate-tax-strategies-guide', label: 'Tax Strategies for Real Estate Investors' },
     ],
-    cityInsights: {
-      'raleigh-nc': 'Raleigh’s appreciation thesis rests on the Research Triangle job engine — tech, life sciences, and three major research universities — adding high-paying jobs. Apple, Google, and Epic Games have all announced expansions in the region.',
-      'austin-tx': 'Austin prices corrected from their 2022 peak, which some investors see as a re-entry point. The employer base — Tesla, Apple, Samsung, Oracle — remains strong, while a large wave of new apartment supply is still being absorbed.',
-      'charlotte-nc': 'Charlotte is a banking center (Bank of America headquarters, a large Wells Fargo presence) with a growing fintech sector. Urban redevelopment along the Rail Trail is reshaping NoDa and South End.',
-      'phoenix-az': 'Phoenix semiconductor investment (TSMC, Intel) is building a tech corridor in the north and east Valley. The west Valley typically offers lower entry points for investors positioning for the long term.',
-      'nashville-tn': 'Nashville has shifted from a cash-flow market to an appreciation play. No state income tax on wages and corporate expansions (Oracle, Amazon, AllianceBernstein) continue to drive demand; East Nashville and the Gulch have led price growth.',
-      'boise-id': 'Boise saw rapid appreciation from 2020 to 2022 and prices have since leveled off. In-migration continues, but at a slower pace, and limited new supply supports the long-term thesis.',
-      'huntsville-al': 'Huntsville is the dark-horse appreciation market. NASA, defense contractors, and the FBI all have major operations here, bringing high-income employment, and Alabama property taxes are generally low — a cash-flow-plus-appreciation hybrid.',
-      'jacksonville-fl': 'Jacksonville benefits from Florida in-migration with more affordable entry than Miami, Tampa, or Orlando. The port and the financial-services sector add economic diversity beyond tourism. Florida has no state income tax.',
-    },
+    cityInsights: withDataNote({
+      'raleigh-nc':
+        'Raleigh’s appreciation thesis rests on the Research Triangle’s technology, life-sciences and university employment base. Appreciation is never guaranteed — underwrite the deal so it survives flat prices.',
+      'austin-tx':
+        'Austin has a large technology employment base, while a wave of new apartment supply has weighed on rents. Buying for appreciation here means underwriting for flat or falling rents in the near term.',
+      'charlotte-nc':
+        'Charlotte is a major banking center with a growing financial-services and technology employment base. Underwrite the deal on today’s rent rather than on the appreciation you hope for.',
+      'phoenix-az':
+        'Phoenix has drawn large semiconductor and manufacturing investment, and the metro spans a wide range of entry prices. Buying for appreciation means underwriting for flat prices in the near term.',
+      'nashville-tn':
+        'Nashville is now usually treated as an appreciation market rather than a cash-flow one. Tennessee has no state income tax on wages, which supports in-migration — but entry prices leave less room for error.',
+      'boise-id':
+        'Boise is a smaller metro where in-migration has driven demand. With prices high relative to rents, an appreciation play here depends on holding through flat years.',
+      'huntsville-al':
+        'Huntsville combines a federal aerospace and defense employment base with generally low Alabama property taxes — a market where investors look for both cash flow and appreciation.',
+      'jacksonville-fl':
+        'Jacksonville draws on Florida in-migration with more affordable entry than Miami, Tampa or Orlando, and a port and financial-services sector add diversity. Florida has no state income tax; insurance costs are the line to watch.',
+    }),
   }),
 ]
 

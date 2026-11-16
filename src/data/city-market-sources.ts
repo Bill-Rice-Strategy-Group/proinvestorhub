@@ -117,7 +117,7 @@ export const cityMarketSources: CityMarketSource[] = [
     acsSlug: 'tulsa-ok',
     fmrCode: 'METRO46140M46140',
     investorTakeaway:
-      'Tulsa pairs moderate prices with a growing remote-worker and tech presence (the Tulsa Remote relocation program). Low cost of living supports renter demand.',
+      'Tulsa pairs moderate prices with a low cost of living that supports renter demand.',
   },
   {
     city: 'Oklahoma City',
@@ -189,7 +189,7 @@ export const cityMarketSources: CityMarketSource[] = [
     acsSlug: 'columbus-oh',
     fmrCode: 'METRO18140M18140',
     investorTakeaway:
-      'Columbus combines state-government employment, Ohio State University, and new investment such as Intel’s planned chip plant in nearby Licking County.',
+      'Columbus combines state-government employment, Ohio State University, and a broad private-sector employment base.',
   },
   {
     city: 'Milwaukee',
@@ -306,7 +306,7 @@ export const cityMarketSources: CityMarketSource[] = [
     acsSlug: 'dallas-fort-worth-arlington-tx',
     fmrCode: 'METRO19100M19100',
     investorTakeaway:
-      'Dallas–Fort Worth has drawn many corporate relocations. Texas has no state income tax, but property taxes are a significant expense, and suburbs can price very differently from the core.',
+      'Dallas–Fort Worth is a large, fast-growing metro. Texas has no state income tax, but property taxes are a significant expense, and suburbs can price very differently from the core.',
   },
   {
     city: 'Charlotte',
@@ -360,7 +360,7 @@ export const cityMarketSources: CityMarketSource[] = [
     acsSlug: 'nashville-davidson-murfreesboro-franklin-tn',
     fmrCode: 'METRO34980M34980',
     investorTakeaway:
-      'Nashville has attracted major corporate expansions (Oracle, Amazon) and has no state income tax on wages. Home values are high relative to rents, so it plays more as a growth market.',
+      'Nashville has drawn strong in-migration and has no state income tax on wages. Home values are high relative to rents, so it plays more as a growth market.',
   },
   {
     city: 'Raleigh',
@@ -387,7 +387,7 @@ export const cityMarketSources: CityMarketSource[] = [
     acsSlug: 'phoenix-mesa-chandler-az',
     fmrCode: 'METRO38060M38060',
     investorTakeaway:
-      'Phoenix has attracted large semiconductor investments (TSMC, Intel). Prices rose sharply in 2020–2022, so home values are now high relative to rents.',
+      'Phoenix has drawn large semiconductor and manufacturing investment. Home values are high relative to rents, so it plays more as a growth market than a cash-flow one.',
   },
   {
     city: 'Las Vegas',
@@ -414,7 +414,7 @@ export const cityMarketSources: CityMarketSource[] = [
     acsSlug: 'boise-city-id',
     fmrCode: 'METRO14260M14260',
     investorTakeaway:
-      'Boise saw rapid price appreciation after 2020 and prices have since leveled off. Home values are high relative to rents, so it is primarily an appreciation play.',
+      'Boise is a smaller metro where in-migration has driven demand. Home values are high relative to rents, so it is primarily an appreciation play.',
   },
   {
     city: 'Denver',
@@ -432,7 +432,7 @@ export const cityMarketSources: CityMarketSource[] = [
     acsSlug: 'austin-round-rock-san-marcos-tx',
     fmrCode: 'METRO12420M12420',
     investorTakeaway:
-      'Austin’s tech-driven growth is real, but a large wave of new apartment supply has put pressure on rents since the 2022 peak. Texas property taxes are a significant expense.',
+      'Austin has a large technology employment base, but a wave of new apartment supply has put pressure on rents. Texas property taxes are a significant expense.',
   },
   {
     city: 'Portland',
