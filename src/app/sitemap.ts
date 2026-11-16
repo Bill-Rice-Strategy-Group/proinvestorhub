@@ -1,6 +1,6 @@
 import type { MetadataRoute } from 'next'
 import { client } from '@/sanity/lib/client'
-import { strategies } from '@/data/market-strategies'
+import { strategies, hasStrategyCityInsight } from '@/data/market-strategies'
 import { cities } from '@/data/cap-rate-cities'
 import { getStatesList } from '@/data/city-strategy-helpers'
 import { categoryHubContent } from '@/data/category-content'
@@ -189,9 +189,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'monthly' as const,
       priority: 0.6,
     })),
-    // City x Strategy pages (4 strategies x cities.length)
+    // City x Strategy pages: only those with strategy-specific editorial
+    // (cityInsights) are indexable; the rest are noindex and left out here.
+    // With 4 strategies x 8 insights that is 32 of the 4 x cities.length pages.
     ...strategies.flatMap((s) =>
-      cities.map((c) => ({
+      cities.filter((c) => hasStrategyCityInsight(s.slug, c.slug)).map((c) => ({
         url: `${baseUrl}/markets/${s.slug}/${c.slug}`,
         lastModified: groupLastmod('marketStrategies'),
         changeFrequency: 'monthly' as const,

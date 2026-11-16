@@ -6,7 +6,7 @@ import { encodeCalculatorState } from '@/lib/calculator-utils'
 import { CalculatorCTA } from '@/components/calculator-cta'
 import { StrategyScoreBreakdown } from '@/components/strategy-score-breakdown'
 import { CityStrategyComparison } from '@/components/city-strategy-comparison'
-import { strategies } from '@/data/market-strategies'
+import { strategies, hasStrategyCityInsight } from '@/data/market-strategies'
 import {
   cities,
   computeCapRate,
@@ -50,6 +50,11 @@ export async function generateMetadata({
     description,
     alternates: { canonical: `/markets/${strategySlug}/${citySlug}` },
     openGraph: { title, description },
+    // Only pages with strategy-specific editorial content are indexed; the rest
+    // reuse the city's generic text and the same metro data as the cap-rate page.
+    ...(hasStrategyCityInsight(strategySlug, citySlug)
+      ? {}
+      : { robots: { index: false, follow: true } }),
   }
 }
 

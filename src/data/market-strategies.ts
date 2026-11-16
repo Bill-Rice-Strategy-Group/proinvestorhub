@@ -117,8 +117,9 @@ export type Strategy = {
   relatedCalculators: { href: string; label: string }[]
   relatedArticles: { href: string; label: string }[]
   /**
-   * City-specific editorial insights keyed by city slug. No unsourced figures
-   * in these strings.
+   * City-specific editorial insights keyed by city slug. A market page has
+   * strategy-specific content only when its city has an entry here — see
+   * hasStrategyCityInsight(). No unsourced figures in these strings.
    */
   cityInsights: Record<string, string>
 }
@@ -301,6 +302,13 @@ export const strategies: Strategy[] = [
     },
   }),
 ]
+
+/** True when a strategy has city-specific editorial content for this city. */
+export function hasStrategyCityInsight(strategySlug: string, citySlug: string): boolean {
+  const strategy = strategies.find((s) => s.slug === strategySlug)
+  if (!strategy) return false
+  return Object.prototype.hasOwnProperty.call(strategy.cityInsights, citySlug)
+}
 
 export type CityWithScore = CityCapRate & {
   score: number
