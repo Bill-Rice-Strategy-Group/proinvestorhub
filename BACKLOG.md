@@ -6,6 +6,33 @@
 
 ---
 
+## 2026-11-16 — Lender & market pages: verified figures, no undisclosed rankings
+<!-- added 2026-11-16 session — fixes for the audit of lender and market pages -->
+
+- [x] **RESOLVED 2026-11-16 — audit findings fixed (branch `fix/lender-market-claims`).**
+  - **Lender figures re-verified** for all 20 lenders against each lender's own site on 2026-11-16
+    (`lastReviewed`, `sources`, `termsNote` in `src/data/lenders.ts`). Unpublished figures are `null` →
+    "Not published". `nationwide` replaced by `coverage` + `excludedStates` / `statesServed`; state pages and the
+    finder drop a lender that excludes the state (`lenderStateStatus`). Roc Capital marked `capitalProvider`
+    (funds private lenders; not a finder result). Dead links fixed (CoreVest → corevestfinance.com, Roc →
+    roccapital.com, Aloha → alohaprivatelending.com, Upright → uprightlending.com, Groundfloor →
+    lending.groundfloor.com).
+  - **No undisclosed rankings:** `editorRating`, compare "Better"/"Wins N" badges and finder scoring removed; lists
+    are A–Z; compare pages are generated from the data. "Best X Lenders in {State}" → "X Lenders in {State}:
+    Compare Rates & Terms" (URLs unchanged); loan-type titles likewise.
+  - Review JSON-LD `AggregateRating` removed; FAQ JSON-LD restates only published figures.
+  - Loan types: `typicalRateRange` removed; false "conventional loans are assumable", reserves, SBL $750K,
+    premium and "$3,000–$8,000 saved" claims removed.
+  - Market insights: employer/expansion claims removed; each insight ends with a sourced ACS/HUD sentence.
+  - `/api/lender-lead`: lenders looked up server-side by slug; input validated.
+- [ ] **Re-verify lenders quarterly** (next by 2027-02-16). Lenders change terms often; update figures, `sources`
+  and `lastReviewed` together, and `LENDER_VERIFICATION_DATE`. Kiavi's rental page still says "32 states + DC"
+  while its states page says 49 + DC — re-check. Velocity's figures come from a broker rate sheet (effective
+  9/21/2026) and will go stale when it's replaced; Groundfloor, Defy, Visio, Angel Oak, CoreVest, Tidal and Roc
+  publish few borrower figures, so most of their fields read "Not published".
+- [ ] **Sanity `lender` schema still has `editorRating`/`nationwide`.** Unused by any page (the site reads
+  `src/data/lenders.ts`); drop the fields if Studio editing of lenders is ever turned on.
+
 ## 2026-11-16 — State report pages: data-integrity fixes
 <!-- added 2026-11-16 session — audit of /reports/{rental-yield,investor-financing,investor-lenders}/[state] (153 pages) -->
 
