@@ -6,7 +6,7 @@ import { getStatesList } from '@/data/city-strategy-helpers'
 import { categoryHubContent } from '@/data/category-content'
 import { loanTypes } from '@/data/loan-types'
 import { lenders } from '@/data/lenders'
-import { usStates } from '@/data/us-states'
+import { usStates, hasStateInvestingContext } from '@/data/us-states'
 import { lenderComparisons } from '@/data/lender-comparisons'
 import { financingScenarios } from '@/data/financing-scenarios'
 import { financingTypes } from '@/data/financing-types'
@@ -254,9 +254,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'monthly' as const,
       priority: 0.7,
     })),
-    // State × Loan type pages (600)
+    // State × Loan type pages: only states with state-specific context
+    // (26 × 12 = 312). The rest are noindex near-duplicates.
     ...loanTypes.flatMap((lt) =>
-      usStates.map((state) => ({
+      usStates.filter((state) => hasStateInvestingContext(state.slug)).map((state) => ({
         url: `${baseUrl}/lenders/${lt.slug}/${state.slug}`,
         lastModified: groupLastmod('loanTypes'),
         changeFrequency: 'monthly' as const,

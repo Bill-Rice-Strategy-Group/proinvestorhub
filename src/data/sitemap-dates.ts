@@ -3,23 +3,23 @@
 // Regenerate after data/content changes: node scripts/build-sitemap-dates.mjs
 
 export const sitemapDates = {
-  "calculators": "2026-07-14",
+  "calculators": "2026-11-12",
   "calculatorsHub": "2026-06-13",
-  "capRateCities": "2026-03-14",
-  "categoryContent": "2026-03-26",
-  "financingScenarios": "2026-06-11",
+  "capRateCities": "2026-06-13",
+  "categoryContent": "2026-06-13",
+  "financingScenarios": "2026-06-13",
   "financingTypes": "2026-06-13",
-  "home": "2026-04-03",
-  "lenderComparisons": "2026-07-14",
+  "home": "2026-11-15",
+  "lenderComparisons": "2026-11-14",
   "lenders": "2026-06-25",
   "loanTypes": "2026-06-13",
-  "marketStrategies": "2026-06-05",
+  "marketStrategies": "2026-06-13",
   "reportInvestorFinancing": "2026-06-15",
   "reportInvestorLenders": "2026-06-18",
   "reportRentGrowth": "2026-06-23",
   "reportRentalOwnership": "2026-07-17",
   "reportRentalYield": "2026-06-17",
-  "usStates": "2026-03-28"
+  "usStates": "2026-06-13"
 } as const
 
 export type SitemapDateKey = keyof typeof sitemapDates

@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation'
 import { JsonLd, breadcrumbJsonLd } from '@/components/json-ld'
 import { loanTypes, getLoanTypeBySlug } from '@/data/loan-types'
 import { lenders, getLendersByLoanType, formatCurrency } from '@/data/lenders'
-import { usStates, getStateBySlug, stateInvestingContext } from '@/data/us-states'
+import { usStates, getStateBySlug, stateInvestingContext, hasStateInvestingContext } from '@/data/us-states'
 import { LenderCard } from '@/components/lender-card'
 
 type Props = { params: Promise<{ loanType: string; state: string }> }
@@ -33,6 +33,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     description,
     alternates: { canonical: `/lenders/${ltSlug}/${stateSlug}` },
     openGraph: { title, description },
+    // No state-specific content: near-duplicate of every other state's page.
+    // Keep it for visitors and let link equity flow, but don't ask Google to
+    // index it. See hasStateInvestingContext.
+    ...(hasStateInvestingContext(stateSlug) ? {} : { robots: { index: false, follow: true } }),
   }
 }
 

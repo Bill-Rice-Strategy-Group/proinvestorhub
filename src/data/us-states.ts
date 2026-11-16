@@ -251,3 +251,14 @@ export function getLendersForState(
     return indices
   }, [])
 }
+
+/**
+ * Whether a state has state-specific investing context. State × loan-type
+ * lender pages for states without it differ from each other only by the state
+ * name (the lender list is the same nationwide set), so they are kept for
+ * visitors but marked noindex and left out of the sitemap. Adding a state to
+ * stateInvestingContext makes its pages indexable again automatically.
+ */
+export function hasStateInvestingContext(slug: string): boolean {
+  return Object.prototype.hasOwnProperty.call(stateInvestingContext, slug)
+}
