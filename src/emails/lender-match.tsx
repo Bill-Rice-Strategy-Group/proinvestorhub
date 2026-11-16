@@ -13,21 +13,21 @@ import {
 
 const baseUrl = 'https://proinvestorhub.com'
 
-type LenderMatch = {
+/** Built server-side from the verified lender data — never from the request body. */
+export type LenderMatch = {
   name: string
   slug: string
-  editorRating: number
-  minRate: number
-  maxRate: number
-  maxLtv: number
-  speedToClose: string
+  rates: string
+  maxLtv: string
+  minCredit: string
+  coverage: string
+  verified: string | null
 }
 
-type Scenario = {
+export type Scenario = {
   creditScore?: string
   loanType?: string
   state?: string
-  priority?: string
 }
 
 export function LenderMatchEmail({
@@ -57,7 +57,8 @@ export function LenderMatchEmail({
             <Heading style={h1}>{firstName}, Your Lender Matches</Heading>
             <Text style={paragraph}>
               Based on your search criteria, we found {topMatches.length} lender{topMatches.length !== 1 ? 's' : ''} that
-              match your investment scenario. Here are your top matches:
+              match your investment scenario, listed A–Z. We don&apos;t rank lenders — compare
+              the published terms below and get a written quote from each.
             </Text>
           </Section>
 
@@ -74,9 +75,6 @@ export function LenderMatchEmail({
               {scenario.state && (
                 <Text style={scenarioItem}>State: {scenario.state}</Text>
               )}
-              {scenario.priority && (
-                <Text style={scenarioItem}>Priority: {scenario.priority}</Text>
-              )}
             </Section>
           )}
 
@@ -85,12 +83,11 @@ export function LenderMatchEmail({
           {/* Lender Results */}
           <Section>
             <Heading as="h2" style={h2}>
-              Your Top Matches
+              Your Matches
             </Heading>
 
-            {topMatches.map((lender, i) => (
+            {topMatches.map((lender) => (
               <Section key={lender.slug} style={lenderCard}>
-                <Text style={lenderRank}>#{i + 1}{i === 0 ? ' — Best Match' : ''}</Text>
                 <Link
                   href={`${baseUrl}/lenders/reviews/${lender.slug}`}
                   style={lenderName}
@@ -98,11 +95,14 @@ export function LenderMatchEmail({
                   {lender.name}
                 </Link>
                 <Text style={lenderStats}>
-                  Rating: {lender.editorRating.toFixed(1)}/5 &nbsp;|&nbsp;
-                  Rates: {lender.minRate}%–{lender.maxRate}% &nbsp;|&nbsp;
-                  Max LTV: {lender.maxLtv}% &nbsp;|&nbsp;
-                  Close: {lender.speedToClose}
+                  Rates: {lender.rates} &nbsp;|&nbsp;
+                  Max LTV: {lender.maxLtv} &nbsp;|&nbsp;
+                  Min credit: {lender.minCredit} &nbsp;|&nbsp;
+                  States: {lender.coverage}
                 </Text>
+                {lender.verified && (
+                  <Text style={lenderStats}>Verified {lender.verified} from {lender.name}&apos;s site</Text>
+                )}
                 <Link
                   href={`${baseUrl}/lenders/reviews/${lender.slug}`}
                   style={reviewLink}
@@ -245,15 +245,6 @@ const lenderCard: React.CSSProperties = {
   borderRadius: '8px',
   padding: '16px 20px',
   margin: '0 32px 12px',
-}
-
-const lenderRank: React.CSSProperties = {
-  color: '#1B4D3E',
-  fontSize: '12px',
-  fontWeight: 700,
-  textTransform: 'uppercase' as const,
-  letterSpacing: '0.5px',
-  margin: '0 0 4px',
 }
 
 const lenderName: React.CSSProperties = {
