@@ -6,6 +6,33 @@
 
 ---
 
+## 2026-11-16 — State report pages: data-integrity fixes
+<!-- added 2026-11-16 session — audit of /reports/{rental-yield,investor-financing,investor-lenders}/[state] (153 pages) -->
+
+- [x] **RESOLVED 2026-11-16 — audit findings fixed.** Raw data checked out (ACS 2024 state rent/value match the
+  Census API for all 51; HMDA recomputes match), so the fixes are in how figures are ranked, labelled and described:
+  - **Ties:** competition ranks (1 + states strictly higher) via `rankInfo`/`fmtRankInfo` in `src/data/hmda-investor`
+    and `stateRankInfo`/`fmtYieldRank` in `src/data/rental-yield`; pages say "tied for 6th of 39 states (incl. DC),
+    with 10 other states". Rate medians sit on 1/8-pt steps, so premium ties are common (TX and FL were "20th" vs "9th"
+    at the same 88 bps). Lender ranks are competition ranks in the build and show "(tie)".
+  - **Rate coverage:** shown on every financing page; below `RATE_COVERAGE_MIN` (0.75) a state gets a caveat and is
+    not ranked on the premium (12 states: IA, LA, MN, NE, KS, ND, ...). Also excluded from YoY premium movers.
+  - **HMDA rebuilt from the CFPB Data Browser for both years** (2024 baseline was stale; 2025 had come from the early-release
+    Modified LAR). `build-hmda-investor.mjs` gained `CSV_DIR`/`OUT_SUFFIX` (Node fetch can't use the proxy — download
+    with curl), `build-hmda-lenders.mjs` gained `CSV_DIR` + the 2025 filers registry (`scripts/data/hmda-filers-2025.json`),
+    and trends moved to `scripts/build-hmda-investor-trends.mjs`. Early-release / "will be reconciled" copy removed.
+  - Wording: footer scope (purchase + refi + cash-out, not "financed purchases only"); "% down" inference removed;
+    "U.S. median" → "U.S." for pooled figures; DSCR label text says ≥70% (code unchanged); ratio-of-medians wording on
+    rental-yield; multi-state metros marked "(partly in X)"; "50 states + DC"; loan amounts "in $10K bins".
+  - Rental-yield and rent-growth `Dataset` JSON-LD now name Census/HUD, not CFPB.
+  - Thin rental-yield pages (< 2 ACS metros: VT, RI, DC) are `noindex,follow` and out of the sitemap
+    (`isRentalYieldStateIndexable`).
+  - `stateInvestingContext` highlights (`src/data/us-states.ts`): unsourced figures, superlatives and wrong claims removed
+    (Indianapolis "1% rule", growth %s, CA "highest property values" — HI is higher in ACS — OK "no state income tax on
+    rent"). No entry emptied; indexing of /lenders state pages unchanged.
+- [ ] **Open:** no demand evidence for any /reports/ URL in committed exports (GSC window ends 2026-06-10, before
+  launch). Pull report-page GSC data before investing further in these pages.
+
 ## 2026-11-15 — Newsletter signup on the top-traffic pages
 <!-- added 2026-11-15 session — list growth ahead of the weekly issues -->
 

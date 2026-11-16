@@ -106,7 +106,7 @@ export default function InvestorLendersReport() {
       <JsonLd
         data={datasetJsonLd({
           name: `${lenderMeta.year} Most Active Investment-Property Lenders — national & state`,
-          description: `Investment-property (SF 1-4 unit) mortgage originations by lender, nationally and per state, derived from CFPB HMDA ${lenderMeta.year} Modified LAR data.`,
+          description: `Investment-property (SF 1-4 unit) mortgage originations by lender, nationally and per state, derived from CFPB HMDA ${lenderMeta.year} loan-level data.`,
           url,
           downloadUrl: `${baseUrl}${csvHref}`,
           temporalCoverage: String(lenderMeta.year),

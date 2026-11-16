@@ -49,9 +49,30 @@ export function getMetroBySlug(slug: string): GeoYield | undefined {
 export const statesByYield = states.filter((s) => s.grossYield != null)
 export const metrosByYield = metros.filter((m) => m.grossYield != null)
 
+/** A competition rank: 1 + the number of states with a strictly higher yield. */
+export type YieldRank = { rank: number; tiedWith: number; of: number }
+
+export function stateRankInfo(slug: string): YieldRank | null {
+  const s = statesByYield.find((r) => r.slug === slug)
+  if (!s || s.grossYield == null) return null
+  const v = s.grossYield
+  return {
+    rank: 1 + statesByYield.filter((r) => (r.grossYield as number) > v).length,
+    tiedWith: statesByYield.filter((r) => r !== s && r.grossYield === v).length,
+    of: statesByYield.length,
+  }
+}
+
+/** A state's rank (1 = highest yield); ties share a rank. */
 export function stateRank(slug: string): number | null {
-  const i = statesByYield.findIndex((s) => s.slug === slug)
-  return i === -1 ? null : i + 1
+  return stateRankInfo(slug)?.rank ?? null
+}
+
+/** "33rd of 51 states (incl. DC)" / "tied for 8th of 51 states (incl. DC), with 2 other states". */
+export function fmtYieldRank(r: YieldRank): string {
+  const scope = `of ${r.of} states (incl. DC)`
+  if (r.tiedWith === 0) return `${ordinal(r.rank)} ${scope}`
+  return `tied for ${ordinal(r.rank)} ${scope}, with ${r.tiedWith} other state${r.tiedWith === 1 ? '' : 's'}`
 }
 
 /**
@@ -63,6 +84,34 @@ export function metrosInState(abbr: string): GeoYield[] {
   return metrosByYield.filter((m) =>
     (m.state ?? '').split('-').includes(abbr)
   )
+}
+
+/** True when a metro spans more than one state. */
+export function isMultiStateMetro(m: GeoYield): boolean {
+  return (m.state ?? '').includes('-')
+}
+
+/**
+ * A metro's display name from one state's point of view: a metro that spans
+ * several states is marked as only partly in this one, e.g.
+ * "Huntington-Ashland, WV-KY-OH (partly in Ohio)".
+ */
+export function metroLabelForState(m: GeoYield, stateName: string): string {
+  return isMultiStateMetro(m) ? `${m.name} (partly in ${stateName})` : m.name
+}
+
+/**
+ * Minimum number of ACS 1-year metros a state needs for its rental-yield page
+ * to be indexed. Below this the page is the three statewide figures (already on
+ * the hub's state table) plus one metro row — kept for visitors and linked
+ * from the hub, but marked noindex,follow and left out of the sitemap.
+ */
+export const MIN_METROS_FOR_INDEX = 2
+
+export function isRentalYieldStateIndexable(slug: string): boolean {
+  const s = getStateBySlug(slug)
+  if (!s?.abbr) return false
+  return metrosInState(s.abbr).length >= MIN_METROS_FOR_INDEX
 }
 
 // ---- formatters ----

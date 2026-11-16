@@ -8,24 +8,24 @@ const url = `${baseUrl}/reports/investor-lenders/methodology`
 
 export const metadata: Metadata = {
   title: `Methodology — Most Active Investment-Property Lenders (${lenderMeta.year})`,
-  description: `How ProInvestorHub builds its investment-property lender rankings from CFPB HMDA ${lenderMeta.year} Modified LAR data: the universe, how lenders are identified and named, and what HMDA does and doesn't capture.`,
+  description: `How ProInvestorHub builds its investment-property lender rankings from CFPB HMDA ${lenderMeta.year} loan-level data: the universe, how lenders are identified and named, and what HMDA does and doesn't capture.`,
   alternates: { canonical: '/reports/investor-lenders/methodology' },
 }
 
 const steps = [
   ['Universe', `We count originated loans (action taken = originated) for home purchase, refinance, and cash-out refinance on investor-occupied (occupancy = investment property), single-family 1-4 unit, site-built properties. Second homes and owner-occupied loans are excluded.`],
   ['Grouping by lender', `Each HMDA record carries the reporting institution's LEI (Legal Entity Identifier). We group originations by LEI within each state, and nationally, counting loans and summing reported loan amounts.`],
-  ['Naming', `The Modified LAR carries only LEIs, not names. We resolve the top lenders' LEIs to institution names via the HMDA filers registry; because LEIs are stable across years, the prior-year registry covers nearly all current filers. Any remaining LEIs are resolved through the public GLEIF registry. For this edition, ${fmtCount(lenderMeta.nameResolution.viaFilers)} of ${fmtCount(lenderMeta.nameResolution.of)} listed lenders resolved via HMDA and ${fmtCount(lenderMeta.nameResolution.viaGleif)} via GLEIF, with ${fmtCount(lenderMeta.nameResolution.unresolved)} unresolved.`],
-  ['Focus label', `We flag each lender's mix using HMDA's business-or-commercial-purpose field. Where most of a lender's investor originations are business-purpose (the bucket that includes DSCR and LLC-held loans) we label it "DSCR / business-purpose"; where most are not, "Conventional"; otherwise "Mixed."`],
+  ['Naming', `The loan-level file carries only LEIs, not names. We resolve the listed lenders' LEIs to institution names via the CFPB's HMDA filers registries (the 2024 registry, which carries full legal names, then the ${lenderMeta.year} registry for any LEI that first filed later), and any LEI in neither through the public GLEIF registry. For this edition, ${fmtCount(lenderMeta.nameResolution.viaFilers)} of ${fmtCount(lenderMeta.nameResolution.of)} listed lenders resolved via HMDA and ${fmtCount(lenderMeta.nameResolution.viaGleif)} via GLEIF, with ${fmtCount(lenderMeta.nameResolution.unresolved)} unresolved.`],
+  ['Focus label', `We flag each lender's mix using HMDA's business-or-commercial-purpose field. Where ≥70% of a lender's investor originations in the state are business-purpose (the bucket that includes DSCR and LLC-held loans) we label it "DSCR / business-purpose"; where ≤20% are, "Conventional"; anything in between is "Mixed."`],
+  ['Ranks and ties', `Lenders are ranked by investor originations. Ranks are competition ranks — 1 plus the number of lenders with strictly more originations — so lenders with equal counts share a rank.`],
   ['Listing thresholds', `We list the top ${lenderMeta.topPerState} lenders per state (and the top 30 nationally), and ignore any lender below ${lenderMeta.minOriginations} investor originations in a state to avoid tiny-sample noise.`],
 ]
 
 const caveats = [
   ['Not a "best" ranking', 'This ranks reported origination volume only. It says nothing about a lender\'s rates, fees, service, speed, or whether it will lend on your specific deal. It is a starting list to research, not a recommendation.'],
   ['HMDA omits many private/hard-money lenders', 'HMDA reporting is required of institutions above loan-count and asset thresholds. Many small private and hard-money lenders fall below those thresholds and never appear — so the truly local hard-money market is undercounted. (Large business-purpose lenders like Kiavi and Lima One do report and do appear.)'],
-  ['Business-purpose loans are partly optional', 'Reporting some business-purpose loans is optional under HMDA, so the DSCR/business-purpose counts are a floor, not a complete census.'],
+  ['Business-purpose loans are partly covered', 'Under Regulation C (12 CFR 1003.3(c)(10)), a business-purpose loan secured by a dwelling is reported only when it is a home purchase, home improvement, or refinance, so the DSCR/business-purpose counts are a floor, not a complete census.'],
   ['Legal entity names, not brands', 'Names come from the LEI registry as registered legal entities (e.g. "United Shore Financial Services, LLC" rather than its "UWM" brand), and parent/DBA relationships are not resolved.'],
-  ['Early-release vintage', 'The Modified LAR is the early-release dataset the CFPB publishes months before the finalized Snapshot; figures may shift slightly when the Snapshot publishes.'],
 ]
 
 export default function InvestorLendersMethodology() {

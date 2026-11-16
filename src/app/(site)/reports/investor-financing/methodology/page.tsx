@@ -1,7 +1,15 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { JsonLd, breadcrumbJsonLd } from '@/components/json-ld'
-import { reportMeta } from '@/data/hmda-investor'
+import {
+  reportMeta,
+  national,
+  states,
+  priorYear,
+  fmtPct,
+  hasRateCoverage,
+  RATE_COVERAGE_MIN,
+} from '@/data/hmda-investor'
 
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://proinvestorhub.com'
 const url = `${baseUrl}/reports/investor-financing/methodology`
@@ -12,13 +20,17 @@ export const metadata: Metadata = {
   alternates: { canonical: '/reports/investor-financing/methodology' },
 }
 
+const lowCoverage = states
+  .filter((s) => !hasRateCoverage(s))
+  .sort((a, b) => a.name.localeCompare(b.name))
+
 const caveats = [
   ['Financed loans only', 'HMDA records mortgage applications and loans, so all-cash investor purchases — a large share of investor activity — are not captured. Read every figure as describing the financed market.'],
   ['Business-purpose loans are partially covered', 'Under Regulation C (12 CFR 1003.3(c)(10)), a business-purpose loan secured by a dwelling is reported only when it is a home purchase, home improvement, or refinance. Most DSCR purchase and refinance loans qualify, but the full private-lending universe is undercounted. Treat the business-purpose share as a floor.'],
   ['Agricultural loans excluded', 'Loans used primarily for agricultural purposes are excluded under 12 CFR 1003.3(c)(9), so farm and rural-ag investor loans drop out.'],
-  ['Privacy modifications', 'The public file rounds property value to the nearest $10,000 and bins debt-to-income and age. Interest rate and loan amount are disclosed, so the rate-premium analysis uses exact reported rates.'],
-  ['Small-filer exemptions', 'Some smaller institutions report partial data ("Exempt" fields). Rows missing a usable interest rate or loan-to-value are excluded from those medians; rate coverage exceeds 90% nationally.'],
-  ['Early-release vintage', 'The 2025 figures are built on the combined Modified LAR, the early-release HMDA product. It contains the same loan records as the later Snapshot but may shift slightly as institutions file late or resubmit. We refresh from the Snapshot once it publishes. Year-over-year comparisons hold the metric definitions constant across vintages.'],
+  ['Privacy modifications', 'The public file reports loan amount and property value in $10,000 bins (as the bin midpoint) and bins debt-to-income and age, so dollar volumes are approximate. Interest rates are reported as filed, so the rate-premium analysis uses the reported rates.'],
+  ['Missing interest rates', `Some institutions report partial data ("Exempt" fields), and some loans carry no rate. Rows without a usable interest rate are left out of the rate medians. An interest rate was reported on ${fmtPct(national.rateCoverage, 0)} of investor originations nationally, but on fewer than ${fmtPct(RATE_COVERAGE_MIN, 0)} in ${lowCoverage.length} states (${lowCoverage.map((s) => `${s.name} ${fmtPct(s.rateCoverage, 0)}`).join(', ')}). Those states show their rate figures with a caveat and are not ranked on the rate premium.`],
+  ['Coarse medians', 'Reported mortgage rates cluster on eighth-of-a-point steps, so state medians — and the premium between them — often land on the same few values (75, 88, 100 bps). Many states tie; ties share a rank.'],
 ]
 
 const fields = [
@@ -27,7 +39,9 @@ const fields = [
   ['Investor share', 'Investor originations ÷ all single-family 1-4 originations (any occupancy) in the state.'],
   ['DSCR / business-purpose share', 'Investor originations flagged business_or_commercial_purpose = 1 ÷ all investor originations.'],
   ['Cash-out share', 'Investor originations with loan_purpose = 32 (cash-out refinance) ÷ all investor originations.'],
-  ['Median LTV', 'Median combined loan-to-value ratio (CLTV) on investor originations.'],
+  ['Median LTV', 'Median combined loan-to-value ratio (CLTV) on investor originations — purchases and refinances together, so it is not a down-payment measure.'],
+  ['Rate coverage', 'Investor originations with a usable reported interest rate ÷ all investor originations. Below 75%, a state is not ranked on the rate premium.'],
+  ['Ranks', 'Competition ranks among the 50 states plus DC: 1 + the number of states with a strictly higher value, so equal values share a rank ("tied for 8th"). 1 = highest.'],
 ]
 
 export default function MethodologyPage() {
@@ -66,16 +80,17 @@ export default function MethodologyPage() {
           public domain.
         </p>
         <p className="mt-3 leading-7 text-text-muted">
-          For {reportMeta.year} we use the combined Modified Loan Application
-          Register (LAR) — the early-release file the CFPB publishes months before
-          the finalized Snapshot National Loan-Level Dataset. Because the Modified
-          LAR carries raw reported codes rather than the Snapshot&apos;s derived
-          fields, we reconstruct the single-family 1-4 unit, site-built universe from{' '}
-          <code className="text-text">construction_method</code> and{' '}
-          <code className="text-text">total_units</code> directly. Every metric is
-          computed with the same logic used for prior Snapshot years, so the years
-          remain directly comparable; {reportMeta.year} figures will be reconciled
-          when the {reportMeta.year} Snapshot is published.
+          Both {priorYear} and {reportMeta.year} are pulled from the CFPB HMDA Data
+          Browser&apos;s loan-level CSV for each state, filtered to{' '}
+          <code className="text-text">action_taken</code> 1 (originated) or 3 (denied),{' '}
+          <code className="text-text">loan_purpose</code> 1 (home purchase), 31
+          (refinance) or 32 (cash-out refinance), and{' '}
+          <code className="text-text">derived_dwelling_category</code> = Single Family
+          (1-4 Units):Site-Built. Investor loans are{' '}
+          <code className="text-text">occupancy_type</code> = 3; the owner-occupant
+          baseline is <code className="text-text">occupancy_type</code> = 1; second
+          homes (2) are excluded. Both years are computed by the same script with the
+          same logic, so the year-over-year changes compare like with like.
         </p>
         <p className="mt-3 leading-7 text-text-muted">
           For each state we separate investor loans (the property is an investment

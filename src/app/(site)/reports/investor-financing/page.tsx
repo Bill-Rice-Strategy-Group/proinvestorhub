@@ -18,6 +18,7 @@ import {
   states,
   reportMeta,
   rankedBy,
+  RATE_COVERAGE_MIN,
   fmtBps,
   fmtPct,
   fmtRate,
@@ -32,11 +33,11 @@ const url = `${baseUrl}/reports/investor-financing`
 
 export const metadata: Metadata = {
   title: `How Real Estate Investors Finance Deals: The ${reportMeta.year} Investor Financing Report`,
-  description: `A 50-state analysis of ${reportMeta.year} HMDA mortgage data: the rate premium investors pay over owner-occupants, denial rates, DSCR/business-purpose lending, and leverage — ranked by state.`,
+  description: `A 50-state + DC analysis of ${reportMeta.year} HMDA mortgage data: the rate premium investors pay over owner-occupants, denial rates, DSCR/business-purpose lending, and leverage — ranked by state.`,
   alternates: { canonical: '/reports/investor-financing' },
   openGraph: {
     title: `The ${reportMeta.year} Investor Financing Report`,
-    description: `How, where, and at what cost real estate investors finance deals — a 50-state analysis of HMDA mortgage data.`,
+    description: `How, where, and at what cost real estate investors finance deals — a 50-state + DC analysis of HMDA mortgage data.`,
   },
 }
 
@@ -51,7 +52,7 @@ const faqs = [
   },
   {
     question: 'How often are investor mortgage applications denied?',
-    answer: `Nationally, ${fmtPct(national.denialRate)} of investment-property loan applications were denied in ${reportMeta.year}, compared with a much lower rate for primary residences. Denials are highest in ${denialHigh[0].name} (${fmtPct(denialHigh[0].denialRate)}).`,
+    answer: `Nationally, ${fmtPct(national.denialRate)} of investment-property loan applications were denied in ${reportMeta.year}. Denials are highest in ${denialHigh[0].name} (${fmtPct(denialHigh[0].denialRate)}).`,
   },
   {
     question: 'What share of investor loans are DSCR or business-purpose loans?',
@@ -59,7 +60,7 @@ const faqs = [
   },
   {
     question: 'What data is this report based on?',
-    answer: `Home Mortgage Disclosure Act (HMDA) loan-level data published by the CFPB, covering ${reportMeta.year}. The universe is single-family 1-4 unit, site-built home-purchase, refinance, and cash-out loans. It reflects financed purchases only — all-cash investor purchases are not captured.`,
+    answer: `Home Mortgage Disclosure Act (HMDA) loan-level data published by the CFPB, covering ${reportMeta.year}. The universe is single-family 1-4 unit, site-built home-purchase, refinance, and cash-out loans. It covers financed loans only — all-cash investor purchases are not captured.`,
   },
 ]
 
@@ -179,10 +180,9 @@ export default function InvestorFinancingReport() {
             {fmtPct(national.businessPurposeShare, 0)} nationally.
           </>,
           <>
-            The typical investor financed at a{' '}
-            <strong>{national.investorMedianLtv?.toFixed(0)}% median LTV</strong> in{' '}
-            {reportMeta.year} — roughly {(100 - (national.investorMedianLtv ?? 0)).toFixed(0)}%
-            down on a financed purchase.
+            The median investor loan carried a{' '}
+            <strong>{national.investorMedianLtv?.toFixed(0)}% combined loan-to-value</strong> in{' '}
+            {reportMeta.year}, across purchase and refinance loans.
           </>,
         ]}
       />
@@ -194,10 +194,10 @@ export default function InvestorFinancingReport() {
       <section className="mt-14 grid gap-8 lg:grid-cols-2">
         <BrandBarChart
           title="Where investors pay the biggest rate premium"
-          subtitle="Investor median rate minus owner-occupant median rate, top 15 states"
+          subtitle={`Investor median rate minus owner-occupant median rate, top 15 states (states where under ${fmtPct(RATE_COVERAGE_MIN, 0)} of investor loans report a rate are not ranked)`}
           unit=" bps"
           highlightTop={3}
-          reference={{ value: national.ratePremiumBps ?? 0, label: 'U.S. median' }}
+          reference={{ value: national.ratePremiumBps ?? 0, label: 'U.S.' }}
           data={premiumHigh.slice(0, 15).map((s) => ({
             label: s.name,
             value: s.ratePremiumBps ?? 0,
@@ -210,7 +210,7 @@ export default function InvestorFinancingReport() {
           highlightTop={3}
           reference={{
             value: (national.denialRate ?? 0) * 100,
-            label: 'U.S. median',
+            label: 'U.S.',
           }}
           data={denialHigh.slice(0, 15).map((s) => ({
             label: s.name,
@@ -250,6 +250,11 @@ export default function InvestorFinancingReport() {
         <div className="mt-6">
           <InvestorRankingsTable states={states} />
         </div>
+        <p className="mt-3 text-xs leading-5 text-text-muted">
+          † An interest rate was reported on fewer than {fmtPct(RATE_COVERAGE_MIN, 0)} of this
+          state&apos;s investor loans (&ldquo;Rate reported&rdquo;), so its rate premium rests on a
+          partial sample and is left out of the premium rankings.
+        </p>
       </section>
 
       {/* Methodology + citation */}

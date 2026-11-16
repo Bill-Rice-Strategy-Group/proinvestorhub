@@ -11,7 +11,7 @@ import { lenderComparisons } from '@/data/lender-comparisons'
 import { financingScenarios } from '@/data/financing-scenarios'
 import { financingTypes } from '@/data/financing-types'
 import { states as investorFinancingStates } from '@/data/hmda-investor'
-import { states as rentalYieldStates } from '@/data/rental-yield'
+import { states as rentalYieldStates, isRentalYieldStateIndexable } from '@/data/rental-yield'
 import { states as investorLenderStates } from '@/data/hmda-lenders'
 import { groupLastmod } from '@/data/sitemap-dates'
 
@@ -338,7 +338,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'yearly' as const,
       priority: 0.5,
     },
-    ...rentalYieldStates.map((s) => ({
+    // Thin state pages (fewer than two ACS metros) are noindex and left out.
+    ...rentalYieldStates.filter((s) => isRentalYieldStateIndexable(s.slug)).map((s) => ({
       url: `${baseUrl}/reports/rental-yield/${s.slug}`,
       lastModified: groupLastmod('reportRentalYield'),
       changeFrequency: 'yearly' as const,

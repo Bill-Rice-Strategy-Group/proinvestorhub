@@ -18,7 +18,7 @@ state,abbr,rank,lender,lei,investor_originations,investor_volume_usd,business_pu
 "Alaska",AK,7,"Rocket Mortgage, LLC",549300FGXN1K3HLB1R50,28,8000000,0.0000
 "Alaska",AK,8,"United Shore Financial Services, LLC",549300HW662MN1WU8550,20,7030000,1.0000
 "Alaska",AK,9,"Denali State Bank",5493003OSI5CD032EN89,14,2930000,0.0000
-"Alaska",AK,10,"Wells Fargo Bank, National Association",KB1H1DSPRFMYMCUFXT09,13,3305000,0.0000
+"Alaska",AK,10,"Guaranteed Rate, Inc.",549300U3721PJGQZYY68,13,4995000,1.0000
 "Arizona",AZ,1,"United Shore Financial Services, LLC",549300HW662MN1WU8550,1045,320745000,1.0000
 "Arizona",AZ,2,"The Loan Store, Inc.",254900DTLHVWQ7NP7R34,596,197890000,0.1678
 "Arizona",AZ,3,"Rocket Mortgage, LLC",549300FGXN1K3HLB1R50,419,137565000,0.0048
@@ -36,7 +36,7 @@ state,abbr,rank,lender,lei,investor_originations,investor_volume_usd,business_pu
 "Arkansas",AR,5,"Simmons Bank",549300DPRWSBUY619V27,169,33335000,0.8994
 "Arkansas",AR,6,"Signature Bank of Arkansas",25490046GL77VSFSYG24,162,53500000,0.0000
 "Arkansas",AR,7,"United Shore Financial Services, LLC",549300HW662MN1WU8550,152,26320000,1.0000
-"Arkansas",AR,8,"Southern Bancorp Bank",549300JQEF6V2RNWCC75,152,22520000,0.9934
+"Arkansas",AR,7,"Southern Bancorp Bank",549300JQEF6V2RNWCC75,152,22520000,0.9934
 "Arkansas",AR,9,"Southern Bank",549300YKBMBBIIMQJS94,139,20915000,1.0000
 "Arkansas",AR,10,"First Service Bank",549300W2LKZKSX67ZU02,130,29480000,0.0000
 "California",CA,1,"United Shore Financial Services, LLC",549300HW662MN1WU8550,3904,1727010000,1.0000
@@ -75,7 +75,7 @@ state,abbr,rank,lender,lei,investor_originations,investor_volume_usd,business_pu
 "Delaware",DE,4,"Kiavi Funding, Inc.",5493006VAGP3GQ8FJT49,57,13835000,1.0000
 "Delaware",DE,5,"RF Renovo Management Company, LLC",254900O2K17TNH5CL873,44,9820000,1.0000
 "Delaware",DE,6,"Rocket Mortgage, LLC",549300FGXN1K3HLB1R50,42,10060000,0.0000
-"Delaware",DE,7,"Crosscountry Mortgage, Inc.",549300VZVN841I2ILS84,42,16200000,1.0000
+"Delaware",DE,6,"Crosscountry Mortgage, Inc.",549300VZVN841I2ILS84,42,16200000,1.0000
 "Delaware",DE,8,"Wilmington Savings Fund Society, FSB",5493005DKMV1IHIM8E20,41,9595000,0.9512
 "Delaware",DE,9,"BPL Mortgage Trust, LLC",5493005PD34O8ZT7QT17,39,5335000,1.0000
 "Delaware",DE,10,"Luminate Bank",549300RFLICNI75BG067,36,10470000,1.0000
@@ -83,12 +83,12 @@ state,abbr,rank,lender,lei,investor_originations,investor_volume_usd,business_pu
 "District of Columbia",DC,2,"Rocket Mortgage, LLC",549300FGXN1K3HLB1R50,30,11380000,0.0000
 "District of Columbia",DC,3,"United Shore Financial Services, LLC",549300HW662MN1WU8550,27,8665000,1.0000
 "District of Columbia",DC,4,"OCMBC, Inc.",549300J7I82PNDVU8H22,24,10650000,1.0000
+"District of Columbia",DC,5,"Loan Funder LLC",254900RUCO27MVGTO768,21,13045000,1.0000
+"District of Columbia",DC,5,"Velocity Commercial Capital, LLC",549300TA4MQM8WN2XG31,21,10775000,1.0000
 "District of Columbia",DC,5,"Anchor Loans, LP",549300623VT8YKPHWM78,21,57895000,1.0000
-"District of Columbia",DC,6,"Temple View Capital Funding, LP",549300RYTR2RVL4SFJ90,21,19645000,1.0000
-"District of Columbia",DC,7,"Loan Funder LLC",254900RUCO27MVGTO768,21,13045000,1.0000
-"District of Columbia",DC,8,"Velocity Commercial Capital, LLC",549300TA4MQM8WN2XG31,21,10775000,1.0000
+"District of Columbia",DC,5,"Temple View Capital Funding, LP",549300RYTR2RVL4SFJ90,21,19645000,1.0000
+"District of Columbia",DC,9,"Atlantic Union Bank",549300ZTT08EKQRVTR15,17,16555000,1.0000
 "District of Columbia",DC,9,"First Savings Mortgage Corporation",549300CF8MP6S7MZV277,17,8905000,0.0000
-"District of Columbia",DC,10,"Atlantic Union Bank",549300ZTT08EKQRVTR15,17,16555000,1.0000
 "Florida",FL,1,"United Shore Financial Services, LLC",549300HW662MN1WU8550,3788,1072730000,1.0000
 "Florida",FL,2,"A&D Mortgage LLC",2549005SIVTHG14U2905,2721,846375000,0.9868
 "Florida",FL,3,"Kiavi Funding, Inc.",5493006VAGP3GQ8FJT49,2360,709180000,1.0000
@@ -115,7 +115,7 @@ state,abbr,rank,lender,lei,investor_originations,investor_volume_usd,business_pu
 "Hawaii",HI,4,"Conventus LLC",98450087981AP406JG03,133,96285000,1.0000
 "Hawaii",HI,5,"Homexpress Mortgage Corp.",549300R77W0P105C3S50,130,76670000,0.9769
 "Hawaii",HI,6,"American Savings Bank, FSB",549300BES7HNVKCDIM50,93,42915000,0.4624
-"Hawaii",HI,7,"Temple View Capital Funding, LP",549300RYTR2RVL4SFJ90,93,46235000,1.0000
+"Hawaii",HI,6,"Temple View Capital Funding, LP",549300RYTR2RVL4SFJ90,93,46235000,1.0000
 "Hawaii",HI,8,"The Loan Store, Inc.",254900DTLHVWQ7NP7R34,85,52215000,0.2471
 "Hawaii",HI,9,"United Shore Financial Services, LLC",549300HW662MN1WU8550,81,54675000,1.0000
 "Hawaii",HI,10,"Hawaiian Financial Federal Credit Union",5493004NKDOFN55L5X23,68,45570000,0.0147
@@ -195,8 +195,8 @@ state,abbr,rank,lender,lei,investor_originations,investor_volume_usd,business_pu
 "Maine",ME,4,"Maine Community Bank",549300HK8HC6F50IC896,71,20565000,0.0000
 "Maine",ME,5,"Guild Mortgage Company",549300AQ3T62GXDU7D76,69,22035000,1.0000
 "Maine",ME,6,"Machias Savings Bank",549300P0GXZAWI355052,55,12405000,1.0000
+"Maine",ME,7,"CMG Mortgage, Inc.",549300GKFNPRWNS0GF29,46,16080000,0.5435
 "Maine",ME,7,"Kennebec Savings Bank",254900CEBR2F5Y0F1A15,46,10440000,1.0000
-"Maine",ME,8,"CMG Mortgage, Inc.",549300GKFNPRWNS0GF29,46,16080000,0.5435
 "Maine",ME,9,"First National Bank",5493002J7RM1JLAXN553,42,10030000,0.9286
 "Maine",ME,10,"Rocket Mortgage, LLC",549300FGXN1K3HLB1R50,39,11995000,0.0000
 "Maryland",MD,1,"United Shore Financial Services, LLC",549300HW662MN1WU8550,594,138390000,1.0000
@@ -234,8 +234,8 @@ state,abbr,rank,lender,lei,investor_originations,investor_volume_usd,business_pu
 "Minnesota",MN,3,"Bridgewater Bank",549300FKWBMLIMGZ7Q40,146,45510000,0.0000
 "Minnesota",MN,4,"Bell Bank",549300WYBPIWKK6SQC06,145,35015000,1.0000
 "Minnesota",MN,5,"Rocket Mortgage, LLC",549300FGXN1K3HLB1R50,101,25205000,0.0000
-"Minnesota",MN,6,"Crosscountry Mortgage, Inc.",549300VZVN841I2ILS84,101,24605000,1.0000
-"Minnesota",MN,7,"Pennymac Loan Services, LLC",RVDPPPGHCGZ40J4VQ731,101,31605000,1.0000
+"Minnesota",MN,5,"Crosscountry Mortgage, Inc.",549300VZVN841I2ILS84,101,24605000,1.0000
+"Minnesota",MN,5,"Pennymac Loan Services, LLC",RVDPPPGHCGZ40J4VQ731,101,31605000,1.0000
 "Minnesota",MN,8,"Coulee Bank",5493002B2O407LCTBX72,95,21435000,0.0105
 "Minnesota",MN,9,"Frandsen Bank & Trust",549300ZZZUYWXK72JD21,90,21600000,0.7333
 "Minnesota",MN,10,"Luminate Bank",549300RFLICNI75BG067,80,24520000,1.0000
@@ -258,7 +258,7 @@ state,abbr,rank,lender,lei,investor_originations,investor_volume_usd,business_pu
 "Missouri",MO,7,"Southern Bank",549300YKBMBBIIMQJS94,254,39420000,0.9961
 "Missouri",MO,8,"Loan Funder LLC",254900RUCO27MVGTO768,217,45905000,1.0000
 "Missouri",MO,9,"RCN Capital, LLC",254900JXCS783CPF1D02,206,34280000,1.0000
-"Missouri",MO,10,"Flat Branch Mortgage, Inc.",549300LXKO1O7CSK5J52,201,33805000,0.0199
+"Missouri",MO,10,"CV3 Financial Services, LLC",254900CTT87ZKAUTIJ37,201,32625000,1.0000
 "Montana",MT,1,"Stockman Bank of Montana",549300FVJ3IB88LTR841,204,60750000,0.9559
 "Montana",MT,2,"Glacier Bank",549300ESRQ6OLBB56N04,140,52610000,0.9214
 "Montana",MT,3,"Opportunity Bank of Montana",5493007ZF78YQRSXQG49,98,31810000,0.9694
@@ -276,7 +276,7 @@ state,abbr,rank,lender,lei,investor_originations,investor_volume_usd,business_pu
 "Nebraska",NE,5,"Dayspring Bank",549300OYN1WD4APNOU82,97,20575000,0.9794
 "Nebraska",NE,6,"Five Points Bank",5493009DQQ81725XIJ49,92,17800000,0.0000
 "Nebraska",NE,7,"West Gate Bank",549300QLO8TSQW5JTK72,91,20135000,0.9890
-"Nebraska",NE,8,"Frontier Bank",254900HEPQK96AEXHS12,91,33365000,0.9560
+"Nebraska",NE,7,"Frontier Bank",254900HEPQK96AEXHS12,91,33365000,0.9560
 "Nebraska",NE,9,"Four Points",549300XZEU2LB7FLWW04,90,15370000,0.0000
 "Nebraska",NE,10,"Charter West Bank",549300GG5XNEIGHQTG04,85,14715000,0.6824
 "Nevada",NV,1,"Kiavi Funding, Inc.",5493006VAGP3GQ8FJT49,578,245610000,1.0000
@@ -294,8 +294,8 @@ state,abbr,rank,lender,lei,investor_originations,investor_volume_usd,business_pu
 "New Hampshire",NH,3,"Crosscountry Mortgage, Inc.",549300VZVN841I2ILS84,43,15265000,1.0000
 "New Hampshire",NH,4,"Rocket Mortgage, LLC",549300FGXN1K3HLB1R50,38,12950000,0.0000
 "New Hampshire",NH,5,"RF Renovo Management Company, LLC",254900O2K17TNH5CL873,34,11830000,1.0000
+"New Hampshire",NH,6,"Guaranteed Rate, Inc.",549300U3721PJGQZYY68,31,14885000,1.0000
 "New Hampshire",NH,6,"Hometown Equity Mortgage, LLC",549300RA3E0BUFO7YZ21,31,12085000,1.0000
-"New Hampshire",NH,7,"Guaranteed Rate, Inc.",549300U3721PJGQZYY68,31,14885000,1.0000
 "New Hampshire",NH,8,"Guild Mortgage Company",549300AQ3T62GXDU7D76,28,9210000,1.0000
 "New Hampshire",NH,9,"EMM Loans LLC",549300EMNDEK4BA8WB53,27,8405000,0.0000
 "New Hampshire",NH,10,"Bangor Savings Bank",549300JEBULFT3BSU682,25,13855000,0.9200
@@ -316,15 +316,15 @@ state,abbr,rank,lender,lei,investor_originations,investor_volume_usd,business_pu
 "New Mexico",NM,5,"Sunward Federal Credit Union",549300CIQ950OK0BS407,52,15220000,0.5577
 "New Mexico",NM,6,"Nusenda",5493007B1GAUZGYHPR07,46,10970000,0.0435
 "New Mexico",NM,7,"Primary Residential Mortgage, Inc.",54930052M48FOD3CWA54,38,9520000,0.5526
+"New Mexico",NM,8,"Citizens Bank of Las Cruces",549300L5PE7ZGYRW5Q15,37,7925000,1.0000
+"New Mexico",NM,8,"Loan Funder LLC",254900RUCO27MVGTO768,37,10835000,1.0000
 "New Mexico",NM,8,"American Heritage Lending, LLC",549300ZPSJZO10ZAX556,37,9535000,1.0000
-"New Mexico",NM,9,"The Loan Store, Inc.",254900DTLHVWQ7NP7R34,37,8805000,0.2432
-"New Mexico",NM,10,"Citizens Bank of Las Cruces",549300L5PE7ZGYRW5Q15,37,7925000,1.0000
 "New York",NY,1,"Loan Funder LLC",254900RUCO27MVGTO768,1689,996665000,1.0000
 "New York",NY,2,"United Shore Financial Services, LLC",549300HW662MN1WU8550,1160,495270000,1.0000
 "New York",NY,3,"Champions Funding, LLC",984500U2F9A83N391A91,942,546370000,1.0000
 "New York",NY,4,"Hometown Equity Mortgage, LLC",549300RA3E0BUFO7YZ21,704,404550000,1.0000
+"New York",NY,5,"Crosscountry Mortgage, Inc.",549300VZVN841I2ILS84,546,286620000,1.0000
 "New York",NY,5,"Logan Finance Corporation",2549002VH9C0PKB8K153,546,315400000,1.0000
-"New York",NY,6,"Crosscountry Mortgage, Inc.",549300VZVN841I2ILS84,546,286620000,1.0000
 "New York",NY,7,"Emporium Tpo LLC",984500F6E6940CCB6A60,532,375020000,1.0000
 "New York",NY,8,"A&D Mortgage LLC",2549005SIVTHG14U2905,473,213225000,0.9894
 "New York",NY,9,"Kiavi Funding, Inc.",5493006VAGP3GQ8FJT49,442,136950000,1.0000
@@ -345,7 +345,7 @@ state,abbr,rank,lender,lei,investor_originations,investor_volume_usd,business_pu
 "North Dakota",ND,4,"First International Bank & Trust",5493002LPXKMOZNXUY90,62,13030000,0.9677
 "North Dakota",ND,5,"First Western Bank & Trust",5493005A0757T9GRRI44,52,7900000,1.0000
 "North Dakota",ND,6,"Starion Bank",54930019RBT2SM6CQS78,42,10730000,0.9762
-"North Dakota",ND,7,"Dakota Community Bank & Trust, National Association",5493002POZ4RFS6X0Z30,42,8810000,1.0000
+"North Dakota",ND,6,"Dakota Community Bank & Trust, National Association",5493002POZ4RFS6X0Z30,42,8810000,1.0000
 "North Dakota",ND,8,"Bank Forward",549300J9E3YDKIBPUY45,40,9030000,0.0000
 "North Dakota",ND,9,"Town and Country Credit Union",5493000JZXUB8NOEMF64,37,8175000,1.0000
 "North Dakota",ND,10,"Choice Financial Group",549300BB4LSE4JRRGV15,27,6295000,0.9630
@@ -396,9 +396,9 @@ state,abbr,rank,lender,lei,investor_originations,investor_volume_usd,business_pu
 "Rhode Island",RI,5,"Centreville Bank",549300Q4BYXP7YD9UI61,48,20240000,0.9792
 "Rhode Island",RI,6,"Banknewport",549300RYJCJ7JPQ4RF20,46,22150000,0.9783
 "Rhode Island",RI,7,"United Shore Financial Services, LLC",549300HW662MN1WU8550,42,14560000,1.0000
+"Rhode Island",RI,8,"CMG Mortgage, Inc.",549300GKFNPRWNS0GF29,40,17890000,0.3250
 "Rhode Island",RI,8,"ARC Home LLC",54930048P8RWCQHQM310,40,16270000,0.9250
-"Rhode Island",RI,9,"CMG Mortgage, Inc.",549300GKFNPRWNS0GF29,40,17890000,0.3250
-"Rhode Island",RI,10,"The Washington Trust Company, of Westerly",549300HKYBSATM44Q425,32,9390000,0.9375
+"Rhode Island",RI,10,"OCMBC, Inc.",549300J7I82PNDVU8H22,32,12440000,0.9688
 "South Carolina",SC,1,"Kiavi Funding, Inc.",5493006VAGP3GQ8FJT49,521,121305000,1.0000
 "South Carolina",SC,2,"United Shore Financial Services, LLC",549300HW662MN1WU8550,381,86285000,1.0000
 "South Carolina",SC,3,"Rocket Mortgage, LLC",549300FGXN1K3HLB1R50,204,54040000,0.0049
@@ -458,7 +458,7 @@ state,abbr,rank,lender,lei,investor_originations,investor_volume_usd,business_pu
 "Vermont",VT,7,"Northeast Home Loan, LLC",549300DQMFK1KT7KEB48,22,6990000,1.0000
 "Vermont",VT,8,"Rocket Mortgage, LLC",549300FGXN1K3HLB1R50,20,6410000,0.0000
 "Vermont",VT,9,"Advisors Mortgage Group, L.L.C.",254900F9ZTVTX763V835,18,6760000,0.0556
-"Vermont",VT,10,"Union Bank",549300I3PFIO81O8JD40,18,6830000,1.0000
+"Vermont",VT,9,"Union Bank",549300I3PFIO81O8JD40,18,6830000,1.0000
 "Virginia",VA,1,"Kiavi Funding, Inc.",5493006VAGP3GQ8FJT49,895,244025000,1.0000
 "Virginia",VA,2,"United Shore Financial Services, LLC",549300HW662MN1WU8550,588,155580000,1.0000
 "Virginia",VA,3,"Rocket Mortgage, LLC",549300FGXN1K3HLB1R50,393,98855000,0.0000
@@ -505,7 +505,7 @@ state,abbr,rank,lender,lei,investor_originations,investor_volume_usd,business_pu
 "Wyoming",WY,4,"Fairway Independent Mortgage Corporation",549300MGPZBLQDIL7538,35,9585000,1.0000
 "Wyoming",WY,5,"Rocket Mortgage, LLC",549300FGXN1K3HLB1R50,34,7400000,0.0000
 "Wyoming",WY,6,"Platte Valley Bank",549300ZFJ1696ECS0S38,31,6915000,0.0000
+"Wyoming",WY,7,"United Shore Financial Services, LLC",549300HW662MN1WU8550,28,5850000,1.0000
 "Wyoming",WY,7,"Pinnacle Bank - Wyoming",549300QG83M0EX7VC434,28,8960000,0.0000
-"Wyoming",WY,8,"United Shore Financial Services, LLC",549300HW662MN1WU8550,28,5850000,1.0000
 "Wyoming",WY,9,"Hilltop National Bank",549300KJI3KX8KY2FG10,25,6305000,0.0000
 "Wyoming",WY,10,"First Interstate Bank",549300RFSMIRUODUVW59,24,6070000,0.9583

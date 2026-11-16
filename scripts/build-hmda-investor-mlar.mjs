@@ -14,8 +14,8 @@
  * Units):Site-Built" universe is reconstructed from construction_method +
  * total_units. The underlying loan records are the same HMDA filings.
  *
- * It also emits a year-over-year trend layer (trends.json) by diffing the new
- * year against a preserved prior-year dataset.
+ * The year-over-year layer (trends.json) is built afterwards by
+ * scripts/build-hmda-investor-trends.mjs.
  *
  * INPUT (stream, never held in memory):
  *   unzip -p 2025_combined_mlar_header.zip | node scripts/build-hmda-investor-mlar.mjs
@@ -25,24 +25,21 @@
  *   src/data/hmda-investor/national.json              (current year)
  *   src/data/hmda-investor/states.json                (current year)
  *   public/data/investor-financing-<year>.csv         (downloadable derived dataset)
- *   src/data/hmda-investor/trends.json                (YoY vs PRIOR_YEAR, if baseline present)
  *
  * ENV:
  *   YEAR=2025            data year stamped into outputs (default 2025)
- *   PRIOR_YEAR=2024      baseline year to diff against for trends (default 2024)
  *   BUILD_DATE=...       stamped into meta.generatedAt (Date.* avoided for determinism)
  *   MLAR_FILE=...        read this file instead of stdin
  *
  * Data: https://ffiec.cfpb.gov/data-publication/modified-lar
  */
 
-import { mkdir, writeFile, readFile } from 'node:fs/promises'
-import { existsSync, createReadStream } from 'node:fs'
+import { mkdir, writeFile } from 'node:fs/promises'
+import { createReadStream } from 'node:fs'
 import { createInterface } from 'node:readline'
 import path from 'node:path'
 
 const YEAR = process.env.YEAR ? Number(process.env.YEAR) : 2025
-const PRIOR_YEAR = process.env.PRIOR_YEAR ? Number(process.env.PRIOR_YEAR) : 2024
 const BUILD_DATE = process.env.BUILD_DATE || null
 const MLAR_FILE = process.env.MLAR_FILE || null
 
@@ -180,83 +177,6 @@ function mergeInto(target, acc) {
   for (const [k, v] of acc.invLtvHist) target.invLtvHist.set(k, (target.invLtvHist.get(k) || 0) + v)
   for (const [k, v] of acc.ownerRateHist) target.ownerRateHist.set(k, (target.ownerRateHist.get(k) || 0) + v)
   for (const [k, v] of acc.denialReasons) target.denialReasons.set(k, (target.denialReasons.get(k) || 0) + v)
-}
-
-// ---- trend layer ----
-
-const TREND_METRICS = [
-  'ratePremiumBps', 'denialRate', 'investorShare', 'businessPurposeShare',
-  'investorMedianRate', 'ownerMedianRate', 'investorMedianLtv', 'cashOutShare',
-  'investorOriginations', 'investorVolume',
-]
-
-function delta(current, prior) {
-  if (current == null || prior == null) return { current, prior, abs: null, pct: null }
-  const abs = current - prior
-  const pct = prior !== 0 ? abs / Math.abs(prior) : null
-  return { current, prior, abs, pct }
-}
-
-async function buildTrends(currentNational, currentStates) {
-  const priorNatPath = path.join(OUT_DATA, `national-${PRIOR_YEAR}.json`)
-  const priorStPath = path.join(OUT_DATA, `states-${PRIOR_YEAR}.json`)
-  if (!existsSync(priorNatPath) || !existsSync(priorStPath)) {
-    console.log(`\n(no ${PRIOR_YEAR} baseline found — skipping trends.json)`)
-    return null
-  }
-  const priorNational = JSON.parse(await readFile(priorNatPath, 'utf8'))
-  const priorStates = JSON.parse(await readFile(priorStPath, 'utf8')).states
-  const priorByAbbr = new Map(priorStates.map((s) => [s.abbr, s]))
-
-  const national = {}
-  for (const m of TREND_METRICS) national[m] = delta(currentNational[m], priorNational[m])
-
-  const stateRows = []
-  for (const cur of currentStates) {
-    const prev = priorByAbbr.get(cur.abbr)
-    if (!prev) continue
-    const row = { abbr: cur.abbr, name: cur.name, slug: cur.slug }
-    for (const m of TREND_METRICS) row[m] = delta(cur[m], prev[m])
-    stateRows.push(row)
-  }
-
-  // Biggest movers (states with a defined delta on each metric).
-  const byAbs = (metric, dir) =>
-    stateRows
-      .filter((r) => r[metric].abs != null)
-      .sort((a, b) => (dir === 'up' ? b[metric].abs - a[metric].abs : a[metric].abs - b[metric].abs))
-      .slice(0, 5)
-      .map((r) => ({
-        abbr: r.abbr, name: r.name, slug: r.slug,
-        prior: r[metric].prior, current: r[metric].current, abs: r[metric].abs,
-      }))
-
-  const movers = {
-    premiumUp: byAbs('ratePremiumBps', 'up'),
-    premiumDown: byAbs('ratePremiumBps', 'down'),
-    denialUp: byAbs('denialRate', 'up'),
-    denialDown: byAbs('denialRate', 'down'),
-    shareUp: byAbs('investorShare', 'up'),
-    bizUp: byAbs('businessPurposeShare', 'up'),
-  }
-
-  return {
-    meta: {
-      currentYear: YEAR,
-      priorYear: PRIOR_YEAR,
-      currentSource: SOURCE,
-      priorSource: priorNational.meta?.source ?? null,
-      note:
-        `Year-over-year compares the ${PRIOR_YEAR} finalized Snapshot dataset with the ` +
-        `${YEAR} early-release combined Modified LAR. Both are CFPB HMDA loan-level public ` +
-        `data covering the same universe and computed identically; ${YEAR} figures will be ` +
-        `reconciled when the ${YEAR} Snapshot publishes.`,
-      generatedAt: BUILD_DATE,
-    },
-    national,
-    states: stateRows,
-    movers,
-  }
 }
 
 async function main() {
@@ -398,12 +318,6 @@ async function main() {
   }
   await writeFile(path.join(OUT_PUBLIC, `investor-financing-${YEAR}.csv`), csvLines.join('\n') + '\n')
 
-  // Year-over-year trend layer.
-  const trends = await buildTrends({ ...nationalSummary, meta }, stateRows)
-  if (trends) {
-    await writeFile(path.join(OUT_DATA, 'trends.json'), JSON.stringify(trends, null, 2))
-  }
-
   const p = nationalSummary
   console.log(
     `\nNATIONAL ${YEAR}: inv orig=${p.investorOriginations.toLocaleString()}  ` +
@@ -411,15 +325,8 @@ async function main() {
       `premium=${p.ratePremiumBps}bps  inv rate=${p.investorMedianRate}  owner=${p.ownerMedianRate}  ` +
       `ltv=${p.investorMedianLtv}  biz=${(p.businessPurposeShare * 100).toFixed(1)}%`
   )
-  if (trends) {
-    const d = trends.national
-    console.log(
-      `YoY vs ${PRIOR_YEAR}: premium ${d.ratePremiumBps.abs >= 0 ? '+' : ''}${d.ratePremiumBps.abs}bps  ` +
-        `denial ${(d.denialRate.abs * 100).toFixed(1)}pp  share ${(d.investorShare.abs * 100).toFixed(1)}pp  ` +
-        `orig ${d.investorOriginations.abs >= 0 ? '+' : ''}${d.investorOriginations.abs.toLocaleString()}`
-    )
-  }
-  console.log('\nWrote national.json, states.json, trends.json, and the CSV.')
+  console.log('\nWrote national.json, states.json, and the CSV.')
+  console.log('Next: node scripts/build-hmda-investor-trends.mjs  (year-over-year layer)')
 }
 
 main().catch((e) => {

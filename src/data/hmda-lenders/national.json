@@ -1,21 +1,21 @@
 {
   "meta": {
     "year": 2025,
-    "source": "CFPB / FFIEC HMDA combined Modified LAR (loan-level public dataset, early release)",
+    "source": "CFPB / FFIEC HMDA Data Browser (loan-level public dataset)",
     "universe": "Investment-property (owner-occupancy = investor), single-family 1-4 unit, site-built originations",
-    "generatedAt": "2026-06-18",
+    "generatedAt": "2026-11-16",
     "topPerState": 10,
     "minOriginations": 10,
     "distinctLenders": 4051,
     "nameResolution": {
-      "viaFilers": 231,
-      "viaGleif": 1,
+      "viaFilers": 229,
+      "viaGleif": 0,
       "unresolved": 0,
-      "of": 232
+      "of": 229
     },
-    "nameNote": "Lender names resolved from the 2024 HMDA filers registry (LEIs are stable across years) with a GLEIF fallback. The 2025 HMDA institution registry was not yet published at build time."
+    "nameNote": "Lender names resolved by LEI from the CFPB HMDA filers registries (2024, then 2025), with GLEIF for any LEI in neither."
   },
-  "totalInvestorOriginations": 524314,
+  "totalInvestorOriginations": 524318,
   "lenders": [
     {
       "rank": 1,

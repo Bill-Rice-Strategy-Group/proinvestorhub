@@ -175,7 +175,10 @@ export function datasetJsonLd({
   downloadUrl?: string
   temporalCoverage?: string
   datePublished?: string
-  /** The upstream government data source. Defaults to CFPB/HMDA for the lending reports. */
+  /**
+   * The upstream government data source. Defaults to CFPB/HMDA for the lending
+   * reports — every non-HMDA dataset (Census, HUD, ...) must pass its own.
+   */
   sourceOrganization?: { name: string; url: string }
 }) {
   return {

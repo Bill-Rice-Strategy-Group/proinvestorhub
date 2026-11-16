@@ -56,18 +56,71 @@ export type MetricKey =
   | 'investorMedianLtv'
   | 'investorOriginations'
 
-/** States ranked high→low by a metric (nulls dropped). 1 = highest value. */
+/**
+ * Minimum share of a state's investor originations that must carry a usable
+ * interest rate for its rate figures to be ranked. Below this, the investor
+ * median rate (and so the premium) rests on too partial a sample — the state is
+ * shown with a caveat and left out of rate-premium rankings.
+ */
+export const RATE_COVERAGE_MIN = 0.75
+
+/** True when a state's investor rate figures meet the coverage floor. */
+export function hasRateCoverage(s: InvestorFinancingRow): boolean {
+  return s.rateCoverage != null && s.rateCoverage >= RATE_COVERAGE_MIN
+}
+
+/** Whether a state takes part in the ranking for a metric. */
+function isRankable(s: InvestorFinancingRow, metric: MetricKey): boolean {
+  if (s[metric] == null) return false
+  if (metric === 'ratePremiumBps') return hasRateCoverage(s)
+  return true
+}
+
+/**
+ * States ranked high→low by a metric (nulls dropped; for the rate premium,
+ * states below the rate-coverage floor are dropped too). 1 = highest value.
+ */
 export function rankedBy(metric: MetricKey): InvestorFinancingRow[] {
   return states
-    .filter((s) => s[metric] != null)
+    .filter((s) => isRankable(s, metric))
     .sort((a, b) => (b[metric] as number) - (a[metric] as number))
 }
 
-/** A state's rank (1 = highest) among all states for a metric. */
-export function rankOf(slug: string, metric: MetricKey): number | null {
+/** A competition rank: 1 + the number of states strictly higher; ties share a rank. */
+export type RankInfo = {
+  rank: number
+  /** Other ranked states with exactly the same value. */
+  tiedWith: number
+  /** Number of states in the ranking. */
+  of: number
+  /** Whether DC is among the ranked (so "states" reads "states incl. DC"). */
+  includesDC: boolean
+}
+
+/** A state's competition rank (1 = highest) for a metric, or null if it is not ranked. */
+export function rankInfo(slug: string, metric: MetricKey): RankInfo | null {
   const ranked = rankedBy(metric)
-  const i = ranked.findIndex((s) => s.slug === slug)
-  return i === -1 ? null : i + 1
+  const s = ranked.find((r) => r.slug === slug)
+  if (!s) return null
+  const v = s[metric] as number
+  return {
+    rank: 1 + ranked.filter((r) => (r[metric] as number) > v).length,
+    tiedWith: ranked.filter((r) => r !== s && (r[metric] as number) === v).length,
+    of: ranked.length,
+    includesDC: ranked.some((r) => r.abbr === 'DC'),
+  }
+}
+
+/** A state's rank number (1 = highest) for a metric; ties share a rank. */
+export function rankOf(slug: string, metric: MetricKey): number | null {
+  return rankInfo(slug, metric)?.rank ?? null
+}
+
+/** "20th of 51 states" / "tied for 8th of 51 states (with 13 other states)". */
+export function fmtRankInfo(r: RankInfo, suffix = ''): string {
+  const scope = `of ${r.of} states${r.includesDC ? ' (incl. DC)' : ''}`
+  if (r.tiedWith === 0) return `${ordinal(r.rank)}${suffix} ${scope}`
+  return `tied for ${ordinal(r.rank)}${suffix} ${scope}, with ${r.tiedWith} other state${r.tiedWith === 1 ? '' : 's'}`
 }
 
 // ---- formatters ----
@@ -169,12 +222,18 @@ export const fmtSignedCount = (v: number | null) =>
 export const trendDir = (v: number | null): 'up' | 'down' | 'flat' =>
   v == null || v === 0 ? 'flat' : v > 0 ? 'up' : 'down'
 
-/** Count of states whose metric moved up / flat / down year over year. */
+/**
+ * Count of states whose rate premium moved up / flat / down year over year.
+ * States below the rate-coverage floor in either year are left out.
+ */
 export function premiumDirectionCounts() {
   let up = 0,
     flat = 0,
     down = 0
   for (const s of trends.states) {
+    const cur = states.find((r) => r.abbr === s.abbr)
+    const prev = statesPrior.find((r) => r.abbr === s.abbr)
+    if (!cur || !prev || !hasRateCoverage(cur) || !hasRateCoverage(prev)) continue
     const d = (s as Record<string, Delta>).ratePremiumBps?.abs
     if (d == null || d === 0) flat++
     else if (d > 0) up++

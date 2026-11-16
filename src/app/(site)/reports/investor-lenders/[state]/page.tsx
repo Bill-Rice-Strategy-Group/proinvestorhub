@@ -83,8 +83,8 @@ export default async function StateLendersPage({
     {
       question: `Which ${s.name} lenders focus on DSCR / business-purpose loans?`,
       answer: dscrLeaders.length
-        ? `Lenders whose ${s.name} investor loans are mostly business- or commercial-purpose (the DSCR/LLC bucket) include ${dscrLeaders.slice(0, 4).map((l) => l.name).join(', ')}. Each lender's mix is flagged in the table.`
-        : `Among the listed ${s.name} lenders, none had a majority of business-purpose investor loans — the market here skews conventional.`,
+        ? `Listed lenders with at least 70% of their ${s.name} investor loans flagged business- or commercial-purpose (the DSCR/LLC bucket) include ${dscrLeaders.slice(0, 4).map((l) => l.name).join(', ')}. Each lender's mix is shown in the table.`
+        : `None of the listed ${s.name} lenders had 70% or more of its investor loans flagged business- or commercial-purpose (our "DSCR / business-purpose" threshold). Each lender's mix is shown in the table.`,
     },
     {
       question: 'Is this a ranking of the best lenders?',
@@ -181,7 +181,10 @@ export default async function StateLendersPage({
                 <tbody>
                   {lenders.map((l) => (
                     <tr key={l.lei} className="border-b border-border/60 last:border-0">
-                      <td className="px-4 py-2.5 text-text-muted">{l.rank}</td>
+                      <td className="px-4 py-2.5 text-text-muted">
+                        {l.rank}
+                        {lenders.some((o) => o !== l && o.rank === l.rank) ? ' (tie)' : ''}
+                      </td>
                       <td className="px-4 py-2.5 font-medium text-text">{l.name}</td>
                       <td className="px-4 py-2.5"><TypeBadge l={l} /></td>
                       <td className="px-4 py-2.5 text-right font-semibold text-primary">{fmtCount(l.originations)}</td>
@@ -240,8 +243,8 @@ export default async function StateLendersPage({
       <section className="mt-12 rounded-2xl border border-border bg-surface p-6">
         <h2 className="text-lg font-bold text-text">Compare lenders serving {s.name}</h2>
         <p className="mt-2 text-sm leading-6 text-text-muted">
-          This ranks reported volume. To compare rates, LTV, and terms from lenders that
-          actively lend in {s.name}, browse our directory:{' '}
+          This ranks reported volume. To compare rates, LTV, and terms from the lenders in
+          our directory (check each lender&apos;s availability in {s.name}), see:{' '}
           <Link href={`/lenders/dscr-loans/${s.slug}`} className="font-semibold text-primary hover:underline">
             DSCR lenders
           </Link>
@@ -263,7 +266,7 @@ export default async function StateLendersPage({
           tools={[
             { label: 'DSCR Loan Qualifier', href: '/calculators/dscr' },
             { label: 'Hard Money / Fix-Flip', href: '/calculators/hard-money' },
-            { label: 'All states ranked', href: '/reports/investor-lenders' },
+            { label: 'All 50 states + DC', href: '/reports/investor-lenders' },
             { label: 'How we built this', href: '/reports/investor-lenders/methodology', muted: true },
           ]}
         />
