@@ -21,6 +21,7 @@ import {
   fmtRent,
   fmtValue,
 } from '@/data/rental-yield'
+import { withArticle } from '@/lib/article'
 
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://proinvestorhub.com'
 const PUBLISHED = '2026-06-16'
@@ -44,7 +45,7 @@ const topMetros = metrosByYield.slice(0, 15)
 const faqs = [
   {
     question: 'What is gross rental yield?',
-    answer: `Gross rental yield is annual rent divided by the property's value — here, (median gross rent × 12) ÷ median home value. Nationally it was ${fmtYield(national.grossYield)} in ${yieldMeta.year} (${fmtRent(national.medianGrossRent)} rent against a ${fmtValue(national.medianHomeValue)} median home value). It's a quick screen for where rent goes furthest against price, before financing and expenses.`,
+    answer: `Gross rental yield is annual rent divided by the property's value — here, (median gross rent × 12) ÷ median home value. Nationally it was ${fmtYield(national.grossYield)} in ${yieldMeta.year} (${fmtRent(national.medianGrossRent)} rent against ${withArticle(fmtValue(national.medianHomeValue))} median home value). It's a quick screen for where rent goes furthest against price, before financing and expenses.`,
   },
   {
     question: 'Which states have the best rental yield?',
@@ -151,8 +152,8 @@ export default function RentalYieldReport() {
             <>
               U.S. gross rental yield was{' '}
               <strong>{fmtYield(national.grossYield)}</strong> in {yieldMeta.year} —
-              a {fmtRent(national.medianGrossRent)} median monthly rent against a{' '}
-              {fmtValue(national.medianHomeValue)} median home value (Census ACS).
+              {withArticle(fmtRent(national.medianGrossRent))} median monthly rent against{' '}
+              {withArticle(fmtValue(national.medianHomeValue))} median home value (Census ACS).
             </>,
             <>
               <strong>{topStates[0].name}</strong> has the highest gross rental yield
@@ -169,8 +170,8 @@ export default function RentalYieldReport() {
             topMetros.length > 0 ? (
               <>
                 Among major U.S. metros,{' '}
-                <strong>{topMetros[0].name}</strong> leads with a{' '}
-                {fmtYield(topMetros[0].grossYield)} gross rental yield in{' '}
+                <strong>{topMetros[0].name}</strong> leads with{' '}
+                {withArticle(fmtYield(topMetros[0].grossYield))} gross rental yield in{' '}
                 {yieldMeta.year}.
               </>
             ) : null,

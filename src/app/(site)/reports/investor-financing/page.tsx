@@ -25,6 +25,7 @@ import {
   fmtCount,
   fmtUSD,
 } from '@/data/hmda-investor'
+import { indefiniteArticle } from '@/lib/article'
 
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://proinvestorhub.com'
 const PUBLISHED = '2026-06-14'
@@ -180,7 +181,8 @@ export default function InvestorFinancingReport() {
             {fmtPct(national.businessPurposeShare, 0)} nationally.
           </>,
           <>
-            The median investor loan carried a{' '}
+            The median investor loan carried{' '}
+            {indefiniteArticle(`${national.investorMedianLtv?.toFixed(0)}%`)}{' '}
             <strong>{national.investorMedianLtv?.toFixed(0)}% combined loan-to-value</strong> in{' '}
             {reportMeta.year}, across purchase and refinance loans.
           </>,

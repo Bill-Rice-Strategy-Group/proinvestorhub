@@ -24,6 +24,7 @@ import {
   fmtRent,
   fmtValue,
 } from '@/data/rental-yield'
+import { withArticle } from '@/lib/article'
 
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://proinvestorhub.com'
 const PUBLISHED = '2026-06-17'
@@ -42,7 +43,7 @@ export async function generateMetadata({
   if (!s) return {}
   const rank = stateRankInfo(s.slug)
   const title = `${s.name} Rental Yield (${yieldMeta.year}): Best Cash-Flow Markets`
-  const description = `Gross rental yield in ${s.name} was ${fmtYield(s.grossYield)} in ${yieldMeta.year}${rank ? ` — ${fmtYieldRank(rank)}` : ''}: ${fmtRent(s.medianGrossRent)} median rent against a ${fmtValue(s.medianHomeValue)} median home value, plus its metros ranked.`
+  const description = `Gross rental yield in ${s.name} was ${fmtYield(s.grossYield)} in ${yieldMeta.year}${rank ? ` — ${fmtYieldRank(rank)}` : ''}: ${fmtRent(s.medianGrossRent)} median rent against ${withArticle(fmtValue(s.medianHomeValue))} median home value, plus its metros ranked.`
   return {
     title,
     description,
@@ -84,7 +85,7 @@ export default async function StateRentalYieldPage({
   const faqs = [
     {
       question: `What is the gross rental yield in ${s.name}?`,
-      answer: `In ${yieldMeta.year}, ${s.name} had a gross rental yield of ${fmtYield(s.grossYield)} — ${fmtRent(s.medianGrossRent)} median gross rent against a ${fmtValue(s.medianHomeValue)} median home value${rank ? `. That ranks ${fmtYieldRank(rank)} (1 = highest yield).` : '.'} The same ratio for the U.S. as a whole was ${fmtYield(national.grossYield)}.`,
+      answer: `In ${yieldMeta.year}, ${s.name} had a gross rental yield of ${fmtYield(s.grossYield)} — ${fmtRent(s.medianGrossRent)} median gross rent against ${withArticle(fmtValue(s.medianHomeValue))} median home value${rank ? `. That ranks ${fmtYieldRank(rank)} (1 = highest yield).` : '.'} The same ratio for the U.S. as a whole was ${fmtYield(national.grossYield)}.`,
     },
     {
       question: topMetros.length

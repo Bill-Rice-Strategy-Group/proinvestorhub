@@ -24,6 +24,7 @@ import {
   fmtMillions,
   fmtMoney,
 } from '@/data/rhfs'
+import { withArticle } from '@/lib/article'
 
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://proinvestorhub.com'
 const PUBLISHED = '2026-07-17'
@@ -175,8 +176,8 @@ export default function RentalOwnershipReport() {
           <>
             Individual investors owned <strong>{fmtPct(ind.propShare)}</strong> of U.S.
             rental properties in {rhfsMeta.curYear}, down from{' '}
-            {fmtPct(previous.individual.propShare)} in {rhfsMeta.prevYear} — a{' '}
-            {fmtPp(previous.individual.propShare, ind.propShare)} slide in six years
+            {fmtPct(previous.individual.propShare)} in {rhfsMeta.prevYear} —{' '}
+            {withArticle(fmtPp(previous.individual.propShare, ind.propShare))} slide in six years
             (Census Rental Housing Finance Survey, property-weighted).
           </>,
           <>

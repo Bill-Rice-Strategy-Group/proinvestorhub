@@ -33,6 +33,7 @@ import {
   trendDir,
 } from '@/data/hmda-investor'
 import { DeltaTag } from '@/components/reports/trend-delta'
+import { indefiniteArticle, withArticle } from '@/lib/article'
 
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://proinvestorhub.com'
 const PUBLISHED = '2026-06-14'
@@ -50,7 +51,7 @@ export async function generateMetadata({
   const s = getStateBySlug(state)
   if (!s) return {}
   const title = `Investor Financing in ${s.name} (${reportMeta.year}): Rates, Denials & DSCR Lending`
-  const description = `How real estate investors finance deals in ${s.name}: a ${fmtBps(s.ratePremiumBps)} rate premium, a ${fmtPct(s.denialRate)} denial rate, and ${fmtPct(s.businessPurposeShare, 0)} DSCR/business-purpose share — from ${reportMeta.year} HMDA data.`
+  const description = `How real estate investors finance deals in ${s.name}: ${withArticle(fmtBps(s.ratePremiumBps))} rate premium, ${withArticle(fmtPct(s.denialRate))} denial rate, and ${fmtPct(s.businessPurposeShare, 0)} DSCR/business-purpose share — from ${reportMeta.year} HMDA data.`
   return {
     title,
     description,
@@ -116,6 +117,11 @@ export default async function StateReportPage({
   const premiumPlacement = premiumRank
     ? `ranks ${fmtRankInfo(premiumRank)} (1 = highest premium)`
     : `is not ranked: an interest rate was reported on only ${coveragePct} of investor loans here, below our ${fmtPct(RATE_COVERAGE_MIN, 0)} floor`
+  // Same, for the body paragraph: the caveat box directly below already gives
+  // the coverage figure, so don't repeat it there.
+  const premiumPlacementShort = premiumRank
+    ? premiumPlacement
+    : `is not ranked against other states (see the caveat below)`
   const premiumRanked = rankedBy('ratePremiumBps')
   // Anchor the comparison bar to the national high, unless this IS the high state —
   // then anchor to the national low so the bar isn't a duplicate of itself.
@@ -134,7 +140,7 @@ export default async function StateReportPage({
   const faqs = [
     {
       question: `How much more do investors pay for a mortgage in ${s.name}?`,
-      answer: `In ${reportMeta.year}, the median investment-property loan in ${s.name} carried a rate of ${fmtRate(s.investorMedianRate)} versus ${fmtRate(s.ownerMedianRate)} for an owner-occupant — a premium of ${fmtBps(s.ratePremiumBps)}. That ${premiumPlacement}.`,
+      answer: `In ${reportMeta.year}, the median investment-property loan in ${s.name} carried a rate of ${fmtRate(s.investorMedianRate)} versus ${fmtRate(s.ownerMedianRate)} for an owner-occupant — a premium of ${fmtBps(s.ratePremiumBps)}. That premium ${premiumPlacement}.`,
     },
     {
       question: `What share of investor loan applications are denied in ${s.name}?`,
@@ -245,9 +251,10 @@ export default async function StateReportPage({
         <p>
           Investors in {s.name} borrowed at a median rate of{' '}
           <strong className="text-text">{fmtRate(s.investorMedianRate)}</strong>, versus{' '}
-          {fmtRate(s.ownerMedianRate)} for owner-occupants — a{' '}
+          {fmtRate(s.ownerMedianRate)} for owner-occupants —{' '}
+          {indefiniteArticle(fmtBps(s.ratePremiumBps))}{' '}
           <strong className="text-text">{fmtBps(s.ratePremiumBps)}</strong> premium that{' '}
-          {premiumPlacement}.
+          {premiumPlacementShort}.
         </p>
         <p className={rateOk ? undefined : 'rounded-xl border border-accent/40 bg-accent/10 px-4 py-3 text-text'}>
           {rateOk
