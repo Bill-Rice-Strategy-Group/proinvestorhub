@@ -1,23 +1,31 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { cities } from '@/data/cap-rate-cities'
-import { strategies, getCitiesForStrategy } from '@/data/market-strategies'
+import {
+  cities,
+  TRACKED_MARKET_COUNT,
+  OPEX_RATIO,
+  ACS_SOURCE_FULL,
+  FMR_SOURCE_LABEL,
+  fmtRentChange,
+} from '@/data/cap-rate-cities'
+
+const N = TRACKED_MARKET_COUNT
+const OPEX = Math.round(OPEX_RATIO * 100)
+import { getCitiesForStrategy } from '@/data/market-strategies'
 import { PrintButton } from '../deal-analysis-checklist/print-button'
 import { GatedContent } from '@/components/gated-content'
 
 export const metadata: Metadata = {
-  title: '50-City Cap Rate Report 2026 — Free Market Data',
-  description:
-    'Free downloadable report comparing cap rates, median prices, rents, vacancy rates, and investment scores across 50 US real estate markets in 2026.',
+  title: `${N}-Metro Cap Rate Report — Census ACS 2024 Data`,
+  description: `Free report comparing estimated cap rates, median home values, rents, rent changes, and strategy scores across ${N} US metros, built from Census ACS 2024 and HUD Fair Market Rent data.`,
   alternates: { canonical: '/resources/cap-rate-report' },
   openGraph: {
-    title: '50-City Cap Rate Report 2026 | ProInvestorHub',
-    description:
-      'Free market data: cap rates, prices, rents, and strategy scores for 50 US investment markets.',
+    title: `${N}-Metro Cap Rate Report | ProInvestorHub`,
+    description: `Free market data: estimated cap rates, home values, rents, and strategy scores for ${N} US metros.`,
     url: '/resources/cap-rate-report',
     images: [
       {
-        url: '/api/og?title=50-City+Cap+Rate+Report+2026&subtitle=Free+Market+Data+for+Investors',
+        url: `/api/og?title=${N}-Metro+Cap+Rate+Report&subtitle=Census+ACS+2024+Data`,
         width: 1200,
         height: 630,
       },
@@ -41,9 +49,17 @@ export default function CapRateReportPage() {
   const appreciationCities = getCitiesForStrategy('appreciation')
 
   const avgCapRate =
-    cities.reduce((sum, c) => sum + c.avgCapRate, 0) / cities.length
+    cities.reduce((sum, c) => sum + c.capRate, 0) / cities.length
   const avgPrice =
-    cities.reduce((sum, c) => sum + c.medianHomePrice, 0) / cities.length
+    cities.reduce((sum, c) => sum + c.medianHomeValue, 0) / cities.length
+  // Data-derived takeaways (cities is sorted by estimated cap rate, desc)
+  const topCap = cities.slice(0, 4)
+  const bottomCap = cities.slice(-4).reverse()
+  const meetsOnePct = cities.filter((c) => c.rentToPrice >= 0.01).length
+  const withRentChange = cities.filter((c) => c.rentChange != null)
+  const rentDown = withRentChange.filter((c) => (c.rentChange as number) < 0).length
+  const list = (xs: typeof cities) =>
+    xs.map((c) => `${c.city} (${c.capRate.toFixed(1)}%)`).join(', ')
   const avgRent =
     cities.reduce((sum, c) => sum + c.medianRent, 0) / cities.length
 
@@ -67,32 +83,31 @@ export default function CapRateReportPage() {
           ProInvestorHub Market Research
         </p>
         <h1 className="mt-2 text-3xl font-bold text-text sm:text-4xl print:text-2xl">
-          50-City Cap Rate Report &mdash; 2026
+          {N}-Metro Cap Rate Report
         </h1>
         <p className="mt-3 text-lg text-text-muted print:text-sm">
-          Cap rates, median prices, rents, and investment strategy scores
-          for the top 50 US real estate markets.
+          Estimated cap rates, median home values, rents, and investment
+          strategy scores for the {N} US metros we track.
         </p>
         <p className="mt-2 text-xs text-text-light">
-          Data: Census ACS, Zillow, Redfin, county assessors &bull; Updated
-          March 2026 &bull; proinvestorhub.com
+          Data: {ACS_SOURCE_FULL}; {FMR_SOURCE_LABEL} &bull; proinvestorhub.com
         </p>
       </div>
 
       {/* National Averages */}
       <section className="mb-12 print:mb-8">
         <h2 className="text-xl font-bold text-text mb-4 print:text-lg">
-          National Averages (50 Markets)
+          Averages Across the {N} Tracked Metros
         </h2>
         <div className="grid grid-cols-3 gap-4">
           <div className="rounded-xl border border-border bg-white p-5 text-center print:border-gray-300">
-            <p className="text-sm text-text-muted">Avg Cap Rate</p>
+            <p className="text-sm text-text-muted">Avg Est. Cap Rate</p>
             <p className="mt-1 text-2xl font-bold text-primary tabular-nums print:text-xl">
               {avgCapRate.toFixed(1)}%
             </p>
           </div>
           <div className="rounded-xl border border-border bg-white p-5 text-center print:border-gray-300">
-            <p className="text-sm text-text-muted">Avg Median Price</p>
+            <p className="text-sm text-text-muted">Avg Median Home Value</p>
             <p className="mt-1 text-2xl font-bold text-text tabular-nums print:text-xl">
               {fmt(avgPrice)}
             </p>
@@ -107,24 +122,27 @@ export default function CapRateReportPage() {
       </section>
 
       <GatedContent previewHeight="500px">
-      {/* Full 50-City Table */}
+      {/* Full table */}
       <section className="mb-12 print:mb-8">
         <h2 className="text-xl font-bold text-text mb-4 print:text-lg">
-          All 50 Markets — Ranked by Cap Rate
+          All {N} Metros — Ranked by Estimated Cap Rate
         </h2>
+        <p className="mb-3 text-xs text-text-light">
+          Est. cap rate = (median gross rent &times; 12 &times; (1 &minus; {OPEX}%))
+          &divide; median home value. Metro-level medians; a market screen, not a
+          property-level return.
+        </p>
         <div className="overflow-x-auto">
           <table className="w-full text-xs border-collapse print:text-[10px]">
             <thead>
               <tr className="bg-surface text-left text-text-muted uppercase tracking-wide">
                 <th className="px-2 py-2">#</th>
-                <th className="px-2 py-2">City</th>
-                <th className="px-2 py-2 text-right">Cap Rate</th>
-                <th className="px-2 py-2 text-right">Median Price</th>
+                <th className="px-2 py-2">Metro</th>
+                <th className="px-2 py-2 text-right">Est. Cap Rate</th>
+                <th className="px-2 py-2 text-right">Median Value</th>
                 <th className="px-2 py-2 text-right">Median Rent</th>
-                <th className="px-2 py-2 text-right">R/P Ratio</th>
-                <th className="px-2 py-2 text-right">Vacancy</th>
-                <th className="px-2 py-2 text-right">Pop Growth</th>
-                <th className="px-2 py-2 text-right">Tax Rate</th>
+                <th className="px-2 py-2 text-right">Rent/Value</th>
+                <th className="px-2 py-2 text-right">Rent Change (1 yr)</th>
               </tr>
             </thead>
             <tbody>
@@ -142,10 +160,10 @@ export default function CapRateReportPage() {
                     {city.city}, {city.state}
                   </td>
                   <td className="px-2 py-1.5 text-right tabular-nums font-semibold text-primary">
-                    {city.avgCapRate.toFixed(1)}%
+                    {city.capRate.toFixed(1)}%
                   </td>
                   <td className="px-2 py-1.5 text-right tabular-nums text-text-muted">
-                    {fmt(city.medianHomePrice)}
+                    {fmt(city.medianHomeValue)}
                   </td>
                   <td className="px-2 py-1.5 text-right tabular-nums text-text-muted">
                     {fmt(city.medianRent)}
@@ -154,22 +172,7 @@ export default function CapRateReportPage() {
                     {(city.rentToPrice * 100).toFixed(2)}%
                   </td>
                   <td className="px-2 py-1.5 text-right tabular-nums text-text-muted">
-                    {city.vacancyRate.toFixed(1)}%
-                  </td>
-                  <td className="px-2 py-1.5 text-right tabular-nums">
-                    <span
-                      className={
-                        city.populationGrowth > 0
-                          ? 'text-emerald-600'
-                          : 'text-red-600'
-                      }
-                    >
-                      {city.populationGrowth > 0 ? '+' : ''}
-                      {city.populationGrowth.toFixed(1)}%
-                    </span>
-                  </td>
-                  <td className="px-2 py-1.5 text-right tabular-nums text-text-muted">
-                    {city.propertyTaxRate.toFixed(2)}%
+                    {fmtRentChange(city.rentChange)}
                   </td>
                 </tr>
               ))}
@@ -230,38 +233,44 @@ export default function CapRateReportPage() {
             <li className="flex items-start gap-2">
               <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
               <span>
-                <strong className="text-text">Midwest dominates cash flow.</strong>{' '}
-                Detroit, Cleveland, Memphis, and Indianapolis offer the highest
-                cap rates and rent-to-price ratios, but population decline in
-                some Ohio markets requires careful neighborhood selection.
+                <strong className="text-text">Highest estimated cap rates.</strong>{' '}
+                {list(topCap)} — the metros where median rent is highest
+                relative to median home value.
               </span>
             </li>
             <li className="flex items-start gap-2">
               <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
               <span>
-                <strong className="text-text">Sun Belt leads appreciation.</strong>{' '}
-                Raleigh, Austin, Charlotte, Phoenix, and Nashville have the
-                strongest population growth and income dynamics, but cap rates
-                are compressed — these are growth plays, not cash flow plays.
+                <strong className="text-text">Lowest estimated cap rates.</strong>{' '}
+                {list(bottomCap)} — home values are high relative to rents, so
+                these are appreciation plays more than cash-flow plays.
               </span>
             </li>
             <li className="flex items-start gap-2">
               <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
               <span>
-                <strong className="text-text">Property taxes matter more than you think.</strong>{' '}
-                Birmingham (0.43%) and Knoxville (0.68%) save investors
-                $3,000–$5,000/year compared to Milwaukee (2.53%) or Detroit
-                (2.76%) at similar price points. Factor taxes into every
-                analysis.
+                <strong className="text-text">The 1% rule is rare at the metro level.</strong>{' '}
+                {meetsOnePct} of {N} metros have median monthly rent at or above
+                1% of median home value. Deals that meet it exist, but they are
+                specific properties, not the median.
               </span>
             </li>
             <li className="flex items-start gap-2">
               <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
               <span>
-                <strong className="text-text">Indianapolis is the best all-around market.</strong>{' '}
-                It ranks in the top 5 for cash flow, BRRRR, and house hacking
-                while maintaining positive population growth — the rare market
-                that works for nearly every strategy.
+                <strong className="text-text">Rents are not rising everywhere.</strong>{' '}
+                HUD&rsquo;s two-bedroom Fair Market Rent fell from FY2025 to
+                FY2026 in {rentDown} of the {withRentChange.length} metros we
+                could match to an FMR area.
+              </span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
+              <span>
+                <strong className="text-text">Run real expenses.</strong>{' '}
+                These estimates use a flat {OPEX}% expense allowance. Property
+                taxes and insurance vary widely by state and county, so check
+                the assessor and get quotes for any specific deal.
               </span>
             </li>
           </ul>
@@ -274,7 +283,8 @@ export default function CapRateReportPage() {
       <div className="text-center text-xs text-text-light border-t border-border pt-6 print:pt-4">
         <p>
           &copy; 2026 ProInvestorHub.com &bull; Free for personal use &bull;
-          Data is approximate and varies by neighborhood
+          Metro-level estimates; results vary by neighborhood and property
+          &bull; Educational only, not investment advice
         </p>
         <p className="mt-1 print:hidden">
           <Link

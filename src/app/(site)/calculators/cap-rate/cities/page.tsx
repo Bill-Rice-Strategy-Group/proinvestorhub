@@ -2,16 +2,22 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { JsonLd, breadcrumbJsonLd } from '@/components/json-ld'
 import { CapRateCitiesTable } from '@/components/cap-rate-cities-table'
+import {
+  TRACKED_MARKET_COUNT,
+  OPEX_RATIO,
+  ACS_SOURCE_FULL,
+} from '@/data/cap-rate-cities'
+
+const N = TRACKED_MARKET_COUNT
+const OPEX = Math.round(OPEX_RATIO * 100)
 
 export const metadata: Metadata = {
-  title: 'Cap Rates by City — 2026 Market Data for 50 US Markets',
-  description:
-    'Compare average cap rates, median home prices, rents, and rent-to-price ratios across the top 50 US real estate investing markets. Sortable data for 2026.',
+  title: `Cap Rates by City — Estimates for ${N} US Metros (ACS 2024 Data)`,
+  description: `Compare estimated cap rates, median home values, median rents, and rent-to-value ratios across ${N} US metros, built from Census ACS 2024 1-year data. Sortable, with the formula shown.`,
   alternates: { canonical: '/calculators/cap-rate/cities' },
   openGraph: {
-    title: 'Cap Rates by City — 2026 Market Data | ProInvestorHub',
-    description:
-      'Compare cap rates across the top 50 US real estate investing markets.',
+    title: 'Cap Rates by City — Census-Based Estimates | ProInvestorHub',
+    description: `Compare estimated cap rates across ${N} US metros, from Census ACS 2024 data.`,
   },
 }
 
@@ -55,12 +61,12 @@ export default function CapRateCitiesPage() {
       {/* Header */}
       <div className="max-w-3xl mb-10">
         <h1 className="text-3xl font-bold text-text sm:text-4xl">
-          Cap Rates by City &mdash; 2026 Market Data
+          Cap Rates by City &mdash; Estimates for {N} Metros
         </h1>
         <p className="mt-3 text-lg text-text-muted leading-7">
-          Compare average cap rates, home prices, rents, and rent-to-price
-          ratios across the top 50 US real estate investing markets. Click any
-          city for a full market breakdown.
+          Compare estimated cap rates, home values, rents, and rent-to-value
+          ratios across the {N} metro areas we track. Click any market for the
+          full calculation.
         </p>
       </div>
 
@@ -68,11 +74,15 @@ export default function CapRateCitiesPage() {
       <CapRateCitiesTable />
 
       {/* Bottom note */}
-      <p className="mt-4 text-xs text-text-light max-w-3xl">
-        Data represents estimated 2025-2026 market averages based on public
-        sources including Census data, Zillow, and Redfin. Cap rates are
-        approximate and will vary by neighborhood, property type, and condition.
-        Always run your own numbers before making investment decisions.
+      <p className="mt-4 text-xs text-text-light max-w-3xl leading-5">
+        Source: {ACS_SOURCE_FULL}. Estimated cap rate = (median gross rent
+        &times; 12 &times; (1 &minus; {OPEX}%)) &divide; median home value; the{' '}
+        {OPEX}% operating-expense allowance is the &ldquo;50% rule&rdquo; of
+        thumb. Figures describe whole metro areas, not city limits, and compare
+        median rent across all rental units with median owner-occupied home
+        value — a market-level screen, not the cap rate of any specific
+        property. Bands are thirds of the {N} tracked metros. Educational only;
+        always run your own numbers before investing.
       </p>
 
       {/* CTA */}

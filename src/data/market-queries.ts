@@ -1,74 +1,38 @@
 /**
- * Sanity GROQ queries for market city data.
- * Replaces the hardcoded cap-rate-cities.ts imports.
- * Falls back to hardcoded data if Sanity query returns empty (safety net).
+ * Market city data access.
+ *
+ * The numbers come from the committed, sourced dataset in `cap-rate-cities.ts`
+ * (Census ACS 2024 1-year + HUD FMR), NOT from Sanity. The `marketCity` docs in
+ * Sanity had drifted from the repo with no committed updater (e.g. Akron's
+ * population differed between two pages), so they are no longer read for
+ * metrics. Sanity remains the source for editorial blocks such as neighborhoods
+ * (see the cap-rate city page).
+ *
+ * The async signatures are kept so callers do not change.
  */
 
-import { client } from '@/sanity/lib/client'
-import { cities as hardcodedCities, type CityCapRate } from './cap-rate-cities'
+import {
+  cities,
+  type CityCapRate,
+  ACS_SOURCE_LABEL,
+  FMR_SOURCE_LABEL,
+  DATA_GENERATED_AT,
+} from './cap-rate-cities'
 
-const MARKET_CITIES_QUERY = `*[_type == "marketCity"] | order(avgCapRate desc) {
-  city,
-  state,
-  "slug": slug.current,
-  medianHomePrice,
-  medianRent,
-  avgCapRate,
-  rentToPrice,
-  population,
-  populationGrowth,
-  medianHouseholdIncome,
-  vacancyRate,
-  propertyTaxRate,
-  investorTakeaway,
-  dataUpdatedAt,
-  dataSources
-}`
-
-const DATA_FRESHNESS_QUERY = `*[_type == "marketCity"] | order(dataUpdatedAt desc) [0] {
-  dataUpdatedAt,
-  dataSources
-}`
-
-export type MarketCity = CityCapRate & {
-  dataUpdatedAt?: string
-  dataSources?: string[]
-}
+export type MarketCity = CityCapRate
 
 export type DataFreshness = {
   dataUpdatedAt: string | null
   dataSources: string[]
 }
 
-/**
- * Fetch all market cities from Sanity, falling back to hardcoded data.
- * Use this everywhere instead of importing `cities` directly.
- */
 export async function getMarketCities(): Promise<MarketCity[]> {
-  try {
-    const results = await client.fetch<MarketCity[]>(MARKET_CITIES_QUERY)
-    if (results && results.length > 0) return results
-  } catch (err) {
-    console.warn('Sanity market query failed, using hardcoded data:', err)
-  }
-  // Fallback — hardcoded data (no dataUpdatedAt)
-  return hardcodedCities
+  return cities
 }
 
-/**
- * Get the most recent data update timestamp from Sanity.
- */
 export async function getDataFreshness(): Promise<DataFreshness> {
-  try {
-    const result = await client.fetch<DataFreshness | null>(DATA_FRESHNESS_QUERY)
-    if (result?.dataUpdatedAt) {
-      return {
-        dataUpdatedAt: result.dataUpdatedAt,
-        dataSources: result.dataSources || [],
-      }
-    }
-  } catch {
-    // fallback
+  return {
+    dataUpdatedAt: DATA_GENERATED_AT,
+    dataSources: [ACS_SOURCE_LABEL, FMR_SOURCE_LABEL],
   }
-  return { dataUpdatedAt: null, dataSources: ['Census ACS', 'Zillow', 'Redfin', 'County Assessors'] }
 }

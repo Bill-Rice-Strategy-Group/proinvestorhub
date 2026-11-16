@@ -5,7 +5,7 @@ import Link from 'next/link'
 import type { CityWithScore } from '@/data/market-strategies'
 import { track } from '@/lib/track'
 
-type SortKey = 'score' | 'city' | 'avgCapRate' | 'medianHomePrice' | 'medianRent' | 'rentToPrice' | 'populationGrowth'
+type SortKey = 'score' | 'city' | 'capRate' | 'medianHomeValue' | 'medianRent' | 'rentToPrice' | 'rentChange'
 type SortDir = 'asc' | 'desc'
 
 function formatCurrency(value: number): string {
@@ -47,7 +47,13 @@ export function StrategyCitiesTable({
         cmp = a.city.localeCompare(b.city)
         return sortDir === 'asc' ? cmp : -cmp
       }
-      cmp = (a[sortKey] as number) - (b[sortKey] as number)
+      const av = a[sortKey] as number | null
+      const bv = b[sortKey] as number | null
+      // Unavailable values always sort last.
+      if (av == null && bv == null) return 0
+      if (av == null) return 1
+      if (bv == null) return -1
+      cmp = av - bv
       return sortDir === 'desc' ? -cmp : cmp
     })
     return arr
@@ -70,7 +76,7 @@ export function StrategyCitiesTable({
     trackEvent('table_sort', { sort_column: key })
   }
 
-  function SortIcon({ col }: { col: SortKey }) {
+  function renderSortIcon(col: SortKey) {
     if (col !== sortKey) return <span className="ml-1 text-text-light">↕</span>
     return <span className="ml-1">{sortDir === 'desc' ? '↓' : '↑'}</span>
   }
@@ -85,37 +91,37 @@ export function StrategyCitiesTable({
               className="px-4 py-3 cursor-pointer hover:text-text transition-colors"
               onClick={() => handleSort('city')}
             >
-              City <SortIcon col="city" />
+              City {renderSortIcon('city')}
             </th>
             <th
               className="px-4 py-3 cursor-pointer hover:text-text transition-colors text-right"
               onClick={() => handleSort('score')}
             >
-              {scoreLabel} <SortIcon col="score" />
+              {scoreLabel} {renderSortIcon('score')}
             </th>
             <th
               className="px-4 py-3 cursor-pointer hover:text-text transition-colors text-right"
-              onClick={() => handleSort('avgCapRate')}
+              onClick={() => handleSort('capRate')}
             >
-              Cap Rate <SortIcon col="avgCapRate" />
+              Est. Cap Rate {renderSortIcon('capRate')}
             </th>
             <th
               className="px-4 py-3 cursor-pointer hover:text-text transition-colors text-right"
-              onClick={() => handleSort('medianHomePrice')}
+              onClick={() => handleSort('medianHomeValue')}
             >
-              Median Price <SortIcon col="medianHomePrice" />
+              Median Value {renderSortIcon('medianHomeValue')}
             </th>
             <th
               className="px-4 py-3 cursor-pointer hover:text-text transition-colors text-right"
               onClick={() => handleSort('medianRent')}
             >
-              Median Rent <SortIcon col="medianRent" />
+              Median Rent {renderSortIcon('medianRent')}
             </th>
             <th
               className="px-4 py-3 cursor-pointer hover:text-text transition-colors text-right"
-              onClick={() => handleSort('populationGrowth')}
+              onClick={() => handleSort('rentChange')}
             >
-              Pop Growth <SortIcon col="populationGrowth" />
+              Rent Change {renderSortIcon('rentChange')}
             </th>
           </tr>
         </thead>
@@ -149,27 +155,31 @@ export function StrategyCitiesTable({
                   </span>
                 </td>
                 <td className="px-4 py-3 text-right tabular-nums text-text-muted">
-                  {formatPercent(city.avgCapRate)}
+                  {formatPercent(city.capRate)}
                 </td>
                 <td className="px-4 py-3 text-right tabular-nums text-text-muted">
-                  {formatCurrency(city.medianHomePrice)}
+                  {formatCurrency(city.medianHomeValue)}
                 </td>
                 <td className="px-4 py-3 text-right tabular-nums text-text-muted">
                   {formatCurrency(city.medianRent)}
                 </td>
                 <td className="px-4 py-3 text-right tabular-nums">
-                  <span
-                    className={
-                      city.populationGrowth > 0
-                        ? 'text-emerald-600'
-                        : city.populationGrowth < 0
-                          ? 'text-red-600'
-                          : 'text-text-muted'
-                    }
-                  >
-                    {city.populationGrowth > 0 ? '+' : ''}
-                    {formatPercent(city.populationGrowth)}
-                  </span>
+                  {city.rentChange == null ? (
+                    <span className="text-text-light">n/a</span>
+                  ) : (
+                    <span
+                      className={
+                        city.rentChange > 0
+                          ? 'text-emerald-600'
+                          : city.rentChange < 0
+                            ? 'text-red-600'
+                            : 'text-text-muted'
+                      }
+                    >
+                      {city.rentChange > 0 ? '+' : ''}
+                      {formatPercent(city.rentChange)}
+                    </span>
+                  )}
                 </td>
               </tr>
             )

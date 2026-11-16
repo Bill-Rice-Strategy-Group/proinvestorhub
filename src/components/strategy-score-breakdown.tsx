@@ -31,14 +31,14 @@ export function StrategyScoreBreakdown({
               <div className="flex items-center gap-3">
                 <span className="text-text-muted">{comp.rawFormatted}</span>
                 <span className="font-semibold text-text w-10 text-right">
-                  {comp.normalizedScore.toFixed(1)}
+                  {comp.normalizedScore == null ? '—' : comp.normalizedScore.toFixed(1)}
                 </span>
               </div>
             </div>
             <div className="h-2 rounded-full bg-surface overflow-hidden">
               <div
                 className="h-full rounded-full bg-primary transition-all"
-                style={{ width: `${(comp.normalizedScore / 10) * 100}%` }}
+                style={{ width: `${((comp.normalizedScore ?? 0) / 10) * 100}%` }}
               />
             </div>
           </div>

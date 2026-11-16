@@ -7,6 +7,7 @@ import { LeadMagnetCTA } from '@/components/lead-magnet-cta'
 import { StrategyCitiesTable } from '@/components/strategy-cities-table'
 import { strategies, fetchCitiesForStrategy } from '@/data/market-strategies'
 import { getDataFreshness } from '@/data/market-queries'
+import { TRACKED_MARKET_COUNT, fmtRentChange } from '@/data/cap-rate-cities'
 import { DownloadPDF } from '@/components/download-pdf'
 import { ToolRecommendations } from '@/components/tool-recommendations'
 
@@ -54,11 +55,9 @@ export default async function StrategyPage({
 
   // Format the "Last updated" date
   const lastUpdated = freshness.dataUpdatedAt
-    ? new Date(freshness.dataUpdatedAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
-    : 'March 2026'
-  const sourcesList = freshness.dataSources.length > 0
-    ? freshness.dataSources.join(', ')
-    : 'Census ACS, Zillow, Redfin, county assessors'
+    ? new Date(`${freshness.dataUpdatedAt}T00:00:00Z`).toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' })
+    : null
+  const sourcesList = freshness.dataSources.join('; ')
 
   return (
     <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8">
@@ -95,7 +94,7 @@ export default async function StrategyPage({
             ? { dateModified: freshness.dataUpdatedAt }
             : {}),
           measurementTechnique:
-            'Weighted composite scoring of median home price, rent, cap rate, vacancy, property-tax, population, and growth across 50+ US markets.',
+            `Weighted composite of Census ACS 2024 1-year metro median rent and home value (and an estimated cap rate derived from them) and HUD two-bedroom Fair Market Rent change, across ${TRACKED_MARKET_COUNT} US metros.`,
           variableMeasured: strategy.scoreLabel,
           isAccessibleForFree: true,
           creativeWorkStatus: 'Published',
@@ -127,7 +126,7 @@ export default async function StrategyPage({
           {strategy.description}
         </p>
         <p className="mt-2 text-xs text-text-light">
-          Last updated: {lastUpdated} &bull; Data sources: {sourcesList}
+          {lastUpdated && <>Data file generated: {lastUpdated} &bull; </>}Data sources: {sourcesList}
         </p>
         <div className="mt-4">
           <DownloadPDF label={`Download ${strategy.shortTitle} Rankings PDF`} />
@@ -142,17 +141,17 @@ export default async function StrategyPage({
       {/* Full Rankings Table */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold text-text mb-6">
-          All 50 Markets Ranked
+          All {TRACKED_MARKET_COUNT} Markets Ranked
         </h2>
         <StrategyCitiesTable
           cities={scoredCities}
           scoreLabel={strategy.scoreLabel}
         />
         <p className="mt-3 text-xs text-text-light max-w-3xl">
-          {strategy.scoreExplainer} Data represents estimated 2025–2026 market
-          averages based on public sources including Census ACS, Zillow, Redfin,
-          and county assessor records. Always run your own numbers before making
-          investment decisions.
+          {strategy.scoreExplainer} Figures are metro-area medians (Census ACS
+          2024 1-year) and HUD Fair Market Rent changes; see Methodology. A
+          screen for further research, not investment advice — always run your
+          own numbers.
         </p>
       </section>
 
@@ -192,31 +191,23 @@ export default async function StrategyPage({
                             </strong>
                           </span>
                           <span>
-                            Cap Rate:{' '}
-                            <strong>{city.avgCapRate.toFixed(1)}%</strong>
+                            Est. Cap Rate:{' '}
+                            <strong>{city.capRate.toFixed(1)}%</strong>
                           </span>
                           <span>
-                            Median:{' '}
+                            Median Value:{' '}
                             <strong>
                               {new Intl.NumberFormat('en-US', {
                                 style: 'currency',
                                 currency: 'USD',
                                 minimumFractionDigits: 0,
-                              }).format(city.medianHomePrice)}
+                              maximumFractionDigits: 0,
+                              }).format(city.medianHomeValue)}
                             </strong>
                           </span>
                           <span>
-                            Growth:{' '}
-                            <strong
-                              className={
-                                city.populationGrowth > 0
-                                  ? 'text-emerald-600'
-                                  : 'text-red-600'
-                              }
-                            >
-                              {city.populationGrowth > 0 ? '+' : ''}
-                              {city.populationGrowth.toFixed(1)}%
-                            </strong>
+                            Rent Change:{' '}
+                            <strong>{fmtRentChange(city.rentChange)}</strong>
                           </span>
                         </div>
                       </div>
@@ -256,7 +247,7 @@ export default async function StrategyPage({
                 ProInvestorHub with a link back. Suggested citation:
               </p>
               <p className="mt-3 rounded-lg bg-primary/5 px-4 py-3 text-sm font-medium text-text leading-6">
-                &ldquo;{strategy.title}.&rdquo; ProInvestorHub, {lastUpdated}.{' '}
+                &ldquo;{strategy.title}.&rdquo; ProInvestorHub{lastUpdated ? `, ${lastUpdated}` : ''}.{' '}
                 {baseUrl}/markets/{slug}
               </p>
               <p className="mt-3 text-xs text-text-muted">

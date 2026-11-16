@@ -7,7 +7,17 @@ import { CalculatorCTA } from '@/components/calculator-cta'
 import { StrategyScoreBreakdown } from '@/components/strategy-score-breakdown'
 import { CityStrategyComparison } from '@/components/city-strategy-comparison'
 import { strategies } from '@/data/market-strategies'
-import { cities } from '@/data/cap-rate-cities'
+import {
+  cities,
+  computeCapRate,
+  fmtCapRate,
+  fmtRentChange,
+  OPEX_RATIO,
+  TRACKED_MARKET_COUNT,
+  ACS_SOURCE_LABEL,
+  FMR_SOURCE_LABEL,
+  type CityCapRate,
+} from '@/data/cap-rate-cities'
 import {
   fetchCityForStrategyPage,
   generateCityStrategyFAQs,
@@ -33,7 +43,7 @@ export async function generateMetadata({
   if (!strategy || !city) return {}
 
   const title = `${strategy.shortTitle} Investing in ${city.city}, ${city.state} 2026 | ProInvestorHub`
-  const description = `${strategy.shortTitle} analysis for ${city.city}, ${city.state}. Score, market data, investment thesis, and how it compares to 52 other markets. Free data-driven research for real estate investors.`
+  const description = `${strategy.shortTitle} analysis for the ${city.metroName} metro: score, Census-based market data (est. cap rate ${fmtCapRate(city.capRate)}), and how it compares to the other ${TRACKED_MARKET_COUNT - 1} metros we track. Educational research for real estate investors.`
 
   return {
     title,
@@ -71,11 +81,13 @@ export default async function CityStrategyPage({
   const allScores = await fetchAllStrategyScores(citySlug)
   const faqs = generateCityStrategyFAQs(strategy, data, data.score, data.rank)
   const lastUpdated = freshness.dataUpdatedAt
-    ? new Date(freshness.dataUpdatedAt).toLocaleDateString('en-US', {
+    ? new Date(`${freshness.dataUpdatedAt}T00:00:00Z`).toLocaleDateString('en-US', {
         month: 'long',
+        day: 'numeric',
         year: 'numeric',
+        timeZone: 'UTC',
       })
-    : 'March 2026'
+    : null
   const stateInfo = stateMetadata[data.state]
 
   // Strategy-specific key metrics
@@ -85,17 +97,9 @@ export default async function CityStrategyPage({
   const insight = strategy.cityInsights[data.slug]
   const thesis = insight ?? data.investorTakeaway
 
-  // Quick math
-  const annualRent = data.medianRent * 12
-  const vacancyLoss = Math.round(annualRent * (data.vacancyRate / 100))
-  const propertyTax = Math.round(
-    data.medianHomePrice * (data.propertyTaxRate / 100)
-  )
-  const insurance = Math.round(data.medianHomePrice * 0.005)
-  const maintenance = Math.round(data.medianHomePrice * 0.015)
-  const noi =
-    annualRent - vacancyLoss - propertyTax - insurance - maintenance
-  const impliedCap = ((noi / data.medianHomePrice) * 100).toFixed(1)
+  // Quick math — identical formula and inputs to /calculators/cap-rate/[city]
+  const math = computeCapRate(data.medianRent, data.medianHomeValue)
+  const opexPct = Math.round(OPEX_RATIO * 100)
 
   return (
     <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8">
@@ -148,7 +152,7 @@ export default async function CityStrategyPage({
             {strategy.scoreLabel}: {data.score.toFixed(1)}/10
           </span>
           <span className="text-sm text-text-muted">
-            Ranked #{data.rank} of 52 markets
+            Ranked #{data.rank} of {TRACKED_MARKET_COUNT} metros
           </span>
         </div>
         <p className="mt-3 text-lg text-text-muted leading-7">
@@ -157,7 +161,10 @@ export default async function CityStrategyPage({
           compares to other markets.
         </p>
         <p className="mt-2 text-xs text-text-light">
-          Last updated: {lastUpdated}
+          Figures describe the {data.metroName} metro area. Sources: U.S.
+          Census Bureau, {ACS_SOURCE_LABEL} (median gross rent, median home
+          value){data.rentChange != null && <>; {FMR_SOURCE_LABEL}</>}.
+          {lastUpdated && <> Data file generated {lastUpdated}.</>}
         </p>
       </div>
 
@@ -219,51 +226,48 @@ export default async function CityStrategyPage({
           {/* Quick Math */}
           <section>
             <h2 className="text-2xl font-bold text-text mb-4">
-              Quick Math: Estimated Annual Return
+              Quick Math: Estimated Cap Rate
             </h2>
             <div className="rounded-xl border border-border bg-white p-6 shadow-sm">
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between">
                   <span className="text-text-muted">
-                    Annual Gross Rent ({usd.format(data.medianRent)}/mo)
+                    Annual Gross Rent ({usd.format(data.medianRent)}/mo &times; 12)
                   </span>
                   <span className="font-medium text-text">
-                    {usd.format(annualRent)}
+                    {usd.format(math.annualRent)}
                   </span>
                 </div>
                 <div className="flex justify-between text-red-600">
-                  <span>Less: Vacancy ({data.vacancyRate}%)</span>
-                  <span>-{usd.format(vacancyLoss)}</span>
-                </div>
-                <div className="flex justify-between text-red-600">
-                  <span>
-                    Less: Property Tax ({data.propertyTaxRate.toFixed(2)}%)
-                  </span>
-                  <span>-{usd.format(propertyTax)}</span>
-                </div>
-                <div className="flex justify-between text-red-600">
-                  <span>Less: Insurance (~0.5%)</span>
-                  <span>-{usd.format(insurance)}</span>
-                </div>
-                <div className="flex justify-between text-red-600">
-                  <span>Less: Maintenance (~1.5%)</span>
-                  <span>-{usd.format(maintenance)}</span>
+                  <span>Less: Operating-Expense Allowance ({opexPct}% of rent)</span>
+                  <span>-{usd.format(math.opex)}</span>
                 </div>
                 <div className="border-t border-border pt-3 flex justify-between font-bold">
                   <span className="text-text">Estimated NOI</span>
-                  <span className={noi >= 0 ? 'text-emerald-600' : 'text-red-600'}>
-                    {usd.format(noi)}
+                  <span className="text-emerald-600">{usd.format(math.noi)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-text-muted">&divide; Median Home Value</span>
+                  <span className="font-medium text-text">
+                    {usd.format(data.medianHomeValue)}
                   </span>
                 </div>
                 <div className="flex justify-between font-bold">
-                  <span className="text-text">Implied Cap Rate</span>
-                  <span className="text-primary">{impliedCap}%</span>
+                  <span className="text-text">Estimated Cap Rate</span>
+                  <span className="text-primary">{fmtCapRate(math.capRate)}</span>
                 </div>
               </div>
-              <p className="mt-4 text-xs text-text-light">
-                Based on median market data. Your actual returns will vary based
-                on specific property, financing, and management costs. Always run
-                your own analysis before investing.
+              <p className="mt-4 text-xs text-text-light leading-5">
+                Same method as our{' '}
+                <Link href={`/calculators/cap-rate/${citySlug}`} className="underline hover:text-primary">
+                  {data.city} cap rate page
+                </Link>
+                : metro median gross rent and median home value (Census ACS 2024
+                1-year) with a {opexPct}% allowance for vacancy, taxes,
+                insurance, maintenance, management and reserves (the
+                &ldquo;50% rule&rdquo;). A market-level estimate, not the return
+                on any specific property; educational only, not investment
+                advice.
               </p>
             </div>
           </section>
@@ -300,14 +304,15 @@ export default async function CityStrategyPage({
             <div className="mt-6 flex flex-wrap justify-center gap-3">
               <Link
                 href={`/calculators/cap-rate?s=${encodeCalculatorState({
-                  purchasePrice: data.medianHomePrice,
+                  purchasePrice: data.medianHomeValue,
                   grossRent: data.medianRent * 12,
-                  vacancy: data.vacancyRate,
-                  propertyTax: Math.round(data.medianHomePrice * data.propertyTaxRate / 100),
-                  insurance: Math.round(data.medianHomePrice * 0.005),
-                  maintenance: Math.round(data.medianHomePrice * 0.015),
-                  management: Math.round(data.medianRent * 12 * 0.1),
-                  otherExpenses: 0,
+                  vacancy: 0,
+                  propertyTax: 0,
+                  insurance: 0,
+                  maintenance: 0,
+                  management: 0,
+                  // The page's 50% allowance, as one line — replace with real figures.
+                  otherExpenses: Math.round(math.opex),
                 })}`}
                 className="rounded-lg bg-accent px-5 py-2.5 text-sm font-bold text-primary-dark hover:bg-accent-light transition-colors"
               >
@@ -381,7 +386,7 @@ export default async function CityStrategyPage({
                 href="/calculators/cap-rate/cities"
                 className="block rounded-lg border border-border/50 px-4 py-3 text-sm font-medium text-text hover:border-primary/40 hover:text-primary hover:shadow-sm transition-all"
               >
-                Full 52-City Data Table
+                Full {TRACKED_MARKET_COUNT}-Metro Data Table
               </Link>
             </div>
           </div>
@@ -470,109 +475,53 @@ export default async function CityStrategyPage({
 // Strategy-specific key metrics
 // ---------------------------------------------------------------------------
 
-function getKeyMetrics(
-  strategySlug: string,
-  city: { avgCapRate: number; rentToPrice: number; medianHomePrice: number; medianRent: number; vacancyRate: number; propertyTaxRate: number; populationGrowth: number; medianHouseholdIncome: number; population: number }
-) {
+function getKeyMetrics(strategySlug: string, city: CityCapRate) {
   const usdFmt = new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD',
     minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
   })
+  const capRate = {
+    label: 'Est. Cap Rate',
+    value: fmtCapRate(city.capRate),
+    note: `Rent less ${Math.round(OPEX_RATIO * 100)}% allowance ÷ value`,
+  }
+  const rentToValue = {
+    label: 'Rent-to-Value',
+    value: `${(city.rentToPrice * 100).toFixed(2)}%`,
+    note: city.rentToPrice >= 0.01 ? 'Meets 1% rule' : 'Below 1% rule',
+  }
+  const homeValue = {
+    label: 'Median Home Value',
+    value: usdFmt.format(city.medianHomeValue),
+    note: 'Owner-occupied, metro',
+  }
+  const rent = {
+    label: 'Median Gross Rent',
+    value: `${usdFmt.format(city.medianRent)}/mo`,
+    note: 'All rental units, metro',
+  }
+  const rentChange = {
+    label: 'Rent Change (1 yr)',
+    value: fmtRentChange(city.rentChange),
+    note: city.rentChange != null ? 'HUD 2BR FMR, FY25→FY26' : 'No HUD FMR match',
+  }
 
   switch (strategySlug) {
     case 'cash-flow':
-      return [
-        {
-          label: 'Cap Rate',
-          value: `${city.avgCapRate.toFixed(1)}%`,
-          note: city.avgCapRate >= 8 ? 'Strong' : city.avgCapRate >= 6 ? 'Good' : 'Moderate',
-        },
-        {
-          label: 'Rent-to-Price',
-          value: `${(city.rentToPrice * 100).toFixed(2)}%`,
-          note: city.rentToPrice >= 0.01 ? 'Meets 1% rule' : 'Below 1% rule',
-        },
-        {
-          label: 'Vacancy Rate',
-          value: `${city.vacancyRate.toFixed(1)}%`,
-          note: city.vacancyRate <= 6 ? 'Very tight' : city.vacancyRate <= 8 ? 'Healthy' : 'Elevated',
-        },
-        {
-          label: 'Property Tax',
-          value: `${city.propertyTaxRate.toFixed(2)}%`,
-          note: city.propertyTaxRate <= 1 ? 'Very low' : city.propertyTaxRate <= 1.5 ? 'Low' : 'Above average',
-        },
-      ]
+      return [capRate, rentToValue, rent, rentChange]
     case 'brrrr':
-      return [
-        {
-          label: 'Median Price',
-          value: usdFmt.format(city.medianHomePrice),
-          note: city.medianHomePrice <= 150000 ? 'Very affordable' : city.medianHomePrice <= 250000 ? 'Affordable' : 'Higher entry',
-        },
-        {
-          label: 'Cap Rate',
-          value: `${city.avgCapRate.toFixed(1)}%`,
-          note: city.avgCapRate >= 8 ? 'Strong' : city.avgCapRate >= 6 ? 'Good' : 'Moderate',
-        },
-        {
-          label: 'Rent-to-Price',
-          value: `${(city.rentToPrice * 100).toFixed(2)}%`,
-          note: 'Post-refi cash flow indicator',
-        },
-        {
-          label: 'Pop. Growth',
-          value: `${city.populationGrowth > 0 ? '+' : ''}${city.populationGrowth.toFixed(1)}%`,
-          note: '5-year trend',
-        },
-      ]
+      return [homeValue, capRate, rentToValue, rentChange]
     case 'house-hacking':
       return [
-        {
-          label: 'Median Price',
-          value: usdFmt.format(city.medianHomePrice),
-          note: `FHA 3.5% down: ${usdFmt.format(Math.round(city.medianHomePrice * 0.035))}`,
-        },
-        {
-          label: 'Median Rent',
-          value: `${usdFmt.format(city.medianRent)}/mo`,
-          note: 'Per-unit rental income',
-        },
-        {
-          label: 'Vacancy Rate',
-          value: `${city.vacancyRate.toFixed(1)}%`,
-          note: city.vacancyRate <= 6 ? 'Very tight' : city.vacancyRate <= 8 ? 'Healthy' : 'Elevated',
-        },
-        {
-          label: 'Pop. Growth',
-          value: `${city.populationGrowth > 0 ? '+' : ''}${city.populationGrowth.toFixed(1)}%`,
-          note: '5-year trend',
-        },
+        { ...homeValue, note: `3.5% down: ${usdFmt.format(Math.round(city.medianHomeValue * 0.035))}` },
+        rent,
+        capRate,
+        rentChange,
       ]
     case 'appreciation':
-      return [
-        {
-          label: 'Pop. Growth',
-          value: `${city.populationGrowth > 0 ? '+' : ''}${city.populationGrowth.toFixed(1)}%`,
-          note: city.populationGrowth >= 10 ? 'Exceptional' : city.populationGrowth >= 5 ? 'Strong' : 'Moderate',
-        },
-        {
-          label: 'Median Income',
-          value: usdFmt.format(city.medianHouseholdIncome),
-          note: 'Household income',
-        },
-        {
-          label: 'Vacancy Rate',
-          value: `${city.vacancyRate.toFixed(1)}%`,
-          note: city.vacancyRate <= 6 ? 'Very tight supply' : 'Moderate supply',
-        },
-        {
-          label: 'Population',
-          value: city.population >= 1000000 ? `${(city.population / 1000000).toFixed(1)}M` : `${Math.round(city.population / 1000)}K`,
-          note: 'Metro demand indicator',
-        },
-      ]
+      return [rentChange, homeValue, rent, capRate]
     default:
       return []
   }

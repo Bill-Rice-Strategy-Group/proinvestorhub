@@ -189,7 +189,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'monthly' as const,
       priority: 0.6,
     })),
-    // City x Strategy pages (208 pages)
+    // City x Strategy pages (4 strategies x cities.length)
     ...strategies.flatMap((s) =>
       cities.map((c) => ({
         url: `${baseUrl}/markets/${s.slug}/${c.slug}`,

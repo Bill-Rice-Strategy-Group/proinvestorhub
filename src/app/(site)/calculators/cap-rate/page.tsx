@@ -4,7 +4,7 @@ import { CapRateCalculator } from '@/components/calculators/cap-rate-calculator'
 import { CalculatorEmbed } from '@/components/calculator-embed'
 import { JsonLd, calculatorJsonLd, breadcrumbJsonLd, faqJsonLd, howToJsonLd } from '@/components/json-ld'
 import { CalculatorRelatedTools } from '@/components/calculator-related-tools'
-import { cities } from '@/data/cap-rate-cities'
+import { cities, fmtCapRate, OPEX_RATIO, TRACKED_MARKET_COUNT } from '@/data/cap-rate-cities'
 
 export const metadata: Metadata = {
   title: 'Cap Rate Calculator + Formula: How to Calculate Cap Rate',
@@ -394,73 +394,50 @@ export default function CapRateCalculatorPage() {
               Cap Rates by City
             </h2>
             <p className="mt-2 text-text-muted">
-              Compare cap rates across the top US real estate investing markets.
+              Estimated cap rates for the {TRACKED_MARKET_COUNT} metros we
+              track, from Census ACS 2024 median rent and home value with a{' '}
+              {Math.round(OPEX_RATIO * 100)}% operating-expense allowance.
             </p>
           </div>
           <Link
             href="/calculators/cap-rate/cities"
             className="hidden sm:inline-flex items-center text-sm font-medium text-primary hover:text-primary-light transition-colors"
           >
-            View All 50 Markets &rarr;
+            View All {TRACKED_MARKET_COUNT} Markets &rarr;
           </Link>
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-          {cities.slice(0, 10).map((city) => {
-            const badgeClass =
-              city.avgCapRate >= 10
-                ? 'bg-blue-100 text-blue-700'
-                : city.avgCapRate >= 8
-                  ? 'bg-emerald-100 text-emerald-700'
-                  : city.avgCapRate >= 6
-                    ? 'bg-emerald-50 text-emerald-600'
-                    : city.avgCapRate >= 4
-                      ? 'bg-amber-50 text-amber-700'
-                      : 'bg-red-50 text-red-600'
-
-            return (
-              <Link
-                key={city.slug}
-                href={`/calculators/cap-rate/${city.slug}`}
-                className="rounded-xl border border-border bg-white p-5 hover:border-primary/40 hover:shadow-md transition-all group"
-              >
-                <p className="text-sm font-semibold text-text group-hover:text-primary transition-colors">
-                  {city.city}, {city.state}
-                </p>
-                <p className="mt-2 text-2xl font-bold text-primary tabular-nums">
-                  {city.avgCapRate.toFixed(1)}%
-                </p>
-                <span
-                  className={`mt-2 inline-block rounded-full px-2 py-0.5 text-xs font-medium ${badgeClass}`}
-                >
-                  {city.avgCapRate >= 10
-                    ? 'Excellent'
-                    : city.avgCapRate >= 8
-                      ? 'Very Good'
-                      : city.avgCapRate >= 6
-                        ? 'Good'
-                        : city.avgCapRate >= 4
-                          ? 'Moderate'
-                          : 'Low'}
-                </span>
-                <p className="mt-2 text-xs text-text-light">
-                  {new Intl.NumberFormat('en-US', {
-                    style: 'currency',
-                    currency: 'USD',
-                    minimumFractionDigits: 0,
-                    maximumFractionDigits: 0,
-                  }).format(city.medianHomePrice)}{' '}
-                  median
-                </p>
-              </Link>
-            )
-          })}
+          {cities.slice(0, 10).map((city) => (
+            <Link
+              key={city.slug}
+              href={`/calculators/cap-rate/${city.slug}`}
+              className="rounded-xl border border-border bg-white p-5 hover:border-primary/40 hover:shadow-md transition-all group"
+            >
+              <p className="text-sm font-semibold text-text group-hover:text-primary transition-colors">
+                {city.city}, {city.state}
+              </p>
+              <p className="mt-2 text-2xl font-bold text-primary tabular-nums">
+                {fmtCapRate(city.capRate)}
+              </p>
+              <p className="mt-1 text-xs text-text-light">est. cap rate (metro)</p>
+              <p className="mt-2 text-xs text-text-light">
+                {new Intl.NumberFormat('en-US', {
+                  style: 'currency',
+                  currency: 'USD',
+                  minimumFractionDigits: 0,
+                  maximumFractionDigits: 0,
+                }).format(city.medianHomeValue)}{' '}
+                median value
+              </p>
+            </Link>
+          ))}
         </div>
         <div className="mt-6 text-center sm:hidden">
           <Link
             href="/calculators/cap-rate/cities"
             className="inline-flex items-center text-sm font-medium text-primary hover:text-primary-light transition-colors"
           >
-            View All 50 Markets &rarr;
+            View All {TRACKED_MARKET_COUNT} Markets &rarr;
           </Link>
         </div>
       </section>

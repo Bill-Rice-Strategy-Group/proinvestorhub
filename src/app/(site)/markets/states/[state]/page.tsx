@@ -10,9 +10,9 @@ import {
   getStateAverages,
   getBestStrategyForCity,
   generateStateFAQs,
-  stateMetadata,
 } from '@/data/city-strategy-helpers'
 import { getDataFreshness } from '@/data/market-queries'
+import { fmtRentChange, ACS_SOURCE_LABEL, FMR_SOURCE_LABEL } from '@/data/cap-rate-cities'
 
 // Hardcoded list for generateStaticParams (just needs slugs, not live data)
 const statesList = getStatesList()
@@ -31,7 +31,7 @@ export async function generateMetadata({
   if (!state) return {}
 
   const title = `Real Estate Investing in ${state.name} 2026 | ProInvestorHub`
-  const description = `${state.name} real estate investing data: ${state.cities.length} markets analyzed with cap rates, rent-to-price ratios, and strategy rankings. Find the best investment cities in ${state.name}.`
+  const description = `${state.name} real estate investing data: ${state.cities.length} metro ${state.cities.length === 1 ? 'area' : 'areas'} with Census ACS 2024 rent and home-value data, estimated cap rates, and strategy rankings. Find the best investment cities in ${state.name}.`
 
   return {
     title,
@@ -54,7 +54,7 @@ export default async function StateDetailPage({
 }) {
   const { state: stateSlug } = await params
 
-  // Fetch live data from Sanity (falls back to hardcoded)
+  // Repo dataset (Census ACS 2024 + HUD FMR) — see src/data/cap-rate-cities.ts
   const [liveStates, freshness] = await Promise.all([
     fetchStatesList(),
     getDataFreshness(),
@@ -67,11 +67,13 @@ export default async function StateDetailPage({
   const avgs = getStateAverages(state.cities)
   const faqs = generateStateFAQs(state.name, state.cities)
   const lastUpdated = freshness.dataUpdatedAt
-    ? new Date(freshness.dataUpdatedAt).toLocaleDateString('en-US', {
+    ? new Date(`${freshness.dataUpdatedAt}T00:00:00Z`).toLocaleDateString('en-US', {
         month: 'long',
+        day: 'numeric',
         year: 'numeric',
+        timeZone: 'UTC',
       })
-    : 'March 2026'
+    : null
 
   // Compute best strategy for each city
   const citiesWithStrategy = state.cities
@@ -79,7 +81,7 @@ export default async function StateDetailPage({
       const best = getBestStrategyForCity(city)
       return { ...city, bestStrategy: best.strategy, bestScore: best.score }
     })
-    .sort((a, b) => b.avgCapRate - a.avgCapRate)
+    .sort((a, b) => b.capRate - a.capRate)
 
   // Find dominant strategy for the state
   const strategyCounts = new Map<string, number>()
@@ -142,13 +144,15 @@ export default async function StateDetailPage({
         </h1>
         <p className="mt-3 text-lg text-text-muted leading-7">
           We track {state.cities.length}{' '}
-          {state.cities.length === 1 ? 'market' : 'markets'} in {state.name}
-          {' '}with detailed investment metrics.
+          {state.cities.length === 1 ? 'metro area' : 'metro areas'} in{' '}
+          {state.name}.
           {dominantStrategy &&
-            ` Most cities here score highest for ${dominantStrategy.shortTitle.toLowerCase()} investing.`}
+            ` Most of them score highest for ${dominantStrategy.shortTitle.toLowerCase()} investing.`}
         </p>
         <p className="mt-2 text-xs text-text-light">
-          Last updated: {lastUpdated}
+          Sources: U.S. Census Bureau, {ACS_SOURCE_LABEL}; {FMR_SOURCE_LABEL}.
+          {lastUpdated && <> Data file generated {lastUpdated}.</>} Averages
+          are simple averages of the tracked metros.
         </p>
       </div>
 
@@ -157,7 +161,7 @@ export default async function StateDetailPage({
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
           <div className="rounded-xl border border-border bg-white p-4 shadow-sm">
             <p className="text-xs font-medium text-text-muted uppercase tracking-wide">
-              Avg Cap Rate
+              Avg Est. Cap Rate
             </p>
             <p className="mt-1 text-xl font-bold text-text">
               {avgs.avgCapRate.toFixed(1)}%
@@ -165,15 +169,15 @@ export default async function StateDetailPage({
           </div>
           <div className="rounded-xl border border-border bg-white p-4 shadow-sm">
             <p className="text-xs font-medium text-text-muted uppercase tracking-wide">
-              Avg Home Price
+              Avg Median Home Value
             </p>
             <p className="mt-1 text-xl font-bold text-text">
-              {usd.format(avgs.avgMedianHomePrice)}
+              {usd.format(avgs.avgMedianHomeValue)}
             </p>
           </div>
           <div className="rounded-xl border border-border bg-white p-4 shadow-sm">
             <p className="text-xs font-medium text-text-muted uppercase tracking-wide">
-              Avg Rent
+              Avg Median Rent
             </p>
             <p className="mt-1 text-xl font-bold text-text">
               {usd.format(avgs.avgMedianRent)}/mo
@@ -181,10 +185,10 @@ export default async function StateDetailPage({
           </div>
           <div className="rounded-xl border border-border bg-white p-4 shadow-sm">
             <p className="text-xs font-medium text-text-muted uppercase tracking-wide">
-              Avg Vacancy
+              Avg Rent Change (1 yr)
             </p>
             <p className="mt-1 text-xl font-bold text-text">
-              {avgs.avgVacancyRate.toFixed(1)}%
+              {fmtRentChange(avgs.avgRentChange)}
             </p>
           </div>
         </div>
@@ -201,18 +205,18 @@ export default async function StateDetailPage({
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-border text-left text-text-muted">
-                    <th className="pb-2 pr-4 font-medium">City</th>
+                    <th className="pb-2 pr-4 font-medium">Metro</th>
                     <th className="pb-2 pr-4 font-medium text-right">
-                      Cap Rate
+                      Est. Cap Rate
                     </th>
                     <th className="pb-2 pr-4 font-medium text-right">
-                      Median Price
+                      Median Value
                     </th>
                     <th className="pb-2 pr-4 font-medium text-right">
                       Rent
                     </th>
                     <th className="pb-2 pr-4 font-medium text-right">
-                      Growth
+                      Rent Change
                     </th>
                     <th className="pb-2 font-medium">Best Strategy</th>
                   </tr>
@@ -232,25 +236,16 @@ export default async function StateDetailPage({
                         </Link>
                       </td>
                       <td className="py-3 pr-4 text-right font-semibold text-primary">
-                        {city.avgCapRate.toFixed(1)}%
+                        {city.capRate.toFixed(1)}%
                       </td>
                       <td className="py-3 pr-4 text-right text-text-muted">
-                        {usd.format(city.medianHomePrice)}
+                        {usd.format(city.medianHomeValue)}
                       </td>
                       <td className="py-3 pr-4 text-right text-text-muted">
                         {usd.format(city.medianRent)}
                       </td>
-                      <td className="py-3 pr-4 text-right">
-                        <span
-                          className={
-                            city.populationGrowth > 0
-                              ? 'text-emerald-600'
-                              : 'text-red-600'
-                          }
-                        >
-                          {city.populationGrowth > 0 ? '+' : ''}
-                          {city.populationGrowth.toFixed(1)}%
-                        </span>
+                      <td className="py-3 pr-4 text-right text-text-muted">
+                        {fmtRentChange(city.rentChange)}
                       </td>
                       <td className="py-3">
                         <Link
@@ -282,7 +277,7 @@ export default async function StateDetailPage({
                   </strong>{' '}
                   investing.{' '}
                   {strategyCounts.get(dominantSlug!)}/{state.cities.length}{' '}
-                  cities in the state score highest for this approach.{' '}
+                  tracked metros in the state score highest for this approach.{' '}
                   {dominantStrategy.description}
                 </p>
                 <Link
@@ -362,7 +357,7 @@ export default async function StateDetailPage({
                 >
                   <span className="font-medium text-text">{city.city}</span>
                   <span className="text-primary font-semibold">
-                    {city.avgCapRate.toFixed(1)}%
+                    {city.capRate.toFixed(1)}%
                   </span>
                 </Link>
               ))}
@@ -402,7 +397,7 @@ export default async function StateDetailPage({
                   {s.name}{' '}
                   <span className="text-text-light">
                     ({s.cities.length}{' '}
-                    {s.cities.length === 1 ? 'city' : 'cities'})
+                    {s.cities.length === 1 ? 'metro' : 'metros'})
                   </span>
                 </Link>
               ))}

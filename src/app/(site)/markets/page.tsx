@@ -3,27 +3,19 @@ import Link from 'next/link'
 import { JsonLd, breadcrumbJsonLd } from '@/components/json-ld'
 import { strategies, fetchCitiesForStrategy } from '@/data/market-strategies'
 import { getDataFreshness } from '@/data/market-queries'
-import { getStatesList, getStateAverages } from '@/data/city-strategy-helpers'
+import { getStatesList } from '@/data/city-strategy-helpers'
+import { TRACKED_MARKET_COUNT } from '@/data/cap-rate-cities'
 
 export const metadata: Metadata = {
   title: 'Best Cities for Real Estate Investing 2026 — By Strategy',
   description:
-    'Compare the best US cities for real estate investing by strategy: cash flow, BRRRR, house hacking, and appreciation. Data-driven rankings for 50 markets.',
+    `Compare the best US cities for real estate investing by strategy: cash flow, BRRRR, house hacking, and appreciation. Data-driven rankings for ${TRACKED_MARKET_COUNT} metros.`,
   alternates: { canonical: '/markets' },
   openGraph: {
     title: 'Best Cities for Real Estate Investing 2026 | ProInvestorHub',
     description:
-      'Compare 50 US markets ranked by cash flow, BRRRR, house hacking, and appreciation potential.',
+      `Compare ${TRACKED_MARKET_COUNT} US metros ranked by cash flow, BRRRR, house hacking, and appreciation potential.`,
   },
-}
-
-function formatCurrency(value: number): string {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(value)
 }
 
 export default async function MarketsHubPage() {
@@ -32,8 +24,8 @@ export default async function MarketsHubPage() {
 
   const freshness = await getDataFreshness()
   const lastUpdated = freshness.dataUpdatedAt
-    ? new Date(freshness.dataUpdatedAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
-    : 'March 2026'
+    ? new Date(`${freshness.dataUpdatedAt}T00:00:00Z`).toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' })
+    : null
 
   // Pre-fetch all strategy rankings in parallel
   const strategyRankings = await Promise.all(
@@ -62,11 +54,12 @@ export default async function MarketsHubPage() {
           The right market depends on your strategy. A city that is perfect for
           cash flow investing may be a poor choice for appreciation, and the best
           BRRRR markets are not necessarily the best for house hacking. We rank
-          all 50 major US investment markets for each strategy using a
-          data-driven scoring system.
+          the {TRACKED_MARKET_COUNT} US metros we track for each strategy using a
+          transparent scoring system built on Census and HUD data.
         </p>
         <p className="mt-2 text-xs text-text-light">
-          Last updated: {lastUpdated}
+          Sources: {freshness.dataSources.join('; ')}.
+          {lastUpdated && <> Data file generated {lastUpdated}.</>}
         </p>
       </div>
 
@@ -123,18 +116,20 @@ export default async function MarketsHubPage() {
           How We Rank Markets
         </h2>
         <p className="mt-4 text-text-muted leading-7">
-          Each strategy uses a weighted composite score based on the market data
-          points that matter most for that approach. Cash flow rankings weight
-          rent-to-price ratio and cap rates heavily. BRRRR rankings prioritize
-          affordable entry prices and strong cap rates. House hacking rankings
-          balance affordability with livability. Appreciation rankings emphasize
-          population growth and income levels. Every score is transparent — click
-          into any strategy to see the full methodology and all 50 markets.
+          Each strategy uses a weighted composite score built from the market
+          data points that matter most for that approach. Cash flow rankings
+          weight the estimated cap rate heavily. BRRRR rankings balance
+          affordable entry prices with estimated cap rate. House hacking
+          rankings prioritize affordability. Appreciation rankings emphasize
+          recent rent change and home-value level. Every score is transparent —
+          click into any strategy to see the full methodology and all{' '}
+          {TRACKED_MARKET_COUNT} metros.
         </p>
         <p className="mt-4 text-text-muted leading-7">
-          Market data is sourced from Census ACS, Zillow, Redfin, county
-          assessor records, and BLS employment data. All figures represent
-          metro-level estimates and will vary by neighborhood, property type, and
+          Median rent and home value come from the U.S. Census Bureau&rsquo;s
+          American Community Survey (2024 1-year estimates); rent change comes
+          from HUD&rsquo;s two-bedroom Fair Market Rents (FY2026 vs FY2025). All
+          figures are metro-level estimates and will vary by neighborhood, property type, and
           condition. Always run your own analysis on specific properties using
           our{' '}
           <Link

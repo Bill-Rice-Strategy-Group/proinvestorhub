@@ -1,17 +1,18 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { JsonLd, breadcrumbJsonLd } from '@/components/json-ld'
-import { fetchStatesList, getStateAverages } from '@/data/city-strategy-helpers'
+import { fetchStatesList, getStateAverages, getStatesList } from '@/data/city-strategy-helpers'
+
+const STATE_COUNT = getStatesList().length
+const STATES_DESCRIPTION = `Compare real estate investment markets by state: average estimated cap rates, median home values, and top metros across the ${STATE_COUNT} US states we track, from Census ACS 2024 data.`
 
 export const metadata: Metadata = {
   title: 'Best States for Real Estate Investing 2026',
-  description:
-    'Compare real estate investment markets by state. Average cap rates, home prices, and top cities across 29 US states we track.',
+  description: STATES_DESCRIPTION,
   alternates: { canonical: '/markets/states' },
   openGraph: {
     title: 'Best States for Real Estate Investing 2026',
-    description:
-      'Compare real estate investment markets by state. Average cap rates, home prices, and top cities across 29 US states we track.',
+    description: STATES_DESCRIPTION,
   },
 }
 
@@ -59,9 +60,10 @@ export default async function StatesHubPage() {
         </h1>
         <p className="mt-3 text-lg text-text-muted leading-7">
           Browse real estate investment markets by state. We track{' '}
-          {states.reduce((sum, s) => sum + s.cities.length, 0)} cities across{' '}
-          {states.length} states with detailed market data, cap rates, and
-          strategy rankings.
+          {states.reduce((sum, s) => sum + s.cities.length, 0)} metro areas across{' '}
+          {states.length} states, with Census ACS 2024 rent and home-value
+          data, estimated cap rates, and strategy rankings. Figures are
+          metro-level; averages are simple averages of the tracked metros.
         </p>
       </div>
 
@@ -70,7 +72,7 @@ export default async function StatesHubPage() {
         {states.map((state) => {
           const avgs = getStateAverages(state.cities)
           const topCity = state.cities.reduce(
-            (best, c) => (c.avgCapRate > best.avgCapRate ? c : best),
+            (best, c) => (c.capRate > best.capRate ? c : best),
             state.cities[0]
           )
           return (
@@ -85,26 +87,25 @@ export default async function StatesHubPage() {
                 </h2>
                 <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary">
                   {state.cities.length}{' '}
-                  {state.cities.length === 1 ? 'city' : 'cities'}
+                  {state.cities.length === 1 ? 'metro' : 'metros'}
                 </span>
               </div>
               <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
                 <div>
-                  <p className="text-text-light text-xs">Avg Cap Rate</p>
+                  <p className="text-text-light text-xs">Avg Est. Cap Rate</p>
                   <p className="font-semibold text-text">
                     {avgs.avgCapRate.toFixed(1)}%
                   </p>
                 </div>
                 <div>
-                  <p className="text-text-light text-xs">Avg Home Price</p>
+                  <p className="text-text-light text-xs">Avg Median Home Value</p>
                   <p className="font-semibold text-text">
-                    {usd.format(avgs.avgMedianHomePrice)}
+                    {usd.format(avgs.avgMedianHomeValue)}
                   </p>
                 </div>
               </div>
               <p className="mt-3 text-xs text-text-muted">
-                Top market: {topCity.city} ({topCity.avgCapRate.toFixed(1)}%
-                cap rate)
+                Highest est. cap rate: {topCity.city} ({topCity.capRate.toFixed(1)}%)
               </p>
             </Link>
           )

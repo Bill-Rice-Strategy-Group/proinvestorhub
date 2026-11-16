@@ -3,7 +3,21 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { JsonLd, breadcrumbJsonLd } from '@/components/json-ld'
 import { CalculatorCTA } from '@/components/calculator-cta'
-import { cities, getRelatedCities } from '@/data/cap-rate-cities'
+import {
+  cities,
+  getRelatedCities,
+  capRateRank,
+  capRateBand,
+  computeCapRate,
+  fmtCapRate,
+  fmtRentChange,
+  OPEX_RATIO,
+  TRACKED_MARKET_COUNT,
+  ACS_SOURCE_LABEL,
+  FMR_SOURCE_LABEL,
+  DATA_GENERATED_AT,
+  type CapRateBand,
+} from '@/data/cap-rate-cities'
 import { strategies } from '@/data/market-strategies'
 import { client } from '@/sanity/lib/client'
 
@@ -16,62 +30,37 @@ function formatCurrency(value: number): string {
   }).format(value)
 }
 
-function formatPercent(value: number, decimals = 1): string {
-  return `${value.toFixed(decimals)}%`
-}
-
-function formatPopulation(value: number): string {
-  if (value >= 1_000_000) {
-    return `${(value / 1_000_000).toFixed(1)}M`
-  }
-  return `${(value / 1_000).toFixed(0)}K`
-}
-
-function getCapRateRating(rate: number): {
-  label: string
-  color: string
-  bgColor: string
-  description: string
-} {
-  if (rate < 4)
-    return {
-      label: 'Low',
-      color: 'text-red-600',
-      bgColor: 'bg-red-50 border-red-200',
-      description:
-        'Below average return. Common in high-appreciation markets. You are betting on property value growth, not cash flow.',
-    }
-  if (rate < 6)
-    return {
-      label: 'Moderate',
-      color: 'text-amber-600',
-      bgColor: 'bg-amber-50 border-amber-200',
-      description:
-        'Typical for stable markets with moderate growth potential. Balanced risk-return profile.',
-    }
-  if (rate < 8)
-    return {
-      label: 'Good',
-      color: 'text-emerald-600',
-      bgColor: 'bg-emerald-50 border-emerald-200',
-      description:
-        'Strong return relative to market norms. Common in cash-flow-focused markets in the Midwest and South.',
-    }
-  if (rate < 10)
-    return {
-      label: 'Very Good',
-      color: 'text-emerald-700',
-      bgColor: 'bg-emerald-50 border-emerald-200',
-      description:
-        'Above average. Make sure the higher return is not masking higher risk or deferred maintenance.',
-    }
-  return {
-    label: 'Excellent (verify risk)',
-    color: 'text-blue-600',
-    bgColor: 'bg-blue-50 border-blue-200',
+const BAND_INFO: Record<
+  CapRateBand,
+  { label: string; color: string; bgColor: string; description: string }
+> = {
+  upper: {
+    label: 'Upper third of tracked markets',
+    color: 'text-emerald-700',
+    bgColor: 'bg-emerald-50 border-emerald-200',
     description:
-      'Unusually high. Double-check the numbers — high cap rates can signal higher vacancy, crime, or obsolescence risk.',
-  }
+      'Typical rent is high relative to typical home value here compared with the other tracked metros — the profile of a cash-flow-oriented market. Higher rent-to-value can also reflect higher vacancy, older housing stock, or weaker price growth, so check the neighborhood-level picture.',
+  },
+  middle: {
+    label: 'Middle third of tracked markets',
+    color: 'text-amber-700',
+    bgColor: 'bg-amber-50 border-amber-200',
+    description:
+      'Rent relative to home value sits in the middle of the tracked metros. Returns here tend to depend on buying well and on the specific submarket.',
+  },
+  lower: {
+    label: 'Lower third of tracked markets',
+    color: 'text-red-700',
+    bgColor: 'bg-red-50 border-red-200',
+    description:
+      'Home values are high relative to rents compared with the other tracked metros. Investors here are usually relying more on appreciation than on cash flow.',
+  },
+}
+
+function formatDataDate(iso: string | null): string | null {
+  if (!iso) return null
+  const d = new Date(`${iso}T00:00:00Z`)
+  return d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' })
 }
 
 export function generateStaticParams() {
@@ -87,8 +76,9 @@ export async function generateMetadata({
   const city = cities.find((c) => c.slug === slug)
   if (!city) return {}
 
-  const title = `${city.city}, ${city.state} Cap Rate 2026: ${city.avgCapRate}% Average`
-  const description = `The average cap rate in ${city.city}, ${city.state} is ${city.avgCapRate}% in 2026. Compare median home prices, rents, vacancy, and property taxes — plus a free cap rate calculator for ${city.city} deals.`
+  const cap = fmtCapRate(city.capRate)
+  const title = `${city.city}, ${city.state} Cap Rate: ${cap} Estimate (ACS 2024 Data)`
+  const description = `Estimated cap rate for the ${city.metroName} metro: ${cap}, from Census ACS 2024 median rent and home value with a ${Math.round(OPEX_RATIO * 100)}% expense allowance. See the math, the source, and a free cap rate calculator for ${city.city} deals.`
 
   return {
     title,
@@ -113,13 +103,16 @@ export default async function CityCapRatePage({
   const baseUrl =
     process.env.NEXT_PUBLIC_SITE_URL || 'https://proinvestorhub.com'
 
-  const rating = getCapRateRating(city.avgCapRate)
+  const rating = BAND_INFO[capRateBand(city.slug)]
+  const math = computeCapRate(city.medianRent, city.medianHomeValue)
+  const opexPct = Math.round(OPEX_RATIO * 100)
+  const dataDate = formatDataDate(DATA_GENERATED_AT)
   const relatedSlugs = getRelatedCities(city.slug)
   const relatedCities = relatedSlugs
     .map((s) => cities.find((c) => c.slug === s))
     .filter(Boolean) as typeof cities
 
-  const rank = cities.findIndex((c) => c.slug === slug) + 1
+  const rank = capRateRank(slug)
 
   // Fetch neighborhood data from Sanity
   type Neighborhood = { name: string; description: string; investorProfile: string }
@@ -190,63 +183,63 @@ export default async function CityCapRatePage({
           Cap Rate in {city.city}, {city.state}
         </h1>
         <p className="mt-3 text-lg text-text-muted leading-7">
-          2026 Market Overview for Real Estate Investors
+          Estimated from Census rent and home-value data for the{' '}
+          {city.metroName} metro area
         </p>
         <p className="mt-1 text-xs text-text-light">
-          Last updated: March 2026 &bull; Sources: Census ACS, Zillow, Redfin,
-          county assessor
+          Source: U.S. Census Bureau, {ACS_SOURCE_LABEL} (median gross rent,
+          median home value){city.rentChange != null && <>; {FMR_SOURCE_LABEL}</>}.
+          {dataDate && <> Data file generated {dataDate}.</>}
         </p>
       </div>
 
       {/* Key Metrics Cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-10">
         <div className="rounded-xl border border-border bg-white p-6 shadow-sm">
-          <p className="text-sm text-text-muted">Avg Cap Rate</p>
+          <p className="text-sm text-text-muted">Est. Cap Rate</p>
           <p className="mt-1 text-3xl font-bold text-primary tabular-nums">
-            {formatPercent(city.avgCapRate)}
+            {fmtCapRate(city.capRate)}
           </p>
           <p className="mt-1 text-xs text-text-light">
-            #{rank} of {cities.length} markets
+            #{rank} of {cities.length} tracked metros &bull; see Quick Math
           </p>
         </div>
         <div className="rounded-xl border border-border bg-white p-6 shadow-sm">
-          <p className="text-sm text-text-muted">Median Home Price</p>
+          <p className="text-sm text-text-muted">Median Home Value</p>
           <p className="mt-1 text-3xl font-bold text-text tabular-nums">
-            {formatCurrency(city.medianHomePrice)}
+            {formatCurrency(city.medianHomeValue)}
           </p>
-          <p className="mt-1 text-xs text-text-light">Purchase price</p>
+          <p className="mt-1 text-xs text-text-light">Owner-occupied homes, metro</p>
         </div>
         <div className="rounded-xl border border-border bg-white p-6 shadow-sm">
-          <p className="text-sm text-text-muted">Median Monthly Rent</p>
+          <p className="text-sm text-text-muted">Median Gross Rent</p>
           <p className="mt-1 text-3xl font-bold text-text tabular-nums">
             {formatCurrency(city.medianRent)}
           </p>
           <p className="mt-1 text-xs text-text-light">
-            {formatCurrency(city.medianRent * 12)}/yr gross
+            Per month, incl. tenant-paid utilities &bull;{' '}
+            {formatCurrency(city.medianRent * 12)}/yr
           </p>
         </div>
         <div className="rounded-xl border border-border bg-white p-6 shadow-sm">
-          <p className="text-sm text-text-muted">Rent-to-Price Ratio</p>
+          <p className="text-sm text-text-muted">Rent-to-Value Ratio</p>
           <p className="mt-1 text-3xl font-bold text-text tabular-nums">
             {(city.rentToPrice * 100).toFixed(2)}%
           </p>
           <p className="mt-1 text-xs text-text-light">
-            {city.rentToPrice >= 0.008
-              ? 'Strong (1% rule range)'
-              : city.rentToPrice >= 0.005
-                ? 'Moderate'
-                : 'Below 1% rule'}
+            Monthly rent &divide; home value &bull;{' '}
+            {city.rentToPrice >= 0.01 ? 'Meets 1% rule' : 'Below 1% rule'}
           </p>
         </div>
       </div>
 
       {/* Cap Rate Rating */}
-      <div
-        className={`rounded-xl border p-6 mb-10 ${rating.bgColor}`}
-      >
+      <div className={`rounded-xl border p-6 mb-10 ${rating.bgColor}`}>
         <div className="flex items-start gap-4">
           <div>
-            <p className="text-sm font-semibold text-text">Cap Rate Rating</p>
+            <p className="text-sm font-semibold text-text">
+              Where {city.city} Sits
+            </p>
             <p className={`mt-1 text-2xl font-bold ${rating.color}`}>
               {rating.label}
             </p>
@@ -267,71 +260,65 @@ export default async function CityCapRatePage({
                 <tbody className="text-text-muted">
                   <tr className="border-b border-border/50">
                     <td className="py-3 pr-6 font-medium text-text">
-                      Population
+                      Geography
                     </td>
-                    <td className="py-3 tabular-nums">
-                      {city.population.toLocaleString('en-US')}
-                    </td>
-                  </tr>
-                  <tr className="border-b border-border/50">
-                    <td className="py-3 pr-6 font-medium text-text">
-                      5-Year Population Growth
-                    </td>
-                    <td className="py-3 tabular-nums">
-                      <span
-                        className={
-                          city.populationGrowth > 0
-                            ? 'text-emerald-600'
-                            : city.populationGrowth < 0
-                              ? 'text-red-600'
-                              : ''
-                        }
-                      >
-                        {city.populationGrowth > 0 ? '+' : ''}
-                        {formatPercent(city.populationGrowth)}
-                      </span>
+                    <td className="py-3">
+                      {city.metroName} metropolitan statistical area
+                      {city.cbsa && <> (CBSA {city.cbsa})</>}
                     </td>
                   </tr>
                   <tr className="border-b border-border/50">
                     <td className="py-3 pr-6 font-medium text-text">
-                      Median Household Income
+                      Gross Rental Yield
                     </td>
                     <td className="py-3 tabular-nums">
-                      {formatCurrency(city.medianHouseholdIncome)}
-                    </td>
-                  </tr>
-                  <tr className="border-b border-border/50">
-                    <td className="py-3 pr-6 font-medium text-text">
-                      Vacancy Rate
-                    </td>
-                    <td className="py-3 tabular-nums">
-                      <span
-                        className={
-                          city.vacancyRate > 9
-                            ? 'text-red-600'
-                            : city.vacancyRate > 7
-                              ? 'text-amber-600'
-                              : 'text-emerald-600'
-                        }
-                      >
-                        {formatPercent(city.vacancyRate)}
+                      {(city.grossYield * 100).toFixed(1)}%
+                      <span className="ml-2 text-text-light">
+                        (annual rent &divide; home value, before expenses)
                       </span>
                     </td>
                   </tr>
                   <tr>
                     <td className="py-3 pr-6 font-medium text-text">
-                      Property Tax Rate
+                      Rent Change (1 yr)
                     </td>
                     <td className="py-3 tabular-nums">
-                      {formatPercent(city.propertyTaxRate, 2)}
-                      <span className="ml-2 text-text-light">
-                        ({formatCurrency(city.medianHomePrice * city.propertyTaxRate / 100)}/yr)
-                      </span>
+                      {city.rentChange != null ? (
+                        <>
+                          <span
+                            className={
+                              city.rentChange > 0
+                                ? 'text-emerald-600'
+                                : city.rentChange < 0
+                                  ? 'text-red-600'
+                                  : ''
+                            }
+                          >
+                            {fmtRentChange(city.rentChange)}
+                          </span>
+                          <span className="ml-2 text-text-light">
+                            HUD 2BR Fair Market Rent, {city.fmrAreaName}:{' '}
+                            {formatCurrency(city.fmrPrev2br ?? 0)} (FY2025) &rarr;{' '}
+                            {formatCurrency(city.fmr2br ?? 0)} (FY2026)
+                          </span>
+                        </>
+                      ) : (
+                        <span className="text-text-light">
+                          Not available — no HUD Fair Market Rent area is
+                          matched to this metro in our data.
+                        </span>
+                      )}
                     </td>
                   </tr>
                 </tbody>
               </table>
             </div>
+            <p className="mt-3 text-xs text-text-light leading-5">
+              We do not show vacancy, property-tax, population or income
+              figures for this market: our dataset does not include a sourced
+              figure for them. Check the county assessor for the tax rate on a
+              specific property.
+            </p>
           </section>
 
           {/* Investor Takeaway */}
@@ -384,70 +371,58 @@ export default async function CityCapRatePage({
           <section>
             <h2 className="text-2xl font-bold text-text">Quick Math</h2>
             <p className="mt-2 text-sm text-text-muted leading-6">
-              Estimated annual numbers for a median-priced property in{' '}
-              {city.city}, {city.state} before financing:
+              How the {fmtCapRate(city.capRate)} estimate is built, for a
+              home at the metro median value renting at the metro median rent,
+              before financing:
             </p>
             <div className="mt-4 space-y-3 text-sm">
               <div className="flex justify-between border-b border-border/50 pb-3">
-                <span className="text-text-muted">Annual Gross Rent</span>
+                <span className="text-text-muted">
+                  Annual Gross Rent ({formatCurrency(city.medianRent)} &times; 12)
+                </span>
                 <span className="tabular-nums font-medium text-text">
-                  {formatCurrency(city.medianRent * 12)}
+                  {formatCurrency(math.annualRent)}
                 </span>
               </div>
               <div className="flex justify-between border-b border-border/50 pb-3">
                 <span className="text-text-muted">
-                  Less Vacancy ({formatPercent(city.vacancyRate)})
+                  Less Operating-Expense Allowance ({opexPct}% of rent)
                 </span>
                 <span className="tabular-nums text-red-500">
-                  ({formatCurrency(city.medianRent * 12 * city.vacancyRate / 100)})
-                </span>
-              </div>
-              <div className="flex justify-between border-b border-border/50 pb-3">
-                <span className="text-text-muted">
-                  Less Property Tax ({formatPercent(city.propertyTaxRate, 2)})
-                </span>
-                <span className="tabular-nums text-red-500">
-                  ({formatCurrency(city.medianHomePrice * city.propertyTaxRate / 100)})
-                </span>
-              </div>
-              <div className="flex justify-between border-b border-border/50 pb-3">
-                <span className="text-text-muted">
-                  Less Est. Insurance + Maintenance
-                </span>
-                <span className="tabular-nums text-red-500">
-                  ({formatCurrency(city.medianHomePrice * 0.02)})
+                  ({formatCurrency(math.opex)})
                 </span>
               </div>
               <div className="flex justify-between pt-1">
-                <span className="font-semibold text-text">
-                  Estimated NOI
-                </span>
+                <span className="font-semibold text-text">Estimated NOI</span>
                 <span className="tabular-nums font-semibold text-primary">
-                  {formatCurrency(
-                    city.medianRent * 12 * (1 - city.vacancyRate / 100) -
-                      city.medianHomePrice * city.propertyTaxRate / 100 -
-                      city.medianHomePrice * 0.02
-                  )}
+                  {formatCurrency(math.noi)}
+                </span>
+              </div>
+              <div className="flex justify-between border-b border-border/50 pb-3">
+                <span className="text-text-muted">&divide; Median Home Value</span>
+                <span className="tabular-nums font-medium text-text">
+                  {formatCurrency(city.medianHomeValue)}
                 </span>
               </div>
               <div className="flex justify-between pt-1 border-t border-border">
-                <span className="font-semibold text-text">Implied Cap Rate</span>
+                <span className="font-semibold text-text">Estimated Cap Rate</span>
                 <span className="tabular-nums font-semibold text-primary">
-                  {(
-                    ((city.medianRent * 12 * (1 - city.vacancyRate / 100) -
-                      city.medianHomePrice * city.propertyTaxRate / 100 -
-                      city.medianHomePrice * 0.02) /
-                      city.medianHomePrice) *
-                    100
-                  ).toFixed(1)}
-                  %
+                  {fmtCapRate(math.capRate)}
                 </span>
               </div>
             </div>
-            <p className="mt-4 text-xs text-text-light">
-              Estimates based on median values. Insurance + maintenance estimated
-              at 2% of home value. Actual results vary by property condition,
-              neighborhood, and management.
+            <p className="mt-4 text-xs text-text-light leading-5">
+              Formula: (median gross rent &times; 12 &times; (1 &minus; {opexPct}%))
+              &divide; median home value. The {opexPct}% allowance is the
+              &ldquo;50% rule&rdquo; of thumb, standing in for vacancy,
+              property tax, insurance, maintenance, management and reserves
+              together; real expenses vary widely by property and state. Rent
+              is the median across all renter-occupied units (mostly
+              apartments) and value is the median owner-occupied home, both
+              for the whole {city.metroName} metro, not the city proper — so
+              this is a market-level comparison, not the cap rate any specific
+              property will earn. Educational estimate only; not investment
+              advice. Run your own numbers with the calculator below.
             </p>
           </section>
 
@@ -476,6 +451,7 @@ export default async function CityCapRatePage({
             <h3 className="text-sm font-semibold text-text uppercase tracking-wide">
               Compare Other Markets
             </h3>
+            <p className="mt-1 text-xs text-text-light">Est. cap rate, same method</p>
             <div className="mt-4 space-y-3">
               {relatedCities.map((related) => (
                 <Link
@@ -488,21 +464,11 @@ export default async function CityCapRatePage({
                       {related.city}, {related.state}
                     </p>
                     <p className="text-xs text-text-light">
-                      {formatCurrency(related.medianHomePrice)} median
+                      {formatCurrency(related.medianHomeValue)} median value
                     </p>
                   </div>
-                  <span
-                    className={`text-sm font-semibold tabular-nums ${
-                      related.avgCapRate >= 8
-                        ? 'text-emerald-600'
-                        : related.avgCapRate >= 6
-                          ? 'text-emerald-600'
-                          : related.avgCapRate >= 4
-                            ? 'text-amber-600'
-                            : 'text-red-600'
-                    }`}
-                  >
-                    {formatPercent(related.avgCapRate)}
+                  <span className="text-sm font-semibold tabular-nums text-text">
+                    {fmtCapRate(related.capRate)}
                   </span>
                 </Link>
               ))}
@@ -511,7 +477,7 @@ export default async function CityCapRatePage({
               href="/calculators/cap-rate/cities"
               className="mt-4 inline-flex items-center text-sm font-medium text-primary hover:text-primary-light transition-colors"
             >
-              View All 50 Markets &rarr;
+              View All {TRACKED_MARKET_COUNT} Markets &rarr;
             </Link>
           </div>
 
