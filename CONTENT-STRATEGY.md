@@ -3,15 +3,16 @@
 **Written:** 2026-08-28  **Standard:** ../_portfolio/AEO-SEO-STANDARD-2026.md
 
 This file does not restate the standard. Read §1 (what to stop), §3.1 (fan-out method), §4 (the
-structural risk) and §5 (measurement without Ahrefs) first; everything here is the site-specific
+structural risk) and §5 (measurement without Ahrefs — third-party SEO data comes from DataForSEO) first; everything here is the site-specific
 application.
 
 ---
 
 ## What this site can win, and what it cannot
 
-**Cannot.** ProInvestorHub is a lender directory and comparison platform at DR 13 (Ahrefs, 2026-07-14 —
-the last obtainable reading). That is the exact structural category Google's March 2026 core update
+**Cannot.** ProInvestorHub is a lender directory and comparison platform at Ahrefs DR 13 (2026-07-14 —
+the last Ahrefs reading; BRSG has no Ahrefs account. Today it is tracked as DataForSEO domain rank, a
+different 0–1000 scale: 59 on 2026-11-18, estimate). That is the exact structural category Google's March 2026 core update
 demoted in favour of primary and institutional sources, and the category floor is real: affiliate sites
 sit at ~34% of peak organic traffic and information blogs at ~28%. On the AI side, 65.3% of pages
 ChatGPT cites are DR 81+ with a median of DR 90. Nothing in this plan closes a 77-point DR gap.
@@ -274,8 +275,10 @@ been settled.
 
 ## Measurement
 
-No Ahrefs. Every Ahrefs-dependent number in `BACKLOG.md` — "vol 14,000," "DR 13," "369 refdomains,"
-and the entire `is_spam`-based disavow regeneration path — must be re-sourced or marked unknown.
+No Ahrefs — DataForSEO only for third-party SEO data. Every Ahrefs-dependent number in `BACKLOG.md` —
+"vol 14,000," "DR 13," "369 refdomains," and the `is_spam`-based disavow regeneration path — is
+re-sourced to DataForSEO (2026-11-18: "cap rate calculator" ~8,100/mo US; domain rank 59/1000; 68
+referring domains; all estimates) or labelled historical. First-party GSC/GA4 numbers outrank them.
 
 | Need | Tool | PIH status |
 |---|---|---|
@@ -283,9 +286,9 @@ and the entire `is_spam`-based disavow regeneration path — must be re-sourced 
 | Generative AI impressions | GSC Search Generative AI report | Impressions only, no clicks |
 | **AI citation share** | **Bing Webmaster Tools → AI Performance** | **Not registered.** Highest-value unclaimed measurement on this property — and note Bing was PIH's *largest organic source* (39 sessions vs Google's 12, GA4 28d to 2026-06-19) |
 | AI referral sessions | GA4 custom channel group, **source-only** | Not built. The native "AI Assistant" channel matches source *and* medium and undercounts badly; Claude was removed from its list and Perplexity was never in it. Domain set is in standard §5 |
-| Outbound conversion | GA4 key events `generate_lead` + `partner_outbound_click` | Code side verified complete 2026-06-29; container never imported, events never marked. Until then, unmeasured |
-| Search volume | GSC impressions as proxy | Sufficient at this scale |
-| Backlinks / toxicity | GSC Links report | Lower resolution than Ahrefs. Accept it |
+| Leads and outbound conversion | GA4 events `generate_lead`, `newsletter_signup`, `lender_cta_click` / `bp_referral_click` / `tool_referral_click` | Sent from site code via gtag.js since 2026-11-12 (no GTM). Still to do in GA4 Admin: mark `generate_lead` + `newsletter_signup` as Key events |
+| Search volume | GSC impressions first; DataForSEO Labs / Keywords Data for volume (estimate) | Sufficient at this scale |
+| Backlinks / toxicity | GSC Links report + DataForSEO Backlinks API (`backlinks_spam_score`, estimate) | In place via `DATAFORSEO_LOGIN` / `DATAFORSEO_PASSWORD` or the DataForSEO MCP |
 
 Track citations and mentions as two KPIs, not one: 62% of AI citations produce no brand mention
 (Semrush × Indig, 2026-06-09). And keep the volume reality check in view — ChatGPT is 92.4% of LLM

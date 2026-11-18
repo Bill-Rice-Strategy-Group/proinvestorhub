@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { trackLeadCapture, trackCtaDismiss, trackCtaImpression } from '@/lib/tracking'
 import { HoneypotInput } from '@/components/honeypot-input'
-import { track } from '@/lib/track'
+import { track, isCountableLead } from '@/lib/track'
 
 const DISMISS_KEY = 'pih_sticky_cta_dismissed'
 
@@ -67,10 +67,12 @@ export function StickyCTA() {
       })
 
       if (res.ok) {
-        trackLeadCapture('sticky-cta', email.split('@')[1] || '')
-        track('generate_lead', { lead_type: 'deal_analysis_checklist', form_location: 'sticky_cta' })
-        // the checklist is delivered through /api/newsletter, so it is also a subscription
-        track('newsletter_signup', { signup_source: 'sticky-cta' })
+        if (await isCountableLead(res)) {
+          trackLeadCapture('sticky-cta', email.split('@')[1] || '')
+          track('generate_lead', { lead_type: 'deal_analysis_checklist', form_location: 'sticky_cta' })
+          // the checklist is delivered through /api/newsletter, so it is also a subscription
+          track('newsletter_signup', { signup_source: 'sticky-cta' })
+        }
         setStatus('success')
         sessionStorage.setItem(DISMISS_KEY, 'true')
       } else {

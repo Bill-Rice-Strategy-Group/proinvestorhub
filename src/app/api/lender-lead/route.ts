@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { Resend } from 'resend'
 import { LenderMatchEmail } from '@/emails/lender-match'
-import { isGoodOrigin, isHoneypotFilled, isGibberishName } from '@/lib/anti-spam'
+import { isGoodOrigin, isHoneypotFilled, isGibberishName, SPAM_DROPPED } from '@/lib/anti-spam'
 import {
   getLenderBySlug, formatRate, formatLtv, formatCredit, formatCoverage,
 } from '@/data/lenders'
@@ -64,7 +64,7 @@ function getResend() {
 export async function POST(request: Request) {
   try {
     if (!isGoodOrigin(request)) {
-      return NextResponse.json({ success: true })
+      return NextResponse.json(SPAM_DROPPED)
     }
 
     const body: unknown = await request.json().catch(() => null)
@@ -73,7 +73,7 @@ export async function POST(request: Request) {
     }
 
     if (isHoneypotFilled(body as Record<string, unknown>)) {
-      return NextResponse.json({ success: true })
+      return NextResponse.json(SPAM_DROPPED)
     }
 
     const fields = body as Record<string, unknown>
@@ -81,7 +81,7 @@ export async function POST(request: Request) {
     const email = typeof fields.email === 'string' ? fields.email.trim() : ''
 
     if (isGibberishName(firstName)) {
-      return NextResponse.json({ success: true })
+      return NextResponse.json(SPAM_DROPPED)
     }
 
     if (!email || email.length > 254 || !EMAIL_RE.test(email)) {

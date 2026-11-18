@@ -4,7 +4,7 @@
 
 **Strategic thesis:** The site already wins the *"analyze a deal"* job (9 live calculators + lender finder/compare). The undefended white space — and the literal brand promise — is **financing**: *"if you need financing and don't know what type or where to get it, you come here."* That's where low SEO difficulty, the highest commercial value (CPC $4–$12), and brand fit all line up, and no single lender can own it because each sells only one product.
 
-**Data note:** All search volumes are real Ahrefs US figures (June 2026). KD = Ahrefs Keyword Difficulty (0–100). CPC in USD. Site Domain Rating ≈ 13 — winnability is the binding constraint. Strategy doc (living): `~/Documents/proinvestorhub/features/feature-roadmap.html`.
+**Data note:** Search volumes and KD are historical Ahrefs US figures (June 2026); BRSG has no Ahrefs account, so re-pull from DataForSEO Labs (estimates) before acting. CPC in USD. Site authority was low (Ahrefs ≈ 13 then; DataForSEO domain rank 59 on its own 0–1000 scale, 2026-11-18, estimate) — winnability is the binding constraint. Strategy doc (living): `~/Documents/proinvestorhub/features/feature-roadmap.html`.
 
 **Conventions for new calculators** (match existing 9):
 - Component: `src/components/calculators/<name>-calculator.tsx` — `'use client'`, local `InputField`/`ResultRow` helpers, `useCalculatorState`, `CalculatorActions`, `SaveResultsCTA`, `formatCurrency`/`parseCurrencyInput`. Sticky results card (`lg:col-span-2`), inputs `lg:col-span-3`.

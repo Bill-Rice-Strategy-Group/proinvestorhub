@@ -316,7 +316,7 @@ local-pickup play in §3 — hand a writer their state's card and the matching s
 
 ## 9. Measuring what works
 
-- **Referring domains** — track new links via Ahrefs Site Explorer on `/reports/investor-financing*`.
+- **Referring domains** — track new links via the GSC Links report and the DataForSEO Backlinks API (`/v3/backlinks/backlinks/live` with the report URLs as target; estimate) on `/reports/investor-financing*`.
 - **GSC** — watch impressions/clicks on the report + state pages; new linking domains show up as
   referral traffic in GA4.
 - **Citations without links** — periodically search the headline stats ("investor rate premium

@@ -52,3 +52,10 @@ export function isGibberishName(name: string | undefined | null): boolean {
 
   return false;
 }
+
+/**
+ * Response body for a submission dropped as spam. It still reads as a success
+ * to the sender, but `accepted: false` tells our own form not to fire GA4 lead
+ * events (see isCountableLead in src/lib/track.ts).
+ */
+export const SPAM_DROPPED = { success: true, accepted: false } as const;

@@ -23,7 +23,7 @@ everything else on the domain is generated from five hand-maintained TypeScript 
 ## Where it actually stands
 
 Every number below carries its source and measurement date. Where a number used to come from Ahrefs
-it is marked, because Bill no longer has an account and it cannot be refreshed (standard §5).
+it is marked: BRSG has no Ahrefs account, so it is re-sourced from DataForSEO (an estimate) or left historical.
 
 | Fact | Value | Source | Date |
 |---|---|---|---|
@@ -35,7 +35,8 @@ it is marked, because Bill no longer has an account and it cannot be refreshed (
 | AI-assistant sessions (28d) | 12 | GA4, same audit | 2026-06-19 |
 | Indexable URLs | 1,390 | `/website-audit` | 2026-06-19 |
 | Sitemap URLs / with real `lastmod` | 1,408 / 1,235 | in-repo, `scripts/build-sitemap-dates.mjs` | 2026-07-14 |
-| Referring domains / backlinks / DR | 369 / 714 / DR 13 | **Ahrefs — unrepeatable** | 2026-07-14 |
+| Referring domains / backlinks / authority | 369 / 714 / DR 13 | Ahrefs — historical, not comparable | 2026-07-14 |
+| Referring domains / backlinks / domain rank | 68 / 95 / 59 (0–1000) | DataForSEO Backlinks API — estimate | 2026-11-18 |
 | Last commit | `3c175e2` | `git log` | 2026-07-31 |
 
 **The single most important number is 113.** Across a 28-day window, a 1,390-URL site produced
@@ -100,8 +101,9 @@ are purely authority (DR 13) + external links" (2026-06-27), and "further expans
 pairs… the real remaining lever is authority, not more compares" (2026-07-14). Both were correct.
 
 The mistake would be to read "authority-bound" as "so go get authority." The offensive play the backlog
-designed for that — the PR & Backlink Sourcing System — is architected end-to-end on the Ahrefs API
-(`is_spam` classification, backlink-gap pulls, Brand Radar unlinked mentions). That API is gone, and
+designed for that — the PR & Backlink Sourcing System — was architected end-to-end on the Ahrefs API
+(`is_spam` classification, backlink-gap pulls, Brand Radar unlinked mentions). BRSG has no Ahrefs account;
+the DataForSEO Backlinks and Content Analysis APIs cover the same inputs, and
 backlinks sit at the bottom of the AI-visibility correlation table anyway (~0.194, standard §2.2). The
 honest position is that PIH cannot buy its way past DR 13 this quarter with the tools available.
 
@@ -137,10 +139,9 @@ asserts it. These are correctness items, not SEO items, and they are the reason 
 Owner: engineering, ~half a day after action 1 scopes it.
 
 **3. Re-source every Ahrefs-dependent line in `BACKLOG.md` before anyone tries to execute it.**
-The backlog's top-ranked item ("cap rate calculator, vol 14,000") and its largest system build (the PR &
-Backlink System, Phases 1 and 2) both depend on an API Bill no longer has. Replace search volume with GSC
-impressions as the proxy, replace refdomain/DR monitoring with the GSC Links report, and mark the
-disavow-regeneration path as blocked rather than pending. This is 30 minutes of editing that prevents a
+Done 2026-11-18: the cap-rate volume, the PR & Backlink System inputs and the disavow-regeneration path
+now point at DataForSEO (Labs for volume, Backlinks API for referring domains, gap and spam score;
+numbers labelled as estimates), with GSC impressions and the GSC Links report still the first check. This is 30 minutes of editing that prevents a
 future session from spending a day discovering the tooling is gone. Owner: whoever next opens the backlog.
 
 ---
@@ -158,8 +159,8 @@ future session from spending a day discovering the tooling is gone. Owner: whoev
   referral-exclusion list.
 - **The prune decision itself** — noindex 800 URLs, or fund the data work to make them real. This is a
   strategy call, not an engineering one, and action 1 is blocked on it.
-- **Confirm whether the sample-based disavow is still uploaded in GSC**, and accept that it cannot be
-  regenerated to full coverage without Ahrefs. PIH has no manual action; this is low-stakes either way.
+- **Confirm whether the sample-based disavow is still uploaded in GSC**, and regenerate it to full coverage
+  from a DataForSEO Backlinks `referring_domains` pull. PIH has no manual action; this is low-stakes either way.
 
 ---
 
@@ -229,8 +230,8 @@ removing it costs time and buys nothing.
 | "FAQ schema on blog posts" and every item justified by FAQPage as a rich-result / CTR lever (P1 *SEO & Schema*) | FAQ rich results stopped rendering 2026-05-07; Search Console API support ended August 2026. The Q&A *prose* still earns its place — the markup justification does not | §1.2 |
 | "HowTo schema on guide/how-to content" (`src/lib/howto-extract.ts`, `howToJsonLd` on the calculators) | HowTo rich results have been gone since 2023 | §1.3 |
 | The closing note "FAQPage + HowTo + WebApplication schema already present… no schema *build* work needed" | Correct conclusion, wrong reason. Restate it as: schema is done and stays done for entity disambiguation and the rich results that still render — not as an AI-citation lever. Pooled DiD across 1,885 pages found AI Mode +2.4%, ChatGPT +2.2%, AI Overviews −4.6% | §1.3 |
-| **PR & Backlink Sourcing System, Phases 1 and 2** | Not invalidated in principle, but **unexecutable as specified**: every sourcing input (Ahrefs `is_spam`, backlink gap, Brand Radar unlinked mentions) requires an account Bill no longer has. Rewrite around GSC Links + earned mentions, or close it. Note also that backlinks sit at the bottom of the AI-visibility correlation table (~0.194) while brand mentions sit at the top (0.66–0.71) | §5, §2.2 |
-| "⚠️ PIH's disavow file is SAMPLE-BASED — re-run before relying on it… **This is the P0 of the defense half**" | The prescribed fix is a full Ahrefs referring-domains pull. It cannot be run. Downgrade from P0 and reframe: PIH has no manual action and near-zero traffic; a partial disavow is a low-stakes open item, not a priority | §5 |
+| **PR & Backlink Sourcing System, Phases 1 and 2** | Not invalidated in principle, but **unexecutable as specified**: every sourcing input (Ahrefs `is_spam`, backlink gap, Brand Radar unlinked mentions) was built on Ahrefs, which BRSG does not have. Rewrite the inputs around the DataForSEO Backlinks API (`backlinks_spam_score`, `domain_intersection`), the Content Analysis API for unlinked mentions, and GSC Links — or close it. Note also that backlinks sit at the bottom of the AI-visibility correlation table (~0.194) while brand mentions sit at the top (0.66–0.71) | §5, §2.2 |
+| "⚠️ PIH's disavow file is SAMPLE-BASED — re-run before relying on it… **This is the P0 of the defense half**" | The prescribed fix is now a full DataForSEO Backlinks referring-domains pull. Downgrade from P0 and reframe: PIH has no manual action and near-zero traffic; a partial disavow is a low-stakes open item, not a priority | §5 |
 
 Do **not** close: the `Organization` / `Person` entity layer with the canonical `@id` and `sameAs` set
 (`src/lib/identity.ts`). That work is genuinely load-bearing and should be maintained (§1.3).
@@ -243,9 +244,9 @@ Do **not** close: the `Organization` / `Person` entity layer with the canonical 
   and the newsletter archive live in Sanity, not in git. I could not check them for thinness, duplication
   or fan-out coverage. Any prune decision on the *blog* half of the surface needs a GROQ pass first; the
   1,032-URL programmatic figure above deliberately excludes them.
-- **Where "cap rate calculator, volume 14,000" came from, and whether it is still true.** It is an Ahrefs
-  number and cannot be re-checked. What can be verified is GSC: 313 impressions in 28 days at position 20.
-  Treat the impression count as the number, and the 14,000 as folklore until re-sourced.
+- **Where "cap rate calculator, volume 14,000" came from, and whether it is still true.** It was an Ahrefs
+  number. DataForSEO puts it at ~8,100/mo (US, Oct 2026, estimate). What can be verified is GSC: 313 impressions in 28 days at position 20.
+  Treat the impression count as the number; the DataForSEO volume is an estimate.
 - **Whether `cap-rate-cities.ts` has any source at all.** No attribution, no vintage, no comment in the
   file. Someone has to say where those 50 cities' medians came from, or the 250 pages built on them
   cannot honestly carry a freshness stamp.

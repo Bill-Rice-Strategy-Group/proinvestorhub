@@ -1,5 +1,11 @@
 # ProInvestorHub — Measurement Plan (GA4 + GTM)
 
+> **Superseded 2026-11-12 (PR #69).** GTM no longer loads; gtag.js is loaded directly
+> (`src/components/analytics.tsx`) and every event goes through `track()` in
+> `src/lib/track.ts`. The site sends `generate_lead` and `newsletter_signup` itself on
+> form success, so the GTM container import below is obsolete. The only remaining step is
+> GA4 Admin: mark `generate_lead` and `newsletter_signup` as Key events. Kept for history.
+
 > Closes the P0-1 backlog item: GA4 attribution + key-event cleanup.
 > Status as of 2026-06-29: **client-side dataLayer events already fire** (see inventory).
 > The remaining work is GTM container config + GA4 Admin — done in the UIs below,
