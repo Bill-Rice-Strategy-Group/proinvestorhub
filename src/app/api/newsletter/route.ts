@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { Resend } from 'resend'
 import { WelcomeEmail } from '@/emails/welcome'
-import { isGoodOrigin, isHoneypotFilled, isGibberishName } from '@/lib/anti-spam'
+import { isGoodOrigin, isHoneypotFilled, isGibberishName, SPAM_DROPPED } from '@/lib/anti-spam'
 
 export type ExperienceLevel = 'beginner' | 'some-experience' | 'experienced'
 
@@ -18,13 +18,13 @@ const fromEmail =
 export async function POST(request: Request) {
   try {
     if (!isGoodOrigin(request)) {
-      return NextResponse.json({ success: true })
+      return NextResponse.json(SPAM_DROPPED)
     }
 
     const body = await request.json()
 
     if (isHoneypotFilled(body)) {
-      return NextResponse.json({ success: true })
+      return NextResponse.json(SPAM_DROPPED)
     }
 
     const { email, source, experience, firstName: submittedFirstName } = body as {
@@ -35,7 +35,7 @@ export async function POST(request: Request) {
     }
 
     if (isGibberishName(submittedFirstName)) {
-      return NextResponse.json({ success: true })
+      return NextResponse.json(SPAM_DROPPED)
     }
 
     if (!email || typeof email !== 'string' || !email.includes('@')) {

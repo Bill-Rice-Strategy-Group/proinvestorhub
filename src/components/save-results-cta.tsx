@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { trackCalculatorSave } from '@/lib/tracking'
 import { HoneypotInput } from '@/components/honeypot-input'
-import { track } from '@/lib/track'
+import { track, isCountableLead } from '@/lib/track'
 
 export function SaveResultsCTA({
   calculatorName,
@@ -40,14 +40,16 @@ export function SaveResultsCTA({
       })
 
       if (res.ok) {
-        trackCalculatorSave(context, email.split('@')[1] || '', results)
-        track('generate_lead', {
-          lead_type: 'calculator_results',
-          form_location: context,
-          calculator_name: calculatorName,
-        })
-        // /api/calculator-results also adds the contact to the newsletter segment
-        track('newsletter_signup', { signup_source: 'calculator_results' })
+        if (await isCountableLead(res)) {
+          trackCalculatorSave(context, email.split('@')[1] || '', results)
+          track('generate_lead', {
+            lead_type: 'calculator_results',
+            form_location: context,
+            calculator_name: calculatorName,
+          })
+          // /api/calculator-results also adds the contact to the newsletter segment
+          track('newsletter_signup', { signup_source: 'calculator_results' })
+        }
         setStatus('success')
       } else {
         setStatus('error')

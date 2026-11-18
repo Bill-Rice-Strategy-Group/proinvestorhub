@@ -9,7 +9,7 @@ import {
 import { formatMonthYear } from '@/lib/content-freshness'
 import { LenderOutboundLink } from '@/components/lender-outbound-link'
 import { HoneypotInput } from '@/components/honeypot-input'
-import { track } from '@/lib/track'
+import { track, isCountableLead } from '@/lib/track'
 import { loanTypes } from '@/data/loan-types'
 import { usStates } from '@/data/us-states'
 import { trackLenderFinderCapture, trackLenderFinderSkip } from '@/lib/tracking'
@@ -191,10 +191,12 @@ export function LenderFinder({ allLenders }: { allLenders: LenderData[] }) {
       })
 
       if (res.ok) {
-        trackLenderFinderCapture(email.split('@')[1] || '', scenario)
-        track('generate_lead', { lead_type: 'lender_finder', form_location: 'lender_finder' })
-        // /api/lender-lead also adds the contact to the newsletter segment
-        track('newsletter_signup', { signup_source: 'lender_finder' })
+        if (await isCountableLead(res)) {
+          trackLenderFinderCapture(email.split('@')[1] || '', scenario)
+          track('generate_lead', { lead_type: 'lender_finder', form_location: 'lender_finder' })
+          // /api/lender-lead also adds the contact to the newsletter segment
+          track('newsletter_signup', { signup_source: 'lender_finder' })
+        }
         setShowEmailGate(false)
         setShowResults(true)
       } else {

@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import type { ExperienceLevel } from '@/app/api/newsletter/route'
 import { HoneypotInput } from '@/components/honeypot-input'
-import { track } from '@/lib/track'
+import { track, isCountableLead } from '@/lib/track'
 
 type Variant = 'inline' | 'card' | 'banner'
 
@@ -41,11 +41,13 @@ export function NewsletterSignup({
       if (res.ok) {
         setStatus('success')
         setStep('done')
-        track('newsletter_signup', {
-          email_domain: email.split('@')[1],
-          experience_level: experience || 'skipped',
-          signup_source: source,
-        })
+        if (await isCountableLead(res)) {
+          track('newsletter_signup', {
+            email_domain: email.split('@')[1],
+            experience_level: experience || 'skipped',
+            signup_source: source,
+          })
+        }
       } else {
         setStatus('error')
         setStep('email')

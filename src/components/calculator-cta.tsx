@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { HoneypotInput } from '@/components/honeypot-input'
-import { track } from '@/lib/track'
+import { track, isCountableLead } from '@/lib/track'
 
 type Offer = {
   id: string
@@ -50,10 +50,12 @@ export function CalculatorCTA({
       if (res.ok) {
         setEmailSent(true)
         setEmail('')
-        track('newsletter_signup', {
-          signup_location: context || 'calculator',
-          email_domain: email.split('@')[1],
-        })
+        if (await isCountableLead(res)) {
+          track('newsletter_signup', {
+            signup_location: context || 'calculator',
+            email_domain: email.split('@')[1],
+          })
+        }
       }
     } catch {
       // Silently fail — don't interrupt calculator UX

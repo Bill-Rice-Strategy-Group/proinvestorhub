@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { Resend } from 'resend'
 import { CalculatorResultsEmail } from '@/emails/calculator-results'
-import { isGoodOrigin, isHoneypotFilled, isGibberishName } from '@/lib/anti-spam'
+import { isGoodOrigin, isHoneypotFilled, isGibberishName, SPAM_DROPPED } from '@/lib/anti-spam'
 
 function getResend() {
   const key = process.env.RESEND_API_KEY
@@ -12,19 +12,19 @@ function getResend() {
 export async function POST(request: Request) {
   try {
     if (!isGoodOrigin(request)) {
-      return NextResponse.json({ success: true })
+      return NextResponse.json(SPAM_DROPPED)
     }
 
     const body = await request.json()
 
     if (isHoneypotFilled(body)) {
-      return NextResponse.json({ success: true })
+      return NextResponse.json(SPAM_DROPPED)
     }
 
     const { firstName, email, calculatorName, results } = body
 
     if (isGibberishName(firstName)) {
-      return NextResponse.json({ success: true })
+      return NextResponse.json(SPAM_DROPPED)
     }
 
     if (!email || typeof email !== 'string' || !email.includes('@')) {

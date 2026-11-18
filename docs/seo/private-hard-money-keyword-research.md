@@ -1,8 +1,10 @@
 # Private / Hard / Private-Money Lender Keyword Research
 
-Research date: 2026-06-18. Source: Ahrefs (US). KD = keyword difficulty (0–100).
-TP = organic traffic potential of the #1 page. CPC in USD. All numbers pulled
-live from Ahrefs — do not treat as fixed; re-pull before acting on stale figures.
+Research date: 2026-06-18. Source: Ahrefs (US) — historical; BRSG has no Ahrefs account.
+KD = keyword difficulty (0–100). TP = organic traffic potential of the #1 page. CPC in USD.
+"DR" below is the Ahrefs scale at the time. Re-pull from DataForSEO (Labs keyword_overview /
+SERP API for volumes and SERPs; Backlinks API domain `rank`, its own 0–1000 scale, never "DR")
+before acting, and label those numbers as estimates.
 
 ## Headline findings
 
